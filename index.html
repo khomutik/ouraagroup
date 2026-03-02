@@ -7,134 +7,94 @@
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Если хочешь более "уютный" шрифт — включи. Можно убрать, будет системный. -->
+  <!-- Шрифт по умолчанию (можно поменять после выбора на странице fonts.html) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Сейчас стоит Golos Text (очень читабелен по-русски). Можешь заменить на любой выбранный. -->
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      /* значения по умолчанию, если не в Telegram */
-      --bg: #f6f7fb;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: rgba(17,24,39,.65);
-      --border: rgba(17,24,39,.10);
-      --shadow: 0 10px 22px rgba(0,0,0,.08);
-      --shadow2: 0 6px 14px rgba(0,0,0,.06);
+      /* Тёплая "бежевая" база */
+      --bg: #f3eadf;      /* фон */
+      --card: #fffaf3;    /* карточки */
+      --text: #1f2937;
+      --muted: rgba(31,41,55,.72);
+      --border: rgba(31,41,55,.12);
+      --shadow2: 0 6px 14px rgba(0,0,0,.08);
+
       --radius: 18px;
       --radius2: 16px;
-      --pad: 16px;
       --gap: 12px;
-      --accent: #3b82f6;
+
+      /* Крупнее шрифты (под "зрение не ахти") */
+      --h1: 22px;
+      --sub: 15px;
+      --title: 18px;
+      --hint: 15px;
+
+      --font: "Golos Text", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     * { box-sizing: border-box; }
     body{
       margin:0;
       padding: 16px;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: var(--font);
       background: var(--bg);
       color: var(--text);
     }
 
-    .wrap{
-      max-width: 520px;
-      margin: 0 auto;
-    }
+    .wrap{ max-width: 560px; margin: 0 auto; }
 
     header{
-      background: linear-gradient(180deg, rgba(59,130,246,.14), rgba(59,130,246,0));
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 14px 14px 12px;
       box-shadow: var(--shadow2);
       margin-bottom: 14px;
+      background: var(--card);
     }
 
-    h1{
-      font-size: 20px;
-      margin: 0 0 6px;
-      letter-spacing: -0.2px;
-    }
+    h1{ font-size: var(--h1); margin: 0 0 6px; letter-spacing: -0.2px; }
+    .sub{ margin:0; font-size: var(--sub); color: var(--muted); line-height: 1.35; }
 
-    .sub{
-      margin:0;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-
-    .grid{
-      display: grid;
-      gap: var(--gap);
-    }
+    .grid{ display: grid; gap: var(--gap); }
 
     .btn{
       width: 100%;
       border: 1px solid var(--border);
       border-radius: var(--radius2);
       background: var(--card);
-      padding: var(--pad);
+      padding: 16px 14px;
       text-align: left;
       box-shadow: var(--shadow2);
       cursor: pointer;
       transition: transform .06s ease, box-shadow .12s ease;
     }
+    .btn:active{ transform: translateY(1px); box-shadow: 0 4px 10px rgba(0,0,0,.10); }
 
-    .btn:active{
-      transform: translateY(1px);
-      box-shadow: 0 4px 10px rgba(0,0,0,.08);
-    }
-
-    .row{
-      display:flex;
-      align-items:flex-start;
-      gap: 12px;
-    }
+    .row{ display:flex; align-items:flex-start; gap: 12px; }
 
     .icon{
-      width: 42px;
-      height: 42px;
+      width: 44px; height: 44px;
       border-radius: 14px;
-      background: rgba(59,130,246,.14);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      background: rgba(120, 90, 50, .12);
+      display:flex; align-items:center; justify-content:center;
       flex: 0 0 auto;
-      border: 1px solid rgba(59,130,246,.18);
-      font-size: 18px;
+      border: 1px solid rgba(120, 90, 50, .16);
+      font-size: 20px;
     }
 
-    .title{
-      font-size: 16px;
-      font-weight: 700;
-      margin: 0;
-      line-height: 1.1;
-    }
-
-    .hint{
-      margin-top: 4px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      line-height: 1.25;
-    }
+    .title{ font-size: var(--title); font-weight: 800; margin: 0; line-height: 1.1; }
+    .hint{ margin-top: 5px; font-size: var(--hint); font-weight: 650; color: var(--muted); line-height: 1.25; }
 
     .footer{
       margin-top: 14px;
-      font-size: 12px;
+      font-size: 13px;
       color: var(--muted);
       text-align: center;
       line-height: 1.35;
-    }
-
-    .tag{
-      display:inline-block;
-      margin-top: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: rgba(59,130,246,.95);
     }
   </style>
 </head>
@@ -163,7 +123,6 @@
           <div>
             <div class="title">Подключиться к собранию</div>
             <div class="hint">собрание проходит в голосовом чате "Яндекс.Телемост"</div>
-            <div class="tag">ссылка откроется в браузере/приложении</div>
           </div>
         </div>
       </button>
@@ -219,7 +178,7 @@
       </button>
     </div>
 
-    <div class="footer">Если кнопка вдруг “молчит” — закрой меню и открой снова через бота (Телега иногда кэширует).</div>
+    <div class="footer">Если что-то “подвисло”, закрой мини-апп и открой снова через бота (Телега любит кэш).</div>
   </div>
 
   <script>
@@ -231,35 +190,12 @@
     const NEWCOMERS_TOPIC     = "https://t.me/c/3835668674/3/4";
     const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/7/8";
     const POLLS_TOPIC         = "https://t.me/c/3835668674/9/10";
-    const SERVANTS_LIST       = "https://t.me/c/3835668674/19/20"; // Убедись, что тут формат /19/XX (с номером сообщения)
+    const SERVANTS_LIST       = "https://t.me/c/3835668674/19/20"; // ✅ правильная
 
-    // === Telegram Theme адаптация ===
     const tg = window.Telegram?.WebApp;
-
-    function applyTheme() {
-      const p = tg?.themeParams || {};
-      // Telegram отдаёт часть параметров; подстраиваемся мягко
-      const bg = p.bg_color || "#f6f7fb";
-      const text = p.text_color || "#111827";
-      const card = p.secondary_bg_color || "#ffffff";
-      const hint = p.hint_color || "rgba(17,24,39,.65)";
-      const link = p.link_color || "#3b82f6";
-
-      document.documentElement.style.setProperty("--bg", bg);
-      document.documentElement.style.setProperty("--text", text);
-      document.documentElement.style.setProperty("--card", card);
-      document.documentElement.style.setProperty("--muted", hint);
-      document.documentElement.style.setProperty("--accent", link);
-
-      // граница чуть прозрачнее относительно текста
-      document.documentElement.style.setProperty("--border", "rgba(0,0,0,.10)");
-    }
-
     if (tg) {
       tg.ready();
       try { tg.expand(); } catch (e) {}
-      applyTheme();
-      tg.onEvent?.('themeChanged', applyTheme);
     }
 
     function openExternal(url) {
