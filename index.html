@@ -49,6 +49,11 @@
       <div class="hint">с чего начать + как проходит собрание</div>
     </button>
 
+<button class="btn" onclick="openTelegram(SERVANTS_LIST)">
+      Список служащих группы
+      <div class="hint">контакты + даты ротации + свободные служения</div>
+    </button>
+    
     <button class="btn" onclick="openTelegram(POLLS_TOPIC)">
       Голосования
       <div class="hint">актуальные опросы группы</div>
@@ -70,8 +75,9 @@
     const NEWCOMERS_TOPIC     = "https://t.me/c/3835668674/3/4";
     const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/7/8";
     const POLLS_TOPIC         = "https://t.me/c/3835668674/9/10";
+    const SERVANTS_LIST       = "https://t.me/c/3835668674/19";
 
-    // === СЛУЖЕБНОЕ ===
+       // === СЛУЖЕБНОЕ ===
     const tg = window.Telegram?.WebApp;
 
     if (tg) {
@@ -98,4 +104,5 @@
   </script>
 </body>
 </html>
+
 
