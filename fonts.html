@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Шрифты — предпросмотр</title>
+
+  <!-- Подключаем сразу несколько шрифтов с кириллицей -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@500;600;700&family=Manrope:wght@500;600;700&family=Rubik:wght@500;600;700&family=Nunito+Sans:wght@600;700&family=PT+Sans:wght@700&family=IBM+Plex+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f3eadf;
+      --card:#fffaf3;
+      --text:#1f2937;
+      --muted:rgba(31,41,55,.72);
+      --border:rgba(31,41,55,.12);
+      --shadow:0 6px 14px rgba(0,0,0,.08);
+      --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      padding:16px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{ max-width: 640px; margin:0 auto; }
+    h1{ margin:0 0 10px; font-size:22px; }
+    .sub{ margin:0 0 14px; color:var(--muted); font-size:15px; line-height:1.35; }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:14px;
+      box-shadow:var(--shadow);
+      margin-bottom:12px;
+    }
+    .fontname{ font-weight:900; margin:0 0 6px; font-size:16px; }
+    .demoTitle{ font-size:20px; font-weight:800; margin:0 0 6px; letter-spacing:-0.2px; }
+    .demoSub{ margin:0 0 10px; font-size:15px; color:var(--muted); }
+    .btnDemo{
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:var(--card);
+      padding:14px;
+      box-shadow:0 4px 10px rgba(0,0,0,.06);
+      margin-top:10px;
+    }
+    .btnT{ font-size:18px; font-weight:900; margin:0; }
+    .btnH{ margin-top:4px; font-size:15px; font-weight:650; color:var(--muted); }
+    code{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>Предпросмотр шрифтов</h1>
+    <p class="sub">Открой и выбери глазами. Потом просто заменишь строку <code>--font</code> и одну ссылку на шрифт в index.html.</p>
+
+    <div class="card" style="font-family:'Golos Text', system-ui;">
+      <div class="fontname">Golos Text</div>
+      <div class="demoTitle">Группа АА "Название группы"</div>
+      <div class="demoSub">Девиз группы (текст)</div>
+      <div class="btnDemo">
+        <div class="btnT">Подключиться к собранию</div>
+        <div class="btnH">собрание проходит в голосовом чате "Яндекс.Телемост"</div>
+      </div>
+    </div>
+
+    <div class="card" style="font-family:'Manrope', system-ui;">
+      <div class="fontname">Manrope</div>
+      <div class="demoTitle">Группа АА "Название группы"</div>
+      <div class="demoSub">Девиз группы (текст)</div>
+      <div class="btnDemo">
+        <div class="btnT">Чат группы</div>
+        <div class="btnH">общий чат + текстовое сопровождение собрания</div>
+      </div>
+    </div>
+
+    <div class="card" style="font-family:'Rubik', system-ui;">
+      <div class="fontname">Rubik</div>
+      <div class="demoTitle">Группа АА "Название группы"</div>
+      <div class="demoSub">Девиз группы (текст)</div>
+      <div class="btnDemo">
+        <div class="btnT">Объявления</div>
+        <div class="btnH">важное и актуальное</div>
+      </div>
+    </div>
+
+    <div class="card" style="font-family:'Nunito Sans', system-ui;">
+      <div class="fontname">Nunito Sans</div>
+      <div class="demoTitle">Группа АА "Название группы"</div>
+      <div class="demoSub">Девиз группы (текст)</div>
+      <div class="btnDemo">
+        <div class="btnT">Новичкам</div>
+        <div class="btnH">с чего начать + как проходит собрание</div>
+      </div>
+    </div>
+
+    <div class="card" style="font-family:'IBM Plex Sans', system-ui;">
+      <div class="fontname">IBM Plex Sans</div>
+      <div class="demoTitle">Группа АА "Название группы"</div>
+      <div class="demoSub">Девиз группы (текст)</div>
+      <div class="btnDemo">
+        <div class="btnT">Архив</div>
+        <div class="btnH">протоколы Рабочих собраний + решения Группы</div>
+      </div>
+    </div>
+
+    <div class="card" style="font-family:'PT Sans', system-ui;">
+      <div class="fontname">PT Sans</div>
+      <div class="demoTitle">Группа АА "Название группы"</div>
+      <div class="demoSub">Девиз группы (текст)</div>
+      <div class="btnDemo">
+        <div class="btnT">Список служащих группы</div>
+        <div class="btnH">контакты + даты ротации + свободные служения</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
