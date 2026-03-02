@@ -7,7 +7,7 @@
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Manrope (есть кириллица) -->
+  <!-- Manrope -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
@@ -52,7 +52,19 @@
       margin-bottom: 12px;
       background: var(--card);
     }
-    h1{ font-size: var(--h1); margin: 0 0 6px; letter-spacing: .8px; font-weight: 800; text-transform: uppercase; }
+
+    /* ✅ Заголовок: жирный + подчёркнут линией */
+    h1{
+      font-size: var(--h1);
+      margin: 0 0 8px;
+      letter-spacing: .9px;
+      font-weight: 900;           /* жирнее */
+      text-transform: uppercase;
+      display: inline-block;      /* чтобы линия была по ширине текста */
+      padding-bottom: 6px;
+      border-bottom: 3px solid rgba(31,41,55,.55); /* подчёркивание */
+    }
+
     .sub{ margin:0; font-size: var(--sub); color: var(--muted); line-height: 1.35; font-weight: 650; }
 
     .grid{ display: grid; gap: var(--gap); }
@@ -158,7 +170,6 @@
         </div>
       </button>
 
-      <!-- ✅ Перенесли сюда -->
       <button class="btn" onclick="openTelegram(SERVANTS_LIST)">
         <div class="row">
           <div class="icon">👥</div>
