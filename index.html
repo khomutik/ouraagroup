@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Оура АА — меню</title>
 
-  <!-- Telegram Mini Apps JS -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
@@ -22,50 +21,57 @@
       text-align: left;
     }
     .hint { font-size: 13px; opacity: .7; margin-top: 3px; font-weight: 600; }
-    .footer { margin-top: 14px; font-size: 12px; opacity: .6; line-height: 1.35; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
   </style>
 </head>
 
 <body>
   <h1>Оура АА — быстрое меню</h1>
-  <p class="sub">Одна кнопка — одно действие. Без лабиринтов, обещаю.</p>
+  <p class="sub">Ткнул — и ты там.</p>
 
   <div class="grid">
     <button class="btn" onclick="openTelegram(CHAT_TME)">
       Чат группы
-      <div class="hint">болталка + текстовое сопровождение собрания</div>
+      <div class="hint">общий чат + текстовое сопровождение собрания</div>
     </button>
 
     <button class="btn" onclick="openExternal(MEETING_LINK)">
       Подключиться к собранию
-      <div class="hint">откроется Телемост</div>
+      <div class="hint">собрание проходит в голосовом чате &quot;Яндекс.Телемост&quot;</div>
     </button>
 
-    <button class="btn" onclick="openTelegram(INFO_TME)">
-      Инфо-канал
-      <div class="hint">объявления + голосования + архив</div>
+    <button class="btn" onclick="openTelegram(ANNOUNCEMENTS_TOPIC)">
+      Объявления
+      <div class="hint">важное и актуальное</div>
     </button>
 
-    <button class="btn" onclick="openTelegram(NEWCOMERS_TME)">
-      Новичкам / Архив
-      <div class="hint">ссылки, правила, протоколы, навигация</div>
+    <button class="btn" onclick="openTelegram(NEWCOMERS_TOPIC)">
+      Новичкам
+      <div class="hint">с чего начать + как проходит собрание</div>
+    </button>
+
+    <button class="btn" onclick="openTelegram(ARCHIVE_TOPIC)">
+      Архив
+      <div class="hint">протоколы РС + голосования + решения ГС</div>
+    </button>
+
+    <button class="btn" onclick="openTelegram(POLLS_TOPIC)">
+      Голосования
+      <div class="hint">актуальные опросы группы</div>
     </button>
   </div>
 
-  <p class="footer">
-    Подсказка: когда сделаешь в инфо-канале закреп “НАВИГАЦИЯ”, можно направить кнопку “Новичкам/Архив”
-    прямо на конкретный пост вида <span class="mono">https://t.me/ouraagroupnews/123</span>.
-  </p>
-
   <script>
-    // === ТВОИ ССЫЛКИ ===
-    const CHAT_TME      = "https://t.me/+IrdlX5oOJ-gxMGEy";
-    const MEETING_LINK  = "https://telemost.yandex.ru/j/30538613968161";
-    const INFO_TME      = "https://t.me/ouraagroupnews";
-    const NEWCOMERS_TME = "https://t.me/ouraagroupnews"; // потом можно заменить на ссылку на закрепленный пост
+    // === ССЫЛКИ ===
+    const CHAT_TME     = "https://t.me/+IrdlX5oOJ-gxMGEy";
+    const MEETING_LINK = "https://telemost.yandex.ru/j/30538613968161";
 
-    // === СЛУЖЕБНОЕ (не трогай) ===
+    // Форум-темы (инфо-группа)
+    const ANNOUNCEMENTS_TOPIC = "https://t.me/c/3835668674/1/5";
+    const NEWCOMERS_TOPIC     = "https://t.me/c/3835668674/3/4";
+    const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/7/8";
+    const POLLS_TOPIC         = "https://t.me/c/3835668674/9/10";
+
+    // === СЛУЖЕБНОЕ ===
     const tg = window.Telegram?.WebApp;
 
     if (tg) {
@@ -79,12 +85,17 @@
       else window.open(url, "_blank");
     }
 
+    // Фолбэк на случай капризов: openTelegramLink -> openLink -> location.href
     function openTelegram(url) {
       if (!url) return;
-      if (tg && tg.openTelegramLink) tg.openTelegramLink(url);
-      else window.location.href = url;
+      try {
+        if (tg && tg.openTelegramLink) return tg.openTelegramLink(url);
+      } catch (e) {}
+      try {
+        if (tg && tg.openLink) return tg.openLink(url);
+      } catch (e) {}
+      window.location.href = url;
     }
   </script>
 </body>
-
 </html>
