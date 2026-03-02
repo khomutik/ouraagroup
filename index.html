@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Оура АА — меню</title>
+  <title>Группа АА "Название группы"</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -25,8 +25,8 @@
 </head>
 
 <body>
-  <h1>Оура АА — быстрое меню</h1>
-  <p class="sub">Ткнул — и ты там.</p>
+  <h1>Группа АА "Название группы"</h1>
+  <p class="sub">Краткое описание группы (текст)</p>
 
   <div class="grid">
     <button class="btn" onclick="openTelegram(CHAT_TME)">
@@ -49,14 +49,14 @@
       <div class="hint">с чего начать + как проходит собрание</div>
     </button>
 
-    <button class="btn" onclick="openTelegram(ARCHIVE_TOPIC)">
-      Архив
-      <div class="hint">протоколы РС + голосования + решения ГС</div>
-    </button>
-
     <button class="btn" onclick="openTelegram(POLLS_TOPIC)">
       Голосования
       <div class="hint">актуальные опросы группы</div>
+    </button>
+
+    <button class="btn" onclick="openTelegram(ARCHIVE_TOPIC)">
+      Архив
+      <div class="hint">протоколы Рабочих собраний + решения Группы</div>
     </button>
   </div>
 
@@ -85,7 +85,6 @@
       else window.open(url, "_blank");
     }
 
-    // Фолбэк на случай капризов: openTelegramLink -> openLink -> location.href
     function openTelegram(url) {
       if (!url) return;
       try {
