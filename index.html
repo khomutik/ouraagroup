@@ -7,62 +7,219 @@
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+  <!-- Если хочешь более "уютный" шрифт — включи. Можно убрать, будет системный. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; padding: 16px; }
-    h1 { font-size: 20px; margin: 0 0 6px; }
-    .sub { font-size: 13px; opacity: .75; margin: 0 0 14px; line-height: 1.35; }
-    .grid { display: grid; gap: 12px; }
-    .btn {
-      display: block; width: 100%;
-      padding: 16px 14px;
-      font-size: 16px; font-weight: 700;
-      border-radius: 14px; border: 1px solid rgba(0,0,0,.12);
-      background: #fff;
-      text-align: left;
+    :root{
+      /* значения по умолчанию, если не в Telegram */
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: rgba(17,24,39,.65);
+      --border: rgba(17,24,39,.10);
+      --shadow: 0 10px 22px rgba(0,0,0,.08);
+      --shadow2: 0 6px 14px rgba(0,0,0,.06);
+      --radius: 18px;
+      --radius2: 16px;
+      --pad: 16px;
+      --gap: 12px;
+      --accent: #3b82f6;
     }
-    .hint { font-size: 13px; opacity: .7; margin-top: 3px; font-weight: 600; }
+
+    * { box-sizing: border-box; }
+    body{
+      margin:0;
+      padding: 16px;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap{
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    header{
+      background: linear-gradient(180deg, rgba(59,130,246,.14), rgba(59,130,246,0));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 14px 12px;
+      box-shadow: var(--shadow2);
+      margin-bottom: 14px;
+    }
+
+    h1{
+      font-size: 20px;
+      margin: 0 0 6px;
+      letter-spacing: -0.2px;
+    }
+
+    .sub{
+      margin:0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .grid{
+      display: grid;
+      gap: var(--gap);
+    }
+
+    .btn{
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      background: var(--card);
+      padding: var(--pad);
+      text-align: left;
+      box-shadow: var(--shadow2);
+      cursor: pointer;
+      transition: transform .06s ease, box-shadow .12s ease;
+    }
+
+    .btn:active{
+      transform: translateY(1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,.08);
+    }
+
+    .row{
+      display:flex;
+      align-items:flex-start;
+      gap: 12px;
+    }
+
+    .icon{
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: rgba(59,130,246,.14);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex: 0 0 auto;
+      border: 1px solid rgba(59,130,246,.18);
+      font-size: 18px;
+    }
+
+    .title{
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .hint{
+      margin-top: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+
+    .footer{
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.35;
+    }
+
+    .tag{
+      display:inline-block;
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(59,130,246,.95);
+    }
   </style>
 </head>
 
 <body>
-  <h1>Группа АА "Название группы"</h1>
-  <p class="sub">Краткое описание группы (текст)</p>
+  <div class="wrap">
+    <header>
+      <h1>Группа АА "Название группы"</h1>
+      <p class="sub">Девиз группы (текст)</p>
+    </header>
 
-  <div class="grid">
-    <button class="btn" onclick="openTelegram(CHAT_TME)">
-      Чат группы
-      <div class="hint">общий чат + текстовое сопровождение собрания</div>
-    </button>
+    <div class="grid">
+      <button class="btn" onclick="openTelegram(CHAT_TME)">
+        <div class="row">
+          <div class="icon">💬</div>
+          <div>
+            <div class="title">Чат группы</div>
+            <div class="hint">общий чат + текстовое сопровождение собрания</div>
+          </div>
+        </div>
+      </button>
 
-    <button class="btn" onclick="openExternal(MEETING_LINK)">
-      Подключиться к собранию
-      <div class="hint">собрание проходит в голосовом чате &quot;Яндекс.Телемост&quot;</div>
-    </button>
+      <button class="btn" onclick="openExternal(MEETING_LINK)">
+        <div class="row">
+          <div class="icon">🎧</div>
+          <div>
+            <div class="title">Подключиться к собранию</div>
+            <div class="hint">собрание проходит в голосовом чате "Яндекс.Телемост"</div>
+            <div class="tag">ссылка откроется в браузере/приложении</div>
+          </div>
+        </div>
+      </button>
 
-    <button class="btn" onclick="openTelegram(ANNOUNCEMENTS_TOPIC)">
-      Объявления
-      <div class="hint">важное и актуальное</div>
-    </button>
+      <button class="btn" onclick="openTelegram(ANNOUNCEMENTS_TOPIC)">
+        <div class="row">
+          <div class="icon">📣</div>
+          <div>
+            <div class="title">Объявления</div>
+            <div class="hint">важное и актуальное</div>
+          </div>
+        </div>
+      </button>
 
-    <button class="btn" onclick="openTelegram(NEWCOMERS_TOPIC)">
-      Новичкам
-      <div class="hint">с чего начать + как проходит собрание</div>
-    </button>
+      <button class="btn" onclick="openTelegram(NEWCOMERS_TOPIC)">
+        <div class="row">
+          <div class="icon">🧭</div>
+          <div>
+            <div class="title">Новичкам</div>
+            <div class="hint">с чего начать + как проходит собрание</div>
+          </div>
+        </div>
+      </button>
 
-<button class="btn" onclick="openTelegram(SERVANTS_LIST)">
-      Список служащих группы
-      <div class="hint">контакты + даты ротации + свободные служения</div>
-    </button>
-    
-    <button class="btn" onclick="openTelegram(POLLS_TOPIC)">
-      Голосования
-      <div class="hint">актуальные опросы группы</div>
-    </button>
+      <button class="btn" onclick="openTelegram(POLLS_TOPIC)">
+        <div class="row">
+          <div class="icon">🗳️</div>
+          <div>
+            <div class="title">Голосования</div>
+            <div class="hint">актуальные опросы группы</div>
+          </div>
+        </div>
+      </button>
 
-    <button class="btn" onclick="openTelegram(ARCHIVE_TOPIC)">
-      Архив
-      <div class="hint">протоколы Рабочих собраний + решения Группы</div>
-    </button>
+      <button class="btn" onclick="openTelegram(ARCHIVE_TOPIC)">
+        <div class="row">
+          <div class="icon">🗂️</div>
+          <div>
+            <div class="title">Архив</div>
+            <div class="hint">протоколы Рабочих собраний + решения Группы</div>
+          </div>
+        </div>
+      </button>
+
+      <button class="btn" onclick="openTelegram(SERVANTS_LIST)">
+        <div class="row">
+          <div class="icon">👥</div>
+          <div>
+            <div class="title">Список служащих группы</div>
+            <div class="hint">контакты + даты ротации + свободные служения</div>
+          </div>
+        </div>
+      </button>
+    </div>
+
+    <div class="footer">Если кнопка вдруг “молчит” — закрой меню и открой снова через бота (Телега иногда кэширует).</div>
   </div>
 
   <script>
@@ -70,19 +227,39 @@
     const CHAT_TME     = "https://t.me/+IrdlX5oOJ-gxMGEy";
     const MEETING_LINK = "https://telemost.yandex.ru/j/30538613968161";
 
-    // Форум-темы (инфо-группа)
     const ANNOUNCEMENTS_TOPIC = "https://t.me/c/3835668674/1/5";
     const NEWCOMERS_TOPIC     = "https://t.me/c/3835668674/3/4";
     const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/7/8";
     const POLLS_TOPIC         = "https://t.me/c/3835668674/9/10";
-    const SERVANTS_LIST       = "https://t.me/c/3835668674/19/20";
+    const SERVANTS_LIST       = "https://t.me/c/3835668674/19/20"; // Убедись, что тут формат /19/XX (с номером сообщения)
 
-       // === СЛУЖЕБНОЕ ===
+    // === Telegram Theme адаптация ===
     const tg = window.Telegram?.WebApp;
+
+    function applyTheme() {
+      const p = tg?.themeParams || {};
+      // Telegram отдаёт часть параметров; подстраиваемся мягко
+      const bg = p.bg_color || "#f6f7fb";
+      const text = p.text_color || "#111827";
+      const card = p.secondary_bg_color || "#ffffff";
+      const hint = p.hint_color || "rgba(17,24,39,.65)";
+      const link = p.link_color || "#3b82f6";
+
+      document.documentElement.style.setProperty("--bg", bg);
+      document.documentElement.style.setProperty("--text", text);
+      document.documentElement.style.setProperty("--card", card);
+      document.documentElement.style.setProperty("--muted", hint);
+      document.documentElement.style.setProperty("--accent", link);
+
+      // граница чуть прозрачнее относительно текста
+      document.documentElement.style.setProperty("--border", "rgba(0,0,0,.10)");
+    }
 
     if (tg) {
       tg.ready();
       try { tg.expand(); } catch (e) {}
+      applyTheme();
+      tg.onEvent?.('themeChanged', applyTheme);
     }
 
     function openExternal(url) {
@@ -93,17 +270,10 @@
 
     function openTelegram(url) {
       if (!url) return;
-      try {
-        if (tg && tg.openTelegramLink) return tg.openTelegramLink(url);
-      } catch (e) {}
-      try {
-        if (tg && tg.openLink) return tg.openLink(url);
-      } catch (e) {}
+      try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(url); } catch (e) {}
+      try { if (tg && tg.openLink) return tg.openLink(url); } catch (e) {}
       window.location.href = url;
     }
   </script>
 </body>
 </html>
-
-
-
