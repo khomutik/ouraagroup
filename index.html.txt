@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Оура АА — меню</title>
+
+  <!-- Telegram Mini Apps JS -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; padding: 16px; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    .sub { font-size: 13px; opacity: .75; margin: 0 0 14px; line-height: 1.35; }
+    .grid { display: grid; gap: 12px; }
+    .btn {
+      display: block; width: 100%;
+      padding: 16px 14px;
+      font-size: 16px; font-weight: 700;
+      border-radius: 14px; border: 1px solid rgba(0,0,0,.12);
+      background: #fff;
+      text-align: left;
+    }
+    .hint { font-size: 13px; opacity: .7; margin-top: 3px; font-weight: 600; }
+    .footer { margin-top: 14px; font-size: 12px; opacity: .6; line-height: 1.35; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
+</head>
+
+<body>
+  <h1>Оура АА — быстрое меню</h1>
+  <p class="sub">Одна кнопка — одно действие. Без лабиринтов, обещаю.</p>
+
+  <div class="grid">
+    <button class="btn" onclick="openTelegram(CHAT_TME)">
+      Чат группы
+      <div class="hint">болталка + текстовое сопровождение собрания</div>
+    </button>
+
+    <button class="btn" onclick="openExternal(MEETING_LINK)">
+      Подключиться к собранию
+      <div class="hint">откроется Телемост</div>
+    </button>
+
+    <button class="btn" onclick="openTelegram(INFO_TME)">
+      Инфо-канал
+      <div class="hint">объявления + голосования + архив</div>
+    </button>
+
+    <button class="btn" onclick="openTelegram(NEWCOMERS_TME)">
+      Новичкам / Архив
+      <div class="hint">ссылки, правила, протоколы, навигация</div>
+    </button>
+  </div>
+
+  <p class="footer">
+    Подсказка: когда сделаешь в инфо-канале закреп “НАВИГАЦИЯ”, можно направить кнопку “Новичкам/Архив”
+    прямо на конкретный пост вида <span class="mono">https://t.me/ouraagroupnews/123</span>.
+  </p>
+
+  <script>
+    // === ТВОИ ССЫЛКИ ===
+    const CHAT_TME      = "https://t.me/+IrdlX5oOJ-gxMGEy";
+    const MEETING_LINK  = "https://telemost.yandex.ru/j/30538613968161";
+    const INFO_TME      = "https://t.me/ouraagroupnews";
+    const NEWCOMERS_TME = "https://t.me/ouraagroupnews"; // потом можно заменить на ссылку на закрепленный пост
+
+    // === СЛУЖЕБНОЕ (не трогай) ===
+    const tg = window.Telegram?.WebApp;
+
+    if (tg) {
+      tg.ready();
+      try { tg.expand(); } catch (e) {}
+    }
+
+    function openExternal(url) {
+      if (!url) return;
+      if (tg && tg.openLink) tg.openLink(url);
+      else window.open(url, "_blank");
+    }
+
+    function openTelegram(url) {
+      if (!url) return;
+      if (tg && tg.openTelegramLink) tg.openTelegramLink(url);
+      else window.location.href = url;
+    }
+  </script>
+</body>
+</html>
