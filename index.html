@@ -14,7 +14,6 @@
 
   <style>
     :root{
-      /* Тёплая бежевая палитра */
       --bg: #f3eadf;
       --card: #fffaf3;
       --text: #1f2937;
@@ -26,11 +25,9 @@
       --radius2: 16px;
       --gap: 10px;
 
-      /* Крупнее шрифт */
       --h1: 22px;
       --sub: 15px;
 
-      /* ВАЖНОЕ: названия кнопок крупнее */
       --title: 20px;
       --hint: 15px;
 
@@ -55,7 +52,7 @@
       margin-bottom: 12px;
       background: var(--card);
     }
-    h1{ font-size: var(--h1); margin: 0 0 6px; letter-spacing: -0.2px; font-weight: 800; }
+    h1{ font-size: var(--h1); margin: 0 0 6px; letter-spacing: .8px; font-weight: 800; text-transform: uppercase; }
     .sub{ margin:0; font-size: var(--sub); color: var(--muted); line-height: 1.35; font-weight: 650; }
 
     .grid{ display: grid; gap: var(--gap); }
@@ -65,7 +62,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius2);
       background: var(--card);
-      padding: 12px 12px;      /* меньше отступы */
+      padding: 12px 12px;
       text-align: left;
       box-shadow: var(--shadow2);
       cursor: pointer;
@@ -76,7 +73,7 @@
     .row{ display:flex; align-items:flex-start; gap: 10px; }
 
     .icon{
-      width: 40px; height: 40px;   /* чуть компактнее */
+      width: 40px; height: 40px;
       border-radius: 14px;
       background: rgba(120, 90, 50, .12);
       display:flex; align-items:center; justify-content:center;
@@ -92,7 +89,7 @@
       margin: 0;
       line-height: 1.05;
       letter-spacing: .6px;
-      text-transform: uppercase;   /* капслок */
+      text-transform: uppercase;
     }
     .hint{
       margin-top: 4px;
@@ -116,7 +113,7 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>Группа АА "Название группы"</h1>
+      <h1>ГРУППА АА "НАЗВАНИЕ ГРУППЫ"</h1>
       <p class="sub">Девиз группы (текст)</p>
     </header>
 
@@ -161,6 +158,17 @@
         </div>
       </button>
 
+      <!-- ✅ Перенесли сюда -->
+      <button class="btn" onclick="openTelegram(SERVANTS_LIST)">
+        <div class="row">
+          <div class="icon">👥</div>
+          <div>
+            <div class="title">Список служащих</div>
+            <div class="hint">контакты + даты ротации + свободные служения</div>
+          </div>
+        </div>
+      </button>
+
       <button class="btn" onclick="openTelegram(POLLS_TOPIC)">
         <div class="row">
           <div class="icon">🗳️</div>
@@ -180,23 +188,12 @@
           </div>
         </div>
       </button>
-
-      <button class="btn" onclick="openTelegram(SERVANTS_LIST)">
-        <div class="row">
-          <div class="icon">👥</div>
-          <div>
-            <div class="title">Список служащих</div>
-            <div class="hint">контакты + даты ротации + свободные служения</div>
-          </div>
-        </div>
-      </button>
     </div>
 
     <div class="footer">Если что-то “подвисло” — закрой меню и открой снова через бота.</div>
   </div>
 
   <script>
-    // === ССЫЛКИ ===
     const CHAT_TME     = "https://t.me/+IrdlX5oOJ-gxMGEy";
     const MEETING_LINK = "https://telemost.yandex.ru/j/30538613968161";
 
