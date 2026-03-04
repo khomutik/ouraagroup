@@ -5,45 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Группа АА — меню</title>
 
-<link rel="manifest" href="/ouraagroup/manifest.webmanifest">
-<meta name="theme-color" content="#f3eadf">
-<link rel="apple-touch-icon" href="/ouraagroup/icons/apple-touch-icon.png">
-  
+  <link rel="manifest" href="/ouraagroup/manifest.webmanifest">
+  <meta name="theme-color" content="#f3eadf">
+  <link rel="apple-touch-icon" href="/ouraagroup/icons/apple-touch-icon.png">
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Manrope -->
+  <!-- Caveat Brush (Google Fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">  <style>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap" rel="stylesheet">
+
+  <style>
     :root{
       --bg: #f3eadf;
-     --card: var(--card2);
-      --text: #1f2937;
-      --muted: rgba(31,41,55,.74);
-      --border: rgba(31,41,55,.14);
+      --card2: #fff6ea;
+      --card: var(--card2);
+
+      --ink: #151b2b;
+      --text: var(--ink);
+      --muted: rgba(21,27,43,.62);
+
+      --border: rgba(21,27,43,.12);
       --shadow2: 0 6px 14px rgba(0,0,0,.08);
 
       --radius: 18px;
       --radius2: 16px;
       --gap: 10px;
 
-      --h1: 26px;
-      --sub: 15px;
-
-      --title: 20px;
-      --hint: 15px;
-
-      
---font: "Caveat Brush", "Manrope", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-            --ink: #151b2b;          /* тёмно-синий как текст в логотипе */
-      --gold: #d8a23a;         /* тёплое золото */
-      --gold2: #f0c45a;        /* светлее */
-      --sand: #f3eadf;         /* твой фон */
-      --card2: #fff6ea;        /* чуть теплее карточки */
-      --accent: #2e7d32;       /* зелёный под кнопку */
+      /* ВСЁ ТЕКСТОВОЕ — Caveat Brush */
+      --font: "Caveat Brush", cursive;
     }
 
     * { box-sizing: border-box; }
+
     body{
       margin:0;
       padding: 14px;
@@ -51,23 +46,29 @@
       background: var(--bg);
       color: var(--text);
     }
+
+    /* Железобетонно: всё текстовое — Caveat Brush */
+    body, button, input, textarea, select,
+    .title, .hint, .pollBadge, .pollTitle, .pollUntil, .footer, h1 {
+      font-family: var(--font) !important;
+    }
+
     .wrap{ max-width: 560px; margin: 0 auto; }
 
-   header{
-  padding: 6px 4px 10px;
-  margin-bottom: 12px;
-}
+    /* Шапка с логотипом */
+    .topbar{
+      padding: 0;
+      margin-bottom: 12px;
+    }
 
-    /* ✅ Заголовок: жирный */
-    h1{
-  font-size: var(--h1);
-  margin: 0 0 12px;
-  letter-spacing: .9px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-    .sub{ margin:0; font-size: var(--sub); color: var(--muted); line-height: 1.35; font-weight: 650; }
+    .logo{
+      width: 100%;
+      height: 120px;             /* можешь 140/160 */
+      display: block;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 18px;
+    }
 
     .grid{ display: grid; gap: var(--gap); }
 
@@ -82,158 +83,143 @@
       cursor: pointer;
       transition: transform .06s ease, box-shadow .12s ease;
     }
-    .btn:active{ transform: translateY(1px); box-shadow: 0 4px 10px rgba(0,0,0,.10); }
+    .btn:active{
+      transform: translateY(1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,.10);
+    }
 
     .row{ display:flex; align-items:flex-start; gap: 10px; }
 
-   .icon{
-  width: 40px; height: 40px;
-  border-radius: 14px;
-  background: rgba(216,162,58,.14);
-  display:flex; align-items:center; justify-content:center;
-  flex: 0 0 auto;
-  border: 1px solid rgba(21,27,43,.12);
-  font-size: 19px;
-  margin-top: 1px;
-}
+    .icon{
+      width: 40px; height: 40px;
+      border-radius: 14px;
+      background: rgba(216,162,58,.14);
+      display:flex; align-items:center; justify-content:center;
+      flex: 0 0 auto;
+      border: 1px solid rgba(21,27,43,.12);
+      font-size: 19px;
+      margin-top: 2px;
+    }
 
-   .title{
-  font-family: var(--fontTitle);
-  font-size: 22px;
-  font-weight: 800;
-  font-style: italic;
-  margin: 0;
-  line-height: 1.05;
-  letter-spacing: .6px;
-  text-transform: uppercase;
-  color: var(--ink);
-}
+    /* Тексты карточек */
+    .title{
+      font-size: 28px;           /* крупно, “рукописно” */
+      font-weight: 400;          /* у Caveat Brush нет bold — не просим */
+      font-style: normal;
+      margin: 0;
+      line-height: 1.05;
+      letter-spacing: .2px;
+      text-transform: none;
+      color: var(--ink);
+    }
+
     .hint{
-  margin-top: 6px;
-  font-size: 15px;
-  font-weight: 650;
-  color: rgba(21,27,43,.62);
-  line-height: 1.25;
-}
+      margin-top: 6px;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.25;
+      letter-spacing: .1px;
+    }
 
     .footer{
       margin-top: 12px;
-      font-size: 13px;
+      font-size: 16px;
       color: var(--muted);
       text-align: center;
       line-height: 1.35;
-      font-weight: 650;
+      font-weight: 400;
+      letter-spacing: .1px;
     }
 
-    /* ✅ Плашка голосования */
-.pollCard{
-  margin: 0 0 12px;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow2);
-}
+    /* Плашка голосования */
+    .pollCard{
+      margin: 0 0 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow2);
+    }
 
-.pollTop{
-  display:flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
+    .pollTop{
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
 
-.pollBadge{
-  font-family: var(--fontTitle);
-  font-weight: 800;
-  font-style: italic;
-  letter-spacing: .4px;
-  text-transform: uppercase;
-  font-size: 14px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(21,27,43,.12);
-  background: rgba(216,162,58,.18);
-  color: var(--ink);
-}
+    .pollBadge{
+      font-weight: 400;
+      letter-spacing: .2px;
+      text-transform: none;
+      font-size: 20px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(21,27,43,.12);
+      background: rgba(216,162,58,.18);
+      color: var(--ink);
+      white-space: nowrap;
+    }
 
-.pollUntil{
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--muted);
-  white-space: nowrap;
-}
+    .pollUntil{
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--muted);
+      white-space: nowrap;
+      letter-spacing: .1px;
+    }
 
-.pollTitle{
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.25;
-  margin-bottom: 10px;
-}
+    .pollTitle{
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.25;
+      margin-bottom: 10px;
+      letter-spacing: .1px;
+      color: var(--ink);
+    }
 
-.pollBtn{
-  width: 100%;
-  border: none;
-  border-radius: var(--radius2);
-  background: #4CAF50;
-  color: #ffffff;
-  padding: 14px 12px;
-  font-weight: 900;
-   font-family: var(--fontTitle);
-font-weight: 800;
-font-style: italic;
-font-size: 22px;
-letter-spacing: .6px;
-text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: var(--shadow2);
-  
-}
+    .pollBtn{
+      width: 100%;
+      border: none;
+      border-radius: var(--radius2);
+      background: #4CAF50;
+      color: #ffffff;
+      padding: 14px 12px;
 
-.pollBtn:active{
-  transform: translateY(1px);
-  background: #43a047; /* чуть темнее при нажатии */
-}
-.pollBtn:active{ transform: translateY(1px); }
+      font-weight: 400;
+      font-size: 28px;
+      letter-spacing: .2px;
+      text-transform: none;
 
-/* ✅ Верхняя шапка с логотипом */
-.topbar{
-  padding: 0;
-  margin-bottom: 12px;
-}
+      cursor: pointer;
+      box-shadow: var(--shadow2);
+    }
 
-/* Логотип-шапка на всю ширину карточек */
-.logo{
-  width: 100%;
-  height: 120px;        /* сделай 120–160, как нравится */
-  display: block;
-
-  object-fit: cover;    /* НЕ искажает, просто обрезает лишнее */
-  object-position: center; /* держим центр */
-  border-radius: 18px;  /* как у карточек */
-}
- /* Железобетонно: всё текстовое — Caveat Brush */
-body, button, input, textarea, select, .title, .hint, .pollBadge, .pollTitle, .pollUntil, .footer {
-  font-family: var(--font) !important;
-}   
+    .pollBtn:active{
+      transform: translateY(1px);
+      background: #43a047;
+    }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-   <header class="topbar">
-  <img class="logo" src="./logo.png.png" alt='Группа АА "Квартирник"'>
-</header>
 
-    <!-- ✅ Плашка активного голосования -->
-<div id="pollCard" class="pollCard" style="display:none;">
-  <div class="pollTop">
-    <div class="pollBadge">🗳️ ИДЁТ ГОЛОСОВАНИЕ</div>
-    <div id="pollUntil" class="pollUntil"></div>
-  </div>
-  <div id="pollTitle" class="pollTitle"></div>
- <button class="pollBtn" id="pollOpenBtn">Проголосовать</button>
-</div>
+    <header class="topbar">
+      <img class="logo" src="./logo.png.png" alt='Группа АА "Квартирник"'>
+    </header>
+
+    <!-- Плашка активного голосования -->
+    <div id="pollCard" class="pollCard" style="display:none;">
+      <div class="pollTop">
+        <div class="pollBadge">🗳️ ИДЁТ ГОЛОСОВАНИЕ</div>
+        <div id="pollUntil" class="pollUntil"></div>
+      </div>
+      <div id="pollTitle" class="pollTitle"></div>
+      <button class="pollBtn" id="pollOpenBtn">Проголосовать</button>
+    </div>
 
     <div class="grid">
       <button class="btn" onclick="openTelegram(CHAT_TME)">
@@ -338,50 +324,33 @@ body, button, input, textarea, select, .title, .hint, .pollBadge, .pollTitle, .p
       try { if (tg && tg.openLink) return tg.openLink(url); } catch (e) {}
       window.location.href = url;
     }
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/ouraagroup/sw.js");
+    }
+
+    // Проверяем, есть ли активное голосование
+    (async function loadPollStatus(){
+      try {
+        const res = await fetch("./status.json?v=" + Date.now(), { cache: "no-store" });
+        const s = await res.json();
+
+        if (!s || !s.polls_active || !s.polls_url) return;
+
+        const card  = document.getElementById("pollCard");
+        const title = document.getElementById("pollTitle");
+        const until = document.getElementById("pollUntil");
+        const btn   = document.getElementById("pollOpenBtn");
+
+        title.textContent = s.polls_title || "Новое голосование";
+        until.textContent = s.polls_until ? ("до " + s.polls_until) : "";
+
+        btn.onclick = () => openTelegram(s.polls_url);
+        card.style.display = "block";
+      } catch (e) {
+        // молча: если статус не прочитался — просто не показываем плашку
+      }
+    })();
   </script>
-
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/ouraagroup/sw.js");
-  }
-
-// ✅ Проверяем, есть ли активное голосование
-(async function loadPollStatus(){
-  try {
-    const res = await fetch("./status.json?v=" + Date.now(), { cache: "no-store" });
-    const s = await res.json();
-
-    if (!s || !s.polls_active || !s.polls_url) return;
-
-    const card = document.getElementById("pollCard");
-    const title = document.getElementById("pollTitle");
-    const until = document.getElementById("pollUntil");
-    const btn = document.getElementById("pollOpenBtn");
-
-    title.textContent = s.polls_title || "Новое голосование";
-    until.textContent = s.polls_until ? ("до " + s.polls_until) : "";
-
-    btn.onclick = () => openTelegram(s.polls_url);
-
-    card.style.display = "block";
-  } catch (e) {
-    // молча: если статус не прочитался — просто не показываем плашку
-  }
-})();
-</script>
-  
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
