@@ -180,15 +180,32 @@
   background: #43a047; /* чуть темнее при нажатии */
 }
 .pollBtn:active{ transform: translateY(1px); }
-  
+
+/* ✅ Верхняя шапка с логотипом */
+.topbar{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0 14px;
+  margin-bottom: 10px;
+}
+
+/* Квадратная картинка — это ок. Ограничиваем размер. */
+.logo{
+  width: 220px;      /* можешь поставить 200 или 240 */
+  max-width: 85vw;   /* чтобы на телефоне не вылезало */
+  height: auto;
+  display: block;
+}
+    
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <header>
-      <h1>ГРУППА АА "НАЗВАНИЕ"</h1>
-    </header>
+   <header class="topbar">
+  <img class="logo" src="./logo.png" alt='Группа АА "Квартирник"'>
+</header>
 
     <!-- ✅ Плашка активного голосования -->
 <div id="pollCard" class="pollCard" style="display:none;">
@@ -337,6 +354,7 @@
   
 </body>
 </html>
+
 
 
 
