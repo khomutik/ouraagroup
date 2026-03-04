@@ -143,15 +143,16 @@
     }
 
     .pollTop{
-      display:flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
+  display:flex;
+  flex-direction: column;   /* было: в строку → делаем столбик */
+  align-items: center;      /* центрируем */
+  gap: 6px;
+  margin-bottom: 10px;
+}
 
     .pollBadge{
-      font-weight: 400;
+      font-weight: 700;
+       text-align: center;
       letter-spacing: .2px;
       text-transform: none;
       font-size: 20px;
@@ -164,6 +165,8 @@
     }
 
     .pollUntil{
+       text-align: center;
+  white-space: normal;
       font-size: 18px;
       font-weight: 400;
       color: var(--muted);
@@ -354,3 +357,4 @@
   </script>
 </body>
 </html>
+
