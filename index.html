@@ -6,7 +6,7 @@
   <title>Группа АА — меню</title>
 
   <link rel="manifest" href="/ouraagroup/manifest.webmanifest">
-  <meta name="theme-color" content="#f3eadf">
+  <meta name="theme-color" content="#F3E6D7">
   <link rel="apple-touch-icon" href="/ouraagroup/icons/apple-touch-icon.png">
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -18,16 +18,27 @@
 
   <style>
     :root{
-      --bg: #f3eadf;
-      --card2: #fff6ea;
-      --card: var(--card2);
+      /* фон и карточки — тёплый “песок/пергамент” */
+      --bg:    #F3E6D7;   /* фон страницы */
+      --card:  #FBF1E4;   /* подложки карточек */
+      --card2: #FBF1E4;
 
-      --ink: #151b2b;
-      --text: var(--ink);
+      /* чернила из картинки */
+      --ink:   #151B2B;   /* основной текст */
+      --text:  var(--ink);
       --muted: rgba(21,27,43,.62);
 
-      --border: rgba(21,27,43,.12);
-      --shadow2: 0 6px 14px rgba(0,0,0,.08);
+      /* золото/охра из картинки */
+      --gold:  #D8A23A;
+      --gold2: #F0C45A;
+
+      /* зелёный “действие”, спокойнее */
+      --accent:  #3F9E57;
+      --accent2: #2F7F44; /* при нажатии */
+
+      /* рамки и тени — мягче, теплее */
+      --border: rgba(21,27,43,.14);
+      --shadow2: 0 10px 22px rgba(21,27,43,.10);
 
       --radius: 18px;
       --radius2: 16px;
@@ -68,13 +79,15 @@
       object-fit: cover;
       object-position: center;
       border-radius: 18px;
+      box-shadow: var(--shadow2);
+      border: 1px solid rgba(216,162,58,.22);
     }
 
     .grid{ display: grid; gap: var(--gap); }
 
     .btn{
       width: 100%;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(216,162,58,.22); /* тёплая золотая рамка */
       border-radius: var(--radius2);
       background: var(--card);
       padding: 12px 12px;
@@ -85,7 +98,7 @@
     }
     .btn:active{
       transform: translateY(1px);
-      box-shadow: 0 4px 10px rgba(0,0,0,.10);
+      box-shadow: 0 6px 14px rgba(21,27,43,.14);
     }
 
     .row{ display:flex; align-items:flex-start; gap: 10px; }
@@ -93,7 +106,7 @@
     .icon{
       width: 40px; height: 40px;
       border-radius: 14px;
-      background: rgba(216,162,58,.14);
+      background: rgba(216,162,58,.18);
       display:flex; align-items:center; justify-content:center;
       flex: 0 0 auto;
       border: 1px solid rgba(21,27,43,.12);
@@ -104,11 +117,11 @@
     /* Тексты карточек */
     .title{
       font-size: 26px;
-      font-weight: 900;            /* жирные заголовки */
+      font-weight: 900;
       margin: 0;
       line-height: 1.05;
       letter-spacing: .2px;
-      text-transform: uppercase;   /* как просила */
+      text-transform: uppercase;
       color: var(--ink);
     }
 
@@ -135,7 +148,7 @@
     .pollCard{
       margin: 0 0 12px;
       padding: 12px;
-      border: 1px solid var(--border);
+      border: 1px solid rgba(216,162,58,.22);
       border-radius: var(--radius);
       background: var(--card);
       box-shadow: var(--shadow2);
@@ -150,15 +163,15 @@
       margin-bottom: 10px;
     }
 
-    /* "ИДЁТ ГОЛОСОВАНИЕ" — как кнопка */
+    /* "ИДЁТ ГОЛОСОВАНИЕ" — как кнопка (золотая) */
     .pollBadge{
       width: 100%;
       text-align: center;
 
       padding: 14px 12px;
       border-radius: var(--radius2);
-      border: 1px solid rgba(21,27,43,.12);
-      background: rgba(216,162,58,.18);
+      border: 1px solid rgba(216,162,58,.35);
+      background: linear-gradient(180deg, rgba(240,196,90,.28), rgba(216,162,58,.18));
       color: var(--ink);
 
       font-size: 20px;
@@ -190,12 +203,12 @@
       color: var(--ink);
     }
 
-    /* кнопка — жирно */
+    /* кнопка — зелёная “мшистая”, в общей гамме */
     .pollBtn{
       width: 100%;
       border: none;
       border-radius: var(--radius2);
-      background: #4CAF50;
+      background: var(--accent);
       color: #ffffff;
 
       padding: 16px 12px;
@@ -211,7 +224,7 @@
 
     .pollBtn:active{
       transform: translateY(1px);
-      background: #43a047;
+      background: var(--accent2);
     }
   </style>
 </head>
