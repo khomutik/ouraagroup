@@ -14,8 +14,7 @@
   <!-- Manrope -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap" rel="stylesheet">
-  <style>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">  <style>
     :root{
       --bg: #f3eadf;
      --card: var(--card2);
@@ -34,7 +33,7 @@
       --title: 20px;
       --hint: 15px;
 
-            --fontTitle: "Caveat Brush", cursive;
+           --fontTitle: "Alegreya Sans", "Manrope", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       
       --font: "Manrope", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
@@ -102,12 +101,13 @@
 
    .title{
   font-family: var(--fontTitle);
-  font-size: 26px;
-  font-weight: 400;
+  font-size: 22px;
+  font-weight: 800;
+  font-style: italic;
   margin: 0;
-  line-height: 1.0;
-  letter-spacing: .2px;
-  text-transform: none;  /* убираем капс */
+  line-height: 1.05;
+  letter-spacing: .6px;
+  text-transform: uppercase;
   color: var(--ink);
 }
     .hint{
@@ -146,18 +146,17 @@
 }
 
 .pollBadge{
-  font-weight: 900;
-  letter-spacing: .6px;
-    font-family: var(--fontTitle);
-  font-size: 18px;
-  letter-spacing: .2px;
-  text-transform: none;
-  background: rgba(216,162,58,.18);
-  font-size: 13px;
+  font-family: var(--fontTitle);
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  font-size: 14px;
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(31,41,55,.18);
-  background: rgba(31,41,55,.06);
+  border: 1px solid rgba(21,27,43,.12);
+  background: rgba(216,162,58,.18);
+  color: var(--ink);
 }
 
 .pollUntil{
@@ -183,9 +182,11 @@
   padding: 14px 12px;
   font-weight: 900;
    font-family: var(--fontTitle);
-  font-size: 26px;
-  letter-spacing: .2px;
-  text-transform: none;
+font-weight: 800;
+font-style: italic;
+font-size: 22px;
+letter-spacing: .6px;
+text-transform: uppercase;
   cursor: pointer;
   box-shadow: var(--shadow2);
   
@@ -370,6 +371,7 @@
   
 </body>
 </html>
+
 
 
 
