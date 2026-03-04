@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Группа АА — меню</title>
 
 <link rel="manifest" href="/ouraagroup/manifest.webmanifest">
-<meta name="theme-color" content="#2c4e67">
+<meta name="theme-color" content="#21465d">
 <link rel="apple-touch-icon" href="/ouraagroup/icons/apple-touch-icon.png">
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -17,383 +17,398 @@
 <link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-
 :root{
+  --font: "Philosopher", serif;
 
-/* цвет текста как на "Квартирник" */
---ink:#142b44;
+  /* Тёмные “красивые” из твоего баннера: сине-нефть + сталь */
+  --deep1:#0e2330;   /* почти нефть */
+  --deep2:#17384a;   /* тёмная бирюза */
+  --deep3:#214e67;   /* стальной синий */
+  --deep4:#2f6a86;   /* светлее (пятна) */
 
-/* фон сине-голубой */
---bg1:#3a6f8f;
---bg2:#6fa0b7;
---bg3:#b9d3e0;
+  /* Чернила как надпись “Квартирник” */
+  --ink:#121f2f;
 
-/* кнопки охра */
---btn1:#c46327;
---btn2:#e38a39;
---btn3:#9e4c1e;
+  /* Карточки/подложки — мягкий тёплый пергамент (как свет из центра баннера) */
+  --paper:#f3efe7;
+  --paper2:#efe6da;
 
---gold:#e7a54b;
+  /* Охра/ржавчина для кнопок (приглушить, чтобы не “орал”) */
+  --rust1:#b45a22;
+  --rust2:#d17a2f;
+  --rust3:#8f4219;
 
---radius:18px;
---radius2:16px;
+  /* Золото для акцентов (дата) */
+  --gold:#d39a3a;
 
---shadow:0 10px 20px rgba(0,0,0,.15);
-
---font:"Philosopher", serif;
+  --radius:18px;
+  --radius2:16px;
+  --shadow: 0 14px 30px rgba(0,0,0,.22);
+  --shadowSoft: 0 10px 22px rgba(0,0,0,.16);
+  --borderSoft: rgba(18,31,47,.14);
 }
 
 *{box-sizing:border-box;}
 
 body{
-margin:0;
-padding:14px;
-font-family:var(--font);
-color:var(--ink);
-
-background:
-linear-gradient(180deg,var(--bg1),var(--bg2),var(--bg3));
+  margin:0;
+  padding:14px;
+  font-family:var(--font);
+  color:var(--ink);
+  background: var(--deep2);
+  position: relative;
+  overflow-x:hidden;
 }
 
-/* применяем шрифт ко всему */
-body,button,input,textarea,.title,.hint,.pollBadge,.pollTitle,.pollUntil{
-font-family:var(--font)!important;
+/* АКВАРЕЛЬНЫЙ ФОН: слой пятен */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-40px;
+  z-index:-2;
+
+  background:
+    /* виньетка глубины */
+    radial-gradient(1200px 700px at 50% -10%, rgba(255,210,120,.22), rgba(0,0,0,0) 62%),
+
+    radial-gradient(900px 700px at 12% 18%, rgba(111,160,183,.35), rgba(0,0,0,0) 60%),
+    radial-gradient(820px 640px at 88% 30%, rgba(47,106,134,.38), rgba(0,0,0,0) 62%),
+    radial-gradient(900px 820px at 30% 78%, rgba(33,78,103,.45), rgba(0,0,0,0) 65%),
+    radial-gradient(1000px 900px at 92% 92%, rgba(14,35,48,.60), rgba(0,0,0,0) 62%),
+
+    /* базовый градиент */
+    linear-gradient(180deg, var(--deep1) 0%, var(--deep2) 35%, var(--deep3) 72%, #2a607b 100%);
+
+  filter: saturate(1.05) contrast(1.04);
 }
 
-.wrap{
-max-width:560px;
-margin:0 auto;
+/* ФАКТУРА/БУМАГА: микро-шум через градиенты (без картинок) */
+body::after{
+  content:"";
+  position:fixed;
+  inset:-40px;
+  z-index:-1;
+
+  background:
+    radial-gradient(3px 3px at 20% 30%, rgba(255,255,255,.10), rgba(0,0,0,0) 60%),
+    radial-gradient(2px 2px at 60% 70%, rgba(0,0,0,.10), rgba(0,0,0,0) 60%),
+    radial-gradient(2px 2px at 80% 20%, rgba(255,255,255,.08), rgba(0,0,0,0) 60%),
+    radial-gradient(3px 3px at 35% 85%, rgba(0,0,0,.08), rgba(0,0,0,0) 60%);
+
+  opacity:.35;
+  mix-blend-mode: overlay;
+  filter: blur(.2px);
 }
+
+body, button, input, textarea, select,
+.title, .hint, .pollBadge, .pollTitle, .pollUntil, .footer, h1, .btn, .pollBtn{
+  font-family:var(--font)!important;
+}
+
+.wrap{max-width:560px;margin:0 auto;}
 
 .logo{
-width:100%;
-height:120px;
-object-fit:cover;
-border-radius:18px;
-margin-bottom:12px;
-box-shadow:var(--shadow);
+  width:100%;
+  height:120px;
+  object-fit:cover;
+  border-radius:18px;
+  margin-bottom:12px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255,255,255,.14);
 }
 
-.grid{
-display:grid;
-gap:10px;
-}
+.grid{display:grid;gap:10px;}
 
-/* КНОПКИ */
+/* Подложка карточек — чтобы на тёмном фоне было “встроено”, а не “наклеено” */
+.cardBase{
+  background: linear-gradient(180deg, rgba(243,239,231,.92), rgba(239,230,218,.90));
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadowSoft);
+  backdrop-filter: blur(2px);
+}
 
 .btn{
+  width:100%;
+  border:none;
+  border-radius:var(--radius2);
 
-width:100%;
-border:none;
-border-radius:var(--radius2);
+  /* Ржаво-охристая “краска”, но приглушённая + лёгкая текстура */
+  background:
+    radial-gradient(800px 140px at 50% 0%, rgba(255,255,255,.22), rgba(0,0,0,0) 60%),
+    linear-gradient(180deg, rgba(209,122,47,.95), rgba(180,90,34,.92));
 
-background:
-linear-gradient(180deg,var(--btn2),var(--btn1));
+  color: rgba(255,255,255,.96);
+  padding:14px;
+  text-align:left;
 
-color:#fff;
-
-padding:14px;
-
-box-shadow:var(--shadow);
-
-cursor:pointer;
-transition:.1s;
+  box-shadow: var(--shadowSoft);
+  cursor:pointer;
+  transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
 }
 
 .btn:active{
-transform:translateY(1px);
-background:linear-gradient(180deg,var(--btn1),var(--btn3));
+  transform: translateY(1px);
+  filter: brightness(.96);
+  box-shadow: 0 10px 18px rgba(0,0,0,.20);
 }
 
-.row{
-display:flex;
-gap:12px;
-align-items:flex-start;
-}
+.row{display:flex;gap:12px;align-items:flex-start;}
 
 .icon{
-width:40px;
-height:40px;
-
-border-radius:12px;
-
-background:rgba(255,255,255,.2);
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-font-size:19px;
+  width:40px;height:40px;border-radius:12px;
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;
+  margin-top:2px;
 }
 
 .title{
-font-size:28px;
-font-weight:700;
-margin:0;
+  font-size:28px;
+  font-weight:700; /* жирнее */
+  margin:0;
+  line-height:1.05;
 }
 
 .hint{
-margin-top:6px;
-font-size:18px;
-opacity:.9;
+  margin-top:6px;
+  font-size:19px;   /* крупнее */
+  font-weight:400;
+  opacity:.92;
+  line-height:1.25;
 }
 
 /* Плашка голосования */
-
 .pollCard{
-
-margin-bottom:12px;
-
-background:rgba(255,255,255,.85);
-
-border-radius:var(--radius);
-
-padding:14px;
-
-box-shadow:var(--shadow);
+  border-radius:var(--radius);
+  padding:14px;
+  margin-bottom:12px;
+}
+.pollCard.cardBase{ /* просто для читаемости в HTML */
 }
 
 .pollTop{
-display:flex;
-flex-direction:column;
-gap:6px;
-margin-bottom:8px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-bottom:10px;
 }
 
+/* ИДЁТ ГОЛОСОВАНИЕ — крупнее/жирнее */
 .pollBadge{
+  width:100%;
+  text-align:center;
+  padding:12px 12px;
+  border-radius:12px;
 
-font-size:28px;
-font-weight:700;
+  background:
+    radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.26), rgba(0,0,0,0) 62%),
+    linear-gradient(180deg, rgba(255,219,160,.78), rgba(240,182,95,.62));
 
-text-align:center;
+  border: 1px solid rgba(18,31,47,.14);
 
-padding:10px;
-
-border-radius:12px;
-
-background:linear-gradient(180deg,#ffe2b4,#f3b15a);
+  font-size:30px;   /* крупнее */
+  font-weight:700;  /* жирнее */
+  letter-spacing:.5px;
 }
 
+/* до 06 марта 20:30 — заметнее цветом */
 .pollUntil{
-
-font-size:20px;
-
-text-align:center;
-
-color:var(--gold);
-
-font-weight:700;
+  width:100%;
+  text-align:center;
+  font-size:22px;
+  font-weight:700;
+  color: var(--gold);
+  text-shadow: 0 1px 0 rgba(255,255,255,.35);
 }
 
 .pollTitle{
-font-size:22px;
-margin-bottom:12px;
+  font-size:22px;
+  font-weight:400;
+  line-height:1.25;
+  margin-bottom:12px;
+  color: var(--ink);
 }
 
+/* Кнопка голосования — ржавчина, но мягче, и центрируем текст */
 .pollBtn{
+  width:100%;
+  border:none;
+  border-radius:var(--radius2);
 
-width:100%;
+  background:
+    radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.20), rgba(0,0,0,0) 64%),
+    linear-gradient(180deg, rgba(209,122,47,.98), rgba(143,66,25,.92));
 
-border:none;
+  color:#fff;
+  padding:16px 12px;
 
-border-radius:var(--radius2);
+  font-size:24px;
+  font-weight:700;
+  letter-spacing:.4px;
 
-background:
-linear-gradient(180deg,var(--btn2),var(--btn1));
+  text-align:center; /* ПРОГОЛОСОВАТЬ по центру */
+  cursor:pointer;
 
-color:#fff;
-
-padding:16px;
-
-font-size:22px;
-
-font-weight:700;
-
-text-align:center;
-
-cursor:pointer;
-
-box-shadow:var(--shadow);
+  box-shadow: var(--shadowSoft);
 }
-
-.pollBtn:active{
-background:linear-gradient(180deg,var(--btn1),var(--btn3));
-}
+.pollBtn:active{ transform: translateY(1px); filter: brightness(.96); }
 
 .footer{
-margin-top:14px;
-text-align:center;
-font-size:16px;
-opacity:.8;
+  margin-top:14px;
+  text-align:center;
+  font-size:16px;
+  color: rgba(255,255,255,.80);
 }
 
+/* слегка “смягчаем” края блоков, чтобы не выглядело наклейками */
+.btn, .pollCard{
+  outline: 1px solid rgba(255,255,255,.08);
+}
 </style>
 </head>
 
 <body>
-
 <div class="wrap">
 
-<img class="logo" src="./logo.png.png" alt='Группа АА "Квартирник"'>
+<header class="topbar">
+  <img class="logo" src="./logo.png.png" alt='Группа АА "Квартирник"'>
+</header>
 
-<div id="pollCard" class="pollCard" style="display:none">
-
-<div class="pollTop">
-
-<div class="pollBadge">🗳 ИДЕТ ГОЛОСОВАНИЕ</div>
-
-<div id="pollUntil" class="pollUntil"></div>
-
-</div>
-
-<div id="pollTitle" class="pollTitle"></div>
-
-<button class="pollBtn" id="pollOpenBtn">
-ПРОГОЛОСОВАТЬ
-</button>
-
+<!-- Плашка активного голосования -->
+<div id="pollCard" class="pollCard cardBase" style="display:none;">
+  <div class="pollTop">
+    <div class="pollBadge">🗳 ИДЕТ ГОЛОСОВАНИЕ</div>
+    <div id="pollUntil" class="pollUntil"></div>
+  </div>
+  <div id="pollTitle" class="pollTitle"></div>
+  <button class="pollBtn" id="pollOpenBtn">ПРОГОЛОСОВАТЬ</button>
 </div>
 
 <div class="grid">
 
-<button class="btn" onclick="openTelegram(CHAT_TME)">
-<div class="row">
-<div class="icon">💬</div>
-<div>
-<div class="title">Чат группы</div>
-<div class="hint">общий чат + текстовое сопровождение собрания</div>
-</div>
-</div>
-</button>
+  <button class="btn" onclick="openTelegram(CHAT_TME)">
+    <div class="row">
+      <div class="icon">💬</div>
+      <div>
+        <div class="title">Чат группы</div>
+        <div class="hint">общий чат + текстовое сопровождение собрания</div>
+      </div>
+    </div>
+  </button>
 
-<button class="btn" onclick="openExternal(MEETING_LINK)">
-<div class="row">
-<div class="icon">🎧</div>
-<div>
-<div class="title">Подключиться к собранию</div>
-<div class="hint">собрание проходит в голосовом чате Яндекс.Телемост</div>
-</div>
-</div>
-</button>
+  <button class="btn" onclick="openExternal(MEETING_LINK)">
+    <div class="row">
+      <div class="icon">🎧</div>
+      <div>
+        <div class="title">Подключиться к собранию</div>
+        <div class="hint">собрание проходит в голосовом чате "Яндекс.Телемост"</div>
+      </div>
+    </div>
+  </button>
 
-<button class="btn" onclick="openTelegram(ANNOUNCEMENTS_TOPIC)">
-<div class="row">
-<div class="icon">📣</div>
-<div>
-<div class="title">Объявления</div>
-<div class="hint">важное и актуальное</div>
-</div>
-</div>
-</button>
+  <button class="btn" onclick="openTelegram(ANNOUNCEMENTS_TOPIC)">
+    <div class="row">
+      <div class="icon">📣</div>
+      <div>
+        <div class="title">Объявления</div>
+        <div class="hint">важное и актуальное</div>
+      </div>
+    </div>
+  </button>
 
-<button class="btn" onclick="openTelegram(NEWCOMERS_TOPIC)">
-<div class="row">
-<div class="icon">🧭</div>
-<div>
-<div class="title">Новичкам</div>
-<div class="hint">с чего начать + как проходит собрание</div>
-</div>
-</div>
-</button>
+  <button class="btn" onclick="openTelegram(NEWCOMERS_TOPIC)">
+    <div class="row">
+      <div class="icon">🧭</div>
+      <div>
+        <div class="title">Новичкам</div>
+        <div class="hint">с чего начать + как проходит собрание</div>
+      </div>
+    </div>
+  </button>
 
-<button class="btn" onclick="openTelegram(SERVANTS_LIST)">
-<div class="row">
-<div class="icon">👥</div>
-<div>
-<div class="title">Список служащих</div>
-<div class="hint">контакты + даты ротации + свободные служения</div>
-</div>
-</div>
-</button>
+  <button class="btn" onclick="openTelegram(SERVANTS_LIST)">
+    <div class="row">
+      <div class="icon">👥</div>
+      <div>
+        <div class="title">Список служащих</div>
+        <div class="hint">контакты + даты ротации + свободные служения</div>
+      </div>
+    </div>
+  </button>
 
-<button class="btn" onclick="openTelegram(POLLS_TOPIC)">
-<div class="row">
-<div class="icon">🗳</div>
-<div>
-<div class="title">Голосования</div>
-<div class="hint">актуальные опросы группы</div>
-</div>
-</div>
-</button>
+  <button class="btn" onclick="openTelegram(POLLS_TOPIC)">
+    <div class="row">
+      <div class="icon">🗳</div>
+      <div>
+        <div class="title">Голосования</div>
+        <div class="hint">актуальные опросы группы</div>
+      </div>
+    </div>
+  </button>
 
-<button class="btn" onclick="openTelegram(ARCHIVE_TOPIC)">
-<div class="row">
-<div class="icon">🗂</div>
-<div>
-<div class="title">Архив</div>
-<div class="hint">протоколы рабочих собраний + решения группы</div>
-</div>
-</div>
-</button>
+  <button class="btn" onclick="openTelegram(ARCHIVE_TOPIC)">
+    <div class="row">
+      <div class="icon">🗂</div>
+      <div>
+        <div class="title">Архив</div>
+        <div class="hint">протоколы Рабочих собраний + решения Группы</div>
+      </div>
+    </div>
+  </button>
 
-</div>
-
-<div class="footer">
-Если что-то зависло — закрой меню и открой снова через бота.
 </div>
 
+<div class="footer">Если что-то “подвисло” — закрой меню и открой снова через бота.</div>
 </div>
 
 <script>
+const CHAT_TME     = "https://t.me/+IrdlX5oOJ-gxMGEy";
+const MEETING_LINK = "https://telemost.yandex.ru/j/30538613968161";
 
-const CHAT_TME="https://t.me/+IrdlX5oOJ-gxMGEy"
-const MEETING_LINK="https://telemost.yandex.ru/j/30538613968161"
+const ANNOUNCEMENTS_TOPIC = "https://t.me/c/3835668674/1/5";
+const NEWCOMERS_TOPIC     = "https://t.me/c/3835668674/3/4";
+const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/7/8";
+const POLLS_TOPIC         = "https://t.me/c/3835668674/9/10";
+const SERVANTS_LIST       = "https://t.me/c/3835668674/19/20";
 
-const ANNOUNCEMENTS_TOPIC="https://t.me/c/3835668674/1/5"
-const NEWCOMERS_TOPIC="https://t.me/c/3835668674/3/4"
-const ARCHIVE_TOPIC="https://t.me/c/3835668674/7/8"
-const POLLS_TOPIC="https://t.me/c/3835668674/9/10"
-const SERVANTS_LIST="https://t.me/c/3835668674/19/20"
-
-const tg=window.Telegram?.WebApp
-if(tg){
-tg.ready()
-try{tg.expand()}catch(e){}
-}
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); try { tg.expand(); } catch(e){} }
 
 function openExternal(url){
-if(!url)return
-if(tg&&tg.openLink)tg.openLink(url)
-else window.open(url,"_blank")
+  if (!url) return;
+  if (tg && tg.openLink) tg.openLink(url);
+  else window.open(url, "_blank");
 }
-
 function openTelegram(url){
-if(!url)return
-try{if(tg&&tg.openTelegramLink)return tg.openTelegramLink(url)}catch(e){}
-try{if(tg&&tg.openLink)return tg.openLink(url)}catch(e){}
-window.location.href=url
+  if (!url) return;
+  try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(url); } catch(e){}
+  try { if (tg && tg.openLink) return tg.openLink(url); } catch(e){}
+  window.location.href = url;
 }
 
-if("serviceWorker"in navigator){
-navigator.serviceWorker.register("/ouraagroup/sw.js")
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/ouraagroup/sw.js");
 }
 
 (async function loadPollStatus(){
+  try {
+    const res = await fetch("./status.json?v=" + Date.now(), { cache: "no-store" });
+    const s = await res.json();
+    if (!s || !s.polls_active || !s.polls_url) return;
 
-try{
+    const card  = document.getElementById("pollCard");
+    const title = document.getElementById("pollTitle");
+    const until = document.getElementById("pollUntil");
+    const btn   = document.getElementById("pollOpenBtn");
 
-const res=await fetch("./status.json?v="+Date.now(),{cache:"no-store"})
-const s=await res.json()
+    title.textContent = s.polls_title || "Новое голосование";
+    until.textContent = s.polls_until ? ("до " + s.polls_until) : "";
 
-if(!s||!s.polls_active||!s.polls_url)return
-
-const card=document.getElementById("pollCard")
-const title=document.getElementById("pollTitle")
-const until=document.getElementById("pollUntil")
-const btn=document.getElementById("pollOpenBtn")
-
-title.textContent=s.polls_title||"Новое голосование"
-until.textContent=s.polls_until?("до "+s.polls_until):""
-
-btn.onclick=()=>openTelegram(s.polls_url)
-
-card.style.display="block"
-
-}catch(e){}
-
-})()
-
+    btn.onclick = () => openTelegram(s.polls_url);
+    card.style.display = "block";
+  } catch(e){}
+})();
 </script>
-
 </body>
 </html>
