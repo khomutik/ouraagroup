@@ -237,7 +237,15 @@
       window.location.href = url;
     }
   </script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/ouraagroup/sw.js");
+  }
+</script>
+  
 </body>
 </html>
+
 
 
