@@ -14,12 +14,11 @@
   <!-- Manrope -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg: #f3eadf;
-      --card: #fffaf3;
+     --card: var(--card2);
       --text: #1f2937;
       --muted: rgba(31,41,55,.74);
       --border: rgba(31,41,55,.14);
@@ -35,7 +34,16 @@
       --title: 20px;
       --hint: 15px;
 
+            --fontTitle: "Caveat Brush", cursive;
+      
       --font: "Manrope", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+            --ink: #151b2b;          /* тёмно-синий как текст в логотипе */
+      --gold: #d8a23a;         /* тёплое золото */
+      --gold2: #f0c45a;        /* светлее */
+      --sand: #f3eadf;         /* твой фон */
+      --card2: #fff6ea;        /* чуть теплее карточки */
+      --accent: #2e7d32;       /* зелёный под кнопку */
     }
 
     * { box-sizing: border-box; }
@@ -81,32 +89,34 @@
 
     .row{ display:flex; align-items:flex-start; gap: 10px; }
 
-    .icon{
-      width: 40px; height: 40px;
-      border-radius: 14px;
-      background: rgba(120, 90, 50, .12);
-      display:flex; align-items:center; justify-content:center;
-      flex: 0 0 auto;
-      border: 1px solid rgba(120, 90, 50, .16);
-      font-size: 19px;
-      margin-top: 1px;
-    }
+   .icon{
+  width: 40px; height: 40px;
+  border-radius: 14px;
+  background: rgba(216,162,58,.14);
+  display:flex; align-items:center; justify-content:center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(21,27,43,.12);
+  font-size: 19px;
+  margin-top: 1px;
+}
 
-    .title{
-      font-size: var(--title);
-      font-weight: 900;
-      margin: 0;
-      line-height: 1.05;
-      letter-spacing: .6px;
-      text-transform: uppercase;
-    }
+   .title{
+  font-family: var(--fontTitle);
+  font-size: 26px;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.0;
+  letter-spacing: .2px;
+  text-transform: none;  /* убираем капс */
+  color: var(--ink);
+}
     .hint{
-      margin-top: 4px;
-      font-size: var(--hint);
-      font-weight: 650;
-      color: var(--muted);
-      line-height: 1.25;
-    }
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 650;
+  color: rgba(21,27,43,.62);
+  line-height: 1.25;
+}
 
     .footer{
       margin-top: 12px;
@@ -138,7 +148,11 @@
 .pollBadge{
   font-weight: 900;
   letter-spacing: .6px;
-  text-transform: uppercase;
+    font-family: var(--fontTitle);
+  font-size: 18px;
+  letter-spacing: .2px;
+  text-transform: none;
+  background: rgba(216,162,58,.18);
   font-size: 13px;
   padding: 6px 10px;
   border-radius: 999px;
@@ -168,11 +182,13 @@
   color: #ffffff;
   padding: 14px 12px;
   font-weight: 900;
-  font-size: 18px;
-  letter-spacing: .6px;
-  text-transform: uppercase;
+   font-family: var(--fontTitle);
+  font-size: 26px;
+  letter-spacing: .2px;
+  text-transform: none;
   cursor: pointer;
   box-shadow: var(--shadow2);
+  
 }
 
 .pollBtn:active{
@@ -354,6 +370,7 @@
   
 </body>
 </html>
+
 
 
 
