@@ -169,15 +169,21 @@
 
 .pollBtn{
   width: 100%;
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius2);
-  background: #fff;
+  background: #4CAF50; /* зелёная кнопка */
+  color: #ffffff;
   padding: 12px 12px;
   font-weight: 900;
   letter-spacing: .6px;
   text-transform: uppercase;
   cursor: pointer;
   box-shadow: var(--shadow2);
+}
+
+.pollBtn:active{
+  transform: translateY(1px);
+  background: #43a047; /* чуть темнее при нажатии */
 }
 .pollBtn:active{ transform: translateY(1px); }
   
@@ -338,6 +344,7 @@
   
 </body>
 </html>
+
 
 
 
