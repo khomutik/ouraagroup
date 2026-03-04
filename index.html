@@ -1,381 +1,399 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Группа АА — меню</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Группа АА — меню</title>
 
-  <link rel="manifest" href="/ouraagroup/manifest.webmanifest">
-  <meta name="theme-color" content="#F3E6D7">
-  <link rel="apple-touch-icon" href="/ouraagroup/icons/apple-touch-icon.png">
+<link rel="manifest" href="/ouraagroup/manifest.webmanifest">
+<meta name="theme-color" content="#2c4e67">
+<link rel="apple-touch-icon" href="/ouraagroup/icons/apple-touch-icon.png">
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Neucha (Google Fonts) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
+<!-- Philosopher -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&display=swap" rel="stylesheet">
 
-  <style>
-    :root{
-      /* фон и карточки — тёплый “песок/пергамент” */
-      --bg:    #F3E6D7;   /* фон страницы */
-      --card:  #FBF1E4;   /* подложки карточек */
-      --card2: #FBF1E4;
+<style>
 
-      /* чернила из картинки */
-      --ink:   #151B2B;   /* основной текст */
-      --text:  var(--ink);
-      --muted: rgba(21,27,43,.62);
+:root{
 
-      /* золото/охра из картинки */
-      --gold:  #D8A23A;
-      --gold2: #F0C45A;
+/* цвет текста как на "Квартирник" */
+--ink:#142b44;
 
-      /* зелёный “действие”, спокойнее */
-      --accent:  #3F9E57;
-      --accent2: #2F7F44; /* при нажатии */
+/* фон сине-голубой */
+--bg1:#3a6f8f;
+--bg2:#6fa0b7;
+--bg3:#b9d3e0;
 
-      /* рамки и тени — мягче, теплее */
-      --border: rgba(21,27,43,.14);
-      --shadow2: 0 10px 22px rgba(21,27,43,.10);
+/* кнопки охра */
+--btn1:#c46327;
+--btn2:#e38a39;
+--btn3:#9e4c1e;
 
-      --radius: 18px;
-      --radius2: 16px;
-      --gap: 10px;
+--gold:#e7a54b;
 
-      /* ВСЁ ТЕКСТОВОЕ — Neucha */
-      --font: "Neucha", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
+--radius:18px;
+--radius2:16px;
 
-    * { box-sizing: border-box; }
+--shadow:0 10px 20px rgba(0,0,0,.15);
 
-    body{
-      margin:0;
-      padding: 14px;
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-    }
+--font:"Philosopher", serif;
+}
 
-    /* ЖЕЛЕЗОБЕТОННО: всё текстовое — Neucha */
-    body, button, input, textarea, select,
-    .title, .hint, .pollBadge, .pollTitle, .pollUntil, .footer, h1, .btn, .pollBtn {
-      font-family: var(--font) !important;
-    }
+*{box-sizing:border-box;}
 
-    .wrap{ max-width: 560px; margin: 0 auto; }
+body{
+margin:0;
+padding:14px;
+font-family:var(--font);
+color:var(--ink);
 
-    /* Шапка с логотипом */
-    .topbar{
-      padding: 0;
-      margin-bottom: 12px;
-    }
+background:
+linear-gradient(180deg,var(--bg1),var(--bg2),var(--bg3));
+}
 
-    .logo{
-      width: 100%;
-      height: 120px;
-      display: block;
-      object-fit: cover;
-      object-position: center;
-      border-radius: 18px;
-      box-shadow: var(--shadow2);
-      border: 1px solid rgba(216,162,58,.22);
-    }
+/* применяем шрифт ко всему */
+body,button,input,textarea,.title,.hint,.pollBadge,.pollTitle,.pollUntil{
+font-family:var(--font)!important;
+}
 
-    .grid{ display: grid; gap: var(--gap); }
+.wrap{
+max-width:560px;
+margin:0 auto;
+}
 
-    .btn{
-      width: 100%;
-      border: 1px solid rgba(216,162,58,.22); /* тёплая золотая рамка */
-      border-radius: var(--radius2);
-      background: var(--card);
-      padding: 12px 12px;
-      text-align: left;
-      box-shadow: var(--shadow2);
-      cursor: pointer;
-      transition: transform .06s ease, box-shadow .12s ease;
-    }
-    .btn:active{
-      transform: translateY(1px);
-      box-shadow: 0 6px 14px rgba(21,27,43,.14);
-    }
+.logo{
+width:100%;
+height:120px;
+object-fit:cover;
+border-radius:18px;
+margin-bottom:12px;
+box-shadow:var(--shadow);
+}
 
-    .row{ display:flex; align-items:flex-start; gap: 10px; }
+.grid{
+display:grid;
+gap:10px;
+}
 
-    .icon{
-      width: 40px; height: 40px;
-      border-radius: 14px;
-      background: rgba(216,162,58,.18);
-      display:flex; align-items:center; justify-content:center;
-      flex: 0 0 auto;
-      border: 1px solid rgba(21,27,43,.12);
-      font-size: 19px;
-      margin-top: 2px;
-    }
+/* КНОПКИ */
 
-    /* Тексты карточек */
-    .title{
-      font-size: 26px;
-      font-weight: 900;
-      margin: 0;
-      line-height: 1.05;
-      letter-spacing: .2px;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
+.btn{
 
-    .hint{
-      margin-top: 6px;
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--muted);
-      line-height: 1.25;
-      letter-spacing: .1px;
-    }
+width:100%;
+border:none;
+border-radius:var(--radius2);
 
-    .footer{
-      margin-top: 12px;
-      font-size: 15px;
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.35;
-      font-weight: 700;
-      letter-spacing: .1px;
-    }
+background:
+linear-gradient(180deg,var(--btn2),var(--btn1));
 
-    /* Плашка голосования */
-    .pollCard{
-      margin: 0 0 12px;
-      padding: 12px;
-      border: 1px solid rgba(216,162,58,.22);
-      border-radius: var(--radius);
-      background: var(--card);
-      box-shadow: var(--shadow2);
-    }
+color:#fff;
 
-    /* делаем вертикально и растягиваем на всю ширину */
-    .pollTop{
-      display:flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
+padding:14px;
 
-    /* "ИДЁТ ГОЛОСОВАНИЕ" — как кнопка (золотая) */
-    .pollBadge{
-      width: 100%;
-      text-align: center;
+box-shadow:var(--shadow);
 
-      padding: 14px 12px;
-      border-radius: var(--radius2);
-      border: 1px solid rgba(216,162,58,.35);
-      background: linear-gradient(180deg, rgba(240,196,90,.28), rgba(216,162,58,.18));
-      color: var(--ink);
+cursor:pointer;
+transition:.1s;
+}
 
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: .3px;
-      text-transform: uppercase;
-      white-space: normal;
-    }
+.btn:active{
+transform:translateY(1px);
+background:linear-gradient(180deg,var(--btn1),var(--btn3));
+}
 
-    /* дата — крупно и жирно */
-    .pollUntil{
-      width: 100%;
-      text-align: center;
+.row{
+display:flex;
+gap:12px;
+align-items:flex-start;
+}
 
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--ink);
-      letter-spacing: .2px;
+.icon{
+width:40px;
+height:40px;
 
-      white-space: normal;
-    }
+border-radius:12px;
 
-    .pollTitle{
-      font-size: 22px;
-      font-weight: 400;
-      line-height: 1.25;
-      margin-bottom: 10px;
-      letter-spacing: .1px;
-      color: var(--ink);
-    }
+background:rgba(255,255,255,.2);
 
-    /* кнопка — зелёная “мшистая”, в общей гамме */
-    .pollBtn{
-      width: 100%;
-      border: none;
-      border-radius: var(--radius2);
-      background: var(--accent);
-      color: #ffffff;
+display:flex;
+align-items:center;
+justify-content:center;
 
-      padding: 16px 12px;
+font-size:19px;
+}
 
-      font-weight: 900;
-      font-size: 22px;
-      letter-spacing: .3px;
-      text-transform: uppercase;
+.title{
+font-size:28px;
+font-weight:700;
+margin:0;
+}
 
-      cursor: pointer;
-      box-shadow: var(--shadow2);
-    }
+.hint{
+margin-top:6px;
+font-size:18px;
+opacity:.9;
+}
 
-    .pollBtn:active{
-      transform: translateY(1px);
-      background: var(--accent2);
-    }
-  </style>
+/* Плашка голосования */
+
+.pollCard{
+
+margin-bottom:12px;
+
+background:rgba(255,255,255,.85);
+
+border-radius:var(--radius);
+
+padding:14px;
+
+box-shadow:var(--shadow);
+}
+
+.pollTop{
+display:flex;
+flex-direction:column;
+gap:6px;
+margin-bottom:8px;
+}
+
+.pollBadge{
+
+font-size:28px;
+font-weight:700;
+
+text-align:center;
+
+padding:10px;
+
+border-radius:12px;
+
+background:linear-gradient(180deg,#ffe2b4,#f3b15a);
+}
+
+.pollUntil{
+
+font-size:20px;
+
+text-align:center;
+
+color:var(--gold);
+
+font-weight:700;
+}
+
+.pollTitle{
+font-size:22px;
+margin-bottom:12px;
+}
+
+.pollBtn{
+
+width:100%;
+
+border:none;
+
+border-radius:var(--radius2);
+
+background:
+linear-gradient(180deg,var(--btn2),var(--btn1));
+
+color:#fff;
+
+padding:16px;
+
+font-size:22px;
+
+font-weight:700;
+
+text-align:center;
+
+cursor:pointer;
+
+box-shadow:var(--shadow);
+}
+
+.pollBtn:active{
+background:linear-gradient(180deg,var(--btn1),var(--btn3));
+}
+
+.footer{
+margin-top:14px;
+text-align:center;
+font-size:16px;
+opacity:.8;
+}
+
+</style>
 </head>
 
 <body>
-  <div class="wrap">
 
-    <header class="topbar">
-      <img class="logo" src="./logo.png.png" alt='Группа АА "Квартирник"'>
-    </header>
+<div class="wrap">
 
-    <!-- Плашка активного голосования -->
-    <div id="pollCard" class="pollCard" style="display:none;">
-      <div class="pollTop">
-        <div class="pollBadge">🗳️ ИДЁТ ГОЛОСОВАНИЕ</div>
-        <div id="pollUntil" class="pollUntil"></div>
-      </div>
-      <div id="pollTitle" class="pollTitle"></div>
-      <button class="pollBtn" id="pollOpenBtn">Проголосовать</button>
-    </div>
+<img class="logo" src="./logo.png.png" alt='Группа АА "Квартирник"'>
 
-    <div class="grid">
-      <button class="btn" onclick="openTelegram(CHAT_TME)">
-        <div class="row">
-          <div class="icon">💬</div>
-          <div>
-            <div class="title">Чат группы</div>
-            <div class="hint">общий чат + текстовое сопровождение собрания</div>
-          </div>
-        </div>
-      </button>
+<div id="pollCard" class="pollCard" style="display:none">
 
-      <button class="btn" onclick="openExternal(MEETING_LINK)">
-        <div class="row">
-          <div class="icon">🎧</div>
-          <div>
-            <div class="title">Подключиться к собранию</div>
-            <div class="hint">собрание проходит в голосовом чате "Яндекс.Телемост"</div>
-          </div>
-        </div>
-      </button>
+<div class="pollTop">
 
-      <button class="btn" onclick="openTelegram(ANNOUNCEMENTS_TOPIC)">
-        <div class="row">
-          <div class="icon">📣</div>
-          <div>
-            <div class="title">Объявления</div>
-            <div class="hint">важное и актуальное</div>
-          </div>
-        </div>
-      </button>
+<div class="pollBadge">🗳 ИДЕТ ГОЛОСОВАНИЕ</div>
 
-      <button class="btn" onclick="openTelegram(NEWCOMERS_TOPIC)">
-        <div class="row">
-          <div class="icon">🧭</div>
-          <div>
-            <div class="title">Новичкам</div>
-            <div class="hint">с чего начать + как проходит собрание</div>
-          </div>
-        </div>
-      </button>
+<div id="pollUntil" class="pollUntil"></div>
 
-      <button class="btn" onclick="openTelegram(SERVANTS_LIST)">
-        <div class="row">
-          <div class="icon">👥</div>
-          <div>
-            <div class="title">Список служащих</div>
-            <div class="hint">контакты + даты ротации + свободные служения</div>
-          </div>
-        </div>
-      </button>
+</div>
 
-      <button class="btn" onclick="openTelegram(POLLS_TOPIC)">
-        <div class="row">
-          <div class="icon">🗳️</div>
-          <div>
-            <div class="title">Голосования</div>
-            <div class="hint">актуальные опросы группы</div>
-          </div>
-        </div>
-      </button>
+<div id="pollTitle" class="pollTitle"></div>
 
-      <button class="btn" onclick="openTelegram(ARCHIVE_TOPIC)">
-        <div class="row">
-          <div class="icon">🗂️</div>
-          <div>
-            <div class="title">Архив</div>
-            <div class="hint">протоколы Рабочих собраний + решения Группы</div>
-          </div>
-        </div>
-      </button>
-    </div>
+<button class="pollBtn" id="pollOpenBtn">
+ПРОГОЛОСОВАТЬ
+</button>
 
-    <div class="footer">Если что-то “подвисло” — закрой меню и открой снова через бота.</div>
-  </div>
+</div>
 
-  <script>
-    const CHAT_TME     = "https://t.me/+IrdlX5oOJ-gxMGEy";
-    const MEETING_LINK = "https://telemost.yandex.ru/j/30538613968161";
+<div class="grid">
 
-    const ANNOUNCEMENTS_TOPIC = "https://t.me/c/3835668674/1/5";
-    const NEWCOMERS_TOPIC     = "https://t.me/c/3835668674/3/4";
-    const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/7/8";
-    const POLLS_TOPIC         = "https://t.me/c/3835668674/9/10";
-    const SERVANTS_LIST       = "https://t.me/c/3835668674/19/20";
+<button class="btn" onclick="openTelegram(CHAT_TME)">
+<div class="row">
+<div class="icon">💬</div>
+<div>
+<div class="title">Чат группы</div>
+<div class="hint">общий чат + текстовое сопровождение собрания</div>
+</div>
+</div>
+</button>
 
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      try { tg.expand(); } catch (e) {}
-    }
+<button class="btn" onclick="openExternal(MEETING_LINK)">
+<div class="row">
+<div class="icon">🎧</div>
+<div>
+<div class="title">Подключиться к собранию</div>
+<div class="hint">собрание проходит в голосовом чате Яндекс.Телемост</div>
+</div>
+</div>
+</button>
 
-    function openExternal(url) {
-      if (!url) return;
-      if (tg && tg.openLink) tg.openLink(url);
-      else window.open(url, "_blank");
-    }
+<button class="btn" onclick="openTelegram(ANNOUNCEMENTS_TOPIC)">
+<div class="row">
+<div class="icon">📣</div>
+<div>
+<div class="title">Объявления</div>
+<div class="hint">важное и актуальное</div>
+</div>
+</div>
+</button>
 
-    function openTelegram(url) {
-      if (!url) return;
-      try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(url); } catch (e) {}
-      try { if (tg && tg.openLink) return tg.openLink(url); } catch (e) {}
-      window.location.href = url;
-    }
+<button class="btn" onclick="openTelegram(NEWCOMERS_TOPIC)">
+<div class="row">
+<div class="icon">🧭</div>
+<div>
+<div class="title">Новичкам</div>
+<div class="hint">с чего начать + как проходит собрание</div>
+</div>
+</div>
+</button>
 
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/ouraagroup/sw.js");
-    }
+<button class="btn" onclick="openTelegram(SERVANTS_LIST)">
+<div class="row">
+<div class="icon">👥</div>
+<div>
+<div class="title">Список служащих</div>
+<div class="hint">контакты + даты ротации + свободные служения</div>
+</div>
+</div>
+</button>
 
-    // Проверяем, есть ли активное голосование
-    (async function loadPollStatus(){
-      try {
-        const res = await fetch("./status.json?v=" + Date.now(), { cache: "no-store" });
-        const s = await res.json();
+<button class="btn" onclick="openTelegram(POLLS_TOPIC)">
+<div class="row">
+<div class="icon">🗳</div>
+<div>
+<div class="title">Голосования</div>
+<div class="hint">актуальные опросы группы</div>
+</div>
+</div>
+</button>
 
-        if (!s || !s.polls_active || !s.polls_url) return;
+<button class="btn" onclick="openTelegram(ARCHIVE_TOPIC)">
+<div class="row">
+<div class="icon">🗂</div>
+<div>
+<div class="title">Архив</div>
+<div class="hint">протоколы рабочих собраний + решения группы</div>
+</div>
+</div>
+</button>
 
-        const card  = document.getElementById("pollCard");
-        const title = document.getElementById("pollTitle");
-        const until = document.getElementById("pollUntil");
-        const btn   = document.getElementById("pollOpenBtn");
+</div>
 
-        title.textContent = s.polls_title || "Новое голосование";
-        until.textContent = s.polls_until ? ("до " + s.polls_until) : "";
+<div class="footer">
+Если что-то зависло — закрой меню и открой снова через бота.
+</div>
 
-        btn.onclick = () => openTelegram(s.polls_url);
-        card.style.display = "block";
-      } catch (e) {
-        // молча: если статус не прочитался — просто не показываем плашку
-      }
-    })();
-  </script>
+</div>
+
+<script>
+
+const CHAT_TME="https://t.me/+IrdlX5oOJ-gxMGEy"
+const MEETING_LINK="https://telemost.yandex.ru/j/30538613968161"
+
+const ANNOUNCEMENTS_TOPIC="https://t.me/c/3835668674/1/5"
+const NEWCOMERS_TOPIC="https://t.me/c/3835668674/3/4"
+const ARCHIVE_TOPIC="https://t.me/c/3835668674/7/8"
+const POLLS_TOPIC="https://t.me/c/3835668674/9/10"
+const SERVANTS_LIST="https://t.me/c/3835668674/19/20"
+
+const tg=window.Telegram?.WebApp
+if(tg){
+tg.ready()
+try{tg.expand()}catch(e){}
+}
+
+function openExternal(url){
+if(!url)return
+if(tg&&tg.openLink)tg.openLink(url)
+else window.open(url,"_blank")
+}
+
+function openTelegram(url){
+if(!url)return
+try{if(tg&&tg.openTelegramLink)return tg.openTelegramLink(url)}catch(e){}
+try{if(tg&&tg.openLink)return tg.openLink(url)}catch(e){}
+window.location.href=url
+}
+
+if("serviceWorker"in navigator){
+navigator.serviceWorker.register("/ouraagroup/sw.js")
+}
+
+(async function loadPollStatus(){
+
+try{
+
+const res=await fetch("./status.json?v="+Date.now(),{cache:"no-store"})
+const s=await res.json()
+
+if(!s||!s.polls_active||!s.polls_url)return
+
+const card=document.getElementById("pollCard")
+const title=document.getElementById("pollTitle")
+const until=document.getElementById("pollUntil")
+const btn=document.getElementById("pollOpenBtn")
+
+title.textContent=s.polls_title||"Новое голосование"
+until.textContent=s.polls_until?("до "+s.polls_until):""
+
+btn.onclick=()=>openTelegram(s.polls_url)
+
+card.style.display="block"
+
+}catch(e){}
+
+})()
+
+</script>
+
 </body>
 </html>
