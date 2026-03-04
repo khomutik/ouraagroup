@@ -29,7 +29,7 @@
       --radius2: 16px;
       --gap: 10px;
 
-      --h1: 22px;
+      --h1: 26px;
       --sub: 15px;
 
       --title: 20px;
@@ -53,17 +53,14 @@
   margin-bottom: 12px;
 }
 
-    /* ✅ Заголовок: жирный + подчёркнут линией */
+    /* ✅ Заголовок: жирный */
     h1{
-      font-size: var(--h1);
-      margin: 0 0 8px;
-      letter-spacing: .9px;
-      font-weight: 900;           /* жирнее */
-      text-transform: uppercase;
-      display: inline-block;      /* чтобы линия была по ширине текста */
-      padding-bottom: 6px;
-      border-bottom: 3px solid rgba(31,41,55,.55); /* подчёркивание */
-    }
+  font-size: var(--h1);
+  margin: 0 0 12px;
+  letter-spacing: .9px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
 
     .sub{ margin:0; font-size: var(--sub); color: var(--muted); line-height: 1.35; font-weight: 650; }
 
@@ -167,10 +164,11 @@
   width: 100%;
   border: none;
   border-radius: var(--radius2);
-  background: #4CAF50; /* зелёная кнопка */
+  background: #4CAF50;
   color: #ffffff;
-  padding: 12px 12px;
+  padding: 14px 12px;
   font-weight: 900;
+  font-size: 18px;
   letter-spacing: .6px;
   text-transform: uppercase;
   cursor: pointer;
@@ -199,7 +197,7 @@
     <div id="pollUntil" class="pollUntil"></div>
   </div>
   <div id="pollTitle" class="pollTitle"></div>
-  <button class="pollBtn" id="pollOpenBtn">Открыть опрос</button>
+ <button class="pollBtn" id="pollOpenBtn">Проголосовать</button>
 </div>
 
     <div class="grid">
@@ -339,6 +337,7 @@
   
 </body>
 </html>
+
 
 
 
