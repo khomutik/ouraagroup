@@ -41,6 +41,9 @@
   /* Золото для акцентов (дата) */
   --gold:#d39a3a;
 
+  /* ✅ Новый: “тёмный синий из Квартирника” для заголовков */
+  --titleBlue: var(--deep1);
+
   --radius:18px;
   --radius2:16px;
   --shadow: 0 14px 30px rgba(0,0,0,.22);
@@ -163,16 +166,18 @@ body, button, input, textarea, select,
   margin-top:2px;
 }
 
+/* ✅ Все заголовки на кнопках — тёмно-синим */
 .title{
   font-size:28px;
-  font-weight:700; /* жирнее */
+  font-weight:700;
   margin:0;
   line-height:1.05;
+  color: var(--titleBlue);
 }
 
 .hint{
   margin-top:6px;
-  font-size:19px;   /* крупнее */
+  font-size:19px;
   font-weight:400;
   opacity:.92;
   line-height:1.25;
@@ -184,8 +189,6 @@ body, button, input, textarea, select,
   padding:14px;
   margin-bottom:12px;
 }
-.pollCard.cardBase{ /* просто для читаемости в HTML */
-}
 
 .pollTop{
   display:flex;
@@ -194,7 +197,7 @@ body, button, input, textarea, select,
   margin-bottom:10px;
 }
 
-/* ИДЁТ ГОЛОСОВАНИЕ — крупнее/жирнее */
+/* ✅ ИДЁТ ГОЛОСОВАНИЕ — без значка, и тёмно-синим */
 .pollBadge{
   width:100%;
   text-align:center;
@@ -207,18 +210,20 @@ body, button, input, textarea, select,
 
   border: 1px solid rgba(18,31,47,.14);
 
-  font-size:30px;   /* крупнее */
-  font-weight:700;  /* жирнее */
+  font-size:30px;
+  font-weight:700;
   letter-spacing:.5px;
+
+  color: var(--titleBlue);
 }
 
-/* до 06 марта 20:30 — заметнее цветом */
+/* ✅ до ... — тем же тёмным синим */
 .pollUntil{
   width:100%;
   text-align:center;
   font-size:22px;
   font-weight:700;
-  color: var(--gold);
+  color: var(--titleBlue);
   text-shadow: 0 1px 0 rgba(255,255,255,.35);
 }
 
@@ -230,27 +235,32 @@ body, button, input, textarea, select,
   color: var(--ink);
 }
 
-/* Кнопка голосования — ржавчина, но мягче, и центрируем текст */
+/* ✅ Кнопка голосования — цвета фона страницы (deep2), а текст тёмно-синий */
 .pollBtn{
   width:100%;
   border:none;
   border-radius:var(--radius2);
 
+  /* Цвет = общий фон (deep2) + чуть “света” сверху, чтобы не была плоской */
   background:
-    radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.20), rgba(0,0,0,0) 64%),
-    linear-gradient(180deg, rgba(209,122,47,.98), rgba(143,66,25,.92));
+    radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.16), rgba(0,0,0,0) 64%),
+    linear-gradient(180deg, rgba(23,56,74,.98), rgba(23,56,74,.94));
 
-  color:#fff;
+  color: var(--titleBlue);
   padding:16px 12px;
 
   font-size:24px;
   font-weight:700;
   letter-spacing:.4px;
 
-  text-align:center; /* ПРОГОЛОСОВАТЬ по центру */
+  text-align:center;
   cursor:pointer;
 
   box-shadow: var(--shadowSoft);
+
+  /* чтобы на тёмной кнопке тёмный текст читался: светлый “контур” */
+  text-shadow: 0 1px 0 rgba(255,255,255,.38);
+  outline: 1px solid rgba(255,255,255,.18);
 }
 .pollBtn:active{ transform: translateY(1px); filter: brightness(.96); }
 
@@ -278,7 +288,7 @@ body, button, input, textarea, select,
 <!-- Плашка активного голосования -->
 <div id="pollCard" class="pollCard cardBase" style="display:none;">
   <div class="pollTop">
-    <div class="pollBadge">🗳 ИДЕТ ГОЛОСОВАНИЕ</div>
+    <div class="pollBadge">ИДЕТ ГОЛОСОВАНИЕ</div>
     <div id="pollUntil" class="pollUntil"></div>
   </div>
   <div id="pollTitle" class="pollTitle"></div>
