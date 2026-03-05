@@ -20,35 +20,27 @@
 :root{
   --font: "Philosopher", serif;
 
-  /* Тёмные “красивые” из твоего баннера: сине-нефть + сталь */
-  --deep1:#0e2330;   /* почти нефть */
-  --deep2:#17384a;   /* тёмная бирюза */
-  --deep3:#214e67;   /* стальной синий */
-  --deep4:#2f6a86;   /* светлее (пятна) */
+  --deep1:#0e2330;
+  --deep2:#17384a;
+  --deep3:#214e67;
+  --deep4:#2f6a86;
 
-  /* Чернила как надпись “Квартирник” */
   --ink:#121f2f;
 
-  /* Карточки/подложки — мягкий тёплый пергамент (как свет из центра баннера) */
   --paper:#f3efe7;
   --paper2:#efe6da;
 
-  /* Охра/ржавчина для кнопок (приглушить, чтобы не “орал”) */
   --rust1:#b45a22;
   --rust2:#d17a2f;
   --rust3:#8f4219;
 
-  /* Золото для акцентов (дата) */
   --gold:#d39a3a;
 
-  /* “тёмный синий из Квартирника” для заголовков */
   --titleBlue: var(--deep1);
 
-  /* Зеленая кнопка “ПРОГОЛОСОВАТЬ” */
   --green1:#2bb673;
   --green2:#1f8e57;
 
-  /* ✅ Синяя кнопка “ПОДКЛЮЧИТЬСЯ” (под фон) */
   --meet1:#2f6a86;
   --meet2:#214e67;
 
@@ -56,7 +48,6 @@
   --radius2:16px;
   --shadow: 0 14px 30px rgba(0,0,0,.22);
   --shadowSoft: 0 10px 22px rgba(0,0,0,.16);
-  --borderSoft: rgba(18,31,47,.14);
 }
 
 *{box-sizing:border-box;}
@@ -71,7 +62,7 @@ body{
   overflow-x:hidden;
 }
 
-/* АКВАРЕЛЬНЫЙ ФОН: слой пятен */
+/* АКВАРЕЛЬНЫЙ ФОН */
 body::before{
   content:"";
   position:fixed;
@@ -91,7 +82,7 @@ body::before{
   filter: saturate(1.05) contrast(1.04);
 }
 
-/* ФАКТУРА/БУМАГА */
+/* ФАКТУРА */
 body::after{
   content:"";
   position:fixed;
@@ -109,8 +100,7 @@ body::after{
   filter: blur(.2px);
 }
 
-body, button, input, textarea, select,
-.title, .hint, .pollBadge, .pollTitle, .pollUntil, .footer{
+body, button, input, textarea, select{
   font-family:var(--font)!important;
 }
 
@@ -128,7 +118,6 @@ body, button, input, textarea, select,
 
 .grid{display:grid;gap:10px;}
 
-/* Подложка карточек */
 .cardBase{
   background: linear-gradient(180deg, rgba(243,239,231,.92), rgba(239,230,218,.90));
   border: 1px solid rgba(255,255,255,.10);
@@ -136,39 +125,51 @@ body, button, input, textarea, select,
   backdrop-filter: blur(2px);
 }
 
-/* Универсальная карточка “объявление/плашка” */
+/* ✅ Объявление */
 .noticeCard{
   border-radius:var(--radius);
   padding:14px;
   margin-bottom:12px;
+  outline: 1px solid rgba(255,255,255,.08);
 }
 
-/* Заголовок внутри карточки */
 .noticeTitle{
   width:100%;
   text-align:center;
-  padding:12px;
+  padding:10px 12px;           /* чуть компактнее */
   border-radius:12px;
   background:
     radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.26), rgba(0,0,0,0) 62%),
     linear-gradient(180deg, rgba(255,219,160,.78), rgba(240,182,95,.62));
   border: 1px solid rgba(18,31,47,.14);
 
-  font-size:28px;
+  font-size:26px;              /* компактнее */
   font-weight:700;
-  letter-spacing:.5px;
+  letter-spacing:.4px;
   color: var(--titleBlue);
 }
 
+/* ✅ Текст объявления — КРУПНЕЕ */
 .noticeText{
-  margin:12px 0 12px;
-  font-size:20px;
+  margin:12px 0 6px;
+  font-size:24px;              /* было 20 */
   font-weight:400;
-  line-height:1.25;
+  line-height:1.18;
   color: var(--ink);
 }
 
-/* Кнопка подключения (синяя) */
+/* ✅ Дата/время объявления отдельной строкой, как “до …” */
+.noticeUntil{
+  width:100%;
+  text-align:center;
+  margin:0 0 12px;
+  font-size:22px;
+  font-weight:700;
+  color: var(--titleBlue);
+  text-shadow: 0 1px 0 rgba(255,255,255,.35);
+}
+
+/* ✅ Кнопка подключения — МЕНЬШЕ */
 .meetBtn{
   width:100%;
   border:none;
@@ -177,10 +178,12 @@ body, button, input, textarea, select,
     radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.18), rgba(0,0,0,0) 64%),
     linear-gradient(180deg, rgba(47,106,134,.98), rgba(33,78,103,.96));
   color:#fff;
-  padding:16px 12px;
-  font-size:24px;
+
+  padding:12px 12px;           /* было 16 */
+  font-size:20px;              /* было 24 */
   font-weight:700;
-  letter-spacing:.4px;
+  letter-spacing:.35px;
+
   text-align:center;
   cursor:pointer;
   box-shadow: var(--shadowSoft);
@@ -189,6 +192,7 @@ body, button, input, textarea, select,
 }
 .meetBtn:active{ transform: translateY(1px); filter: brightness(.96); }
 
+/* Кнопки меню */
 .btn{
   width:100%;
   border:none;
@@ -202,6 +206,7 @@ body, button, input, textarea, select,
   box-shadow: var(--shadowSoft);
   cursor:pointer;
   transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
+  outline: 1px solid rgba(255,255,255,.08);
 }
 .btn:active{
   transform: translateY(1px);
@@ -236,11 +241,12 @@ body, button, input, textarea, select,
   line-height:1.25;
 }
 
-/* Плашка голосования */
+/* ✅ Голосование */
 .pollCard{
   border-radius:var(--radius);
   padding:14px;
   margin-bottom:12px;
+  outline: 1px solid rgba(255,255,255,.08);
 }
 
 .pollTop{
@@ -253,7 +259,7 @@ body, button, input, textarea, select,
 .pollBadge{
   width:100%;
   text-align:center;
-  padding:12px 12px;
+  padding:10px 12px;           /* компактнее */
   border-radius:12px;
 
   background:
@@ -261,9 +267,9 @@ body, button, input, textarea, select,
     linear-gradient(180deg, rgba(255,219,160,.78), rgba(240,182,95,.62));
   border: 1px solid rgba(18,31,47,.14);
 
-  font-size:30px;
+  font-size:28px;              /* было 30 */
   font-weight:700;
-  letter-spacing:.5px;
+  letter-spacing:.45px;
   color: var(--titleBlue);
 }
 
@@ -276,15 +282,16 @@ body, button, input, textarea, select,
   text-shadow: 0 1px 0 rgba(255,255,255,.35);
 }
 
+/* ✅ “Голосование по названию группы” — КРУПНЕЕ */
 .pollTitle{
-  font-size:22px;
+  font-size:24px;              /* было 22 */
   font-weight:400;
-  line-height:1.25;
+  line-height:1.18;
   margin-bottom:12px;
   color: var(--ink);
 }
 
-/* Зеленая кнопка “ПРОГОЛОСОВАТЬ” */
+/* ✅ Кнопка “ПРОГОЛОСОВАТЬ” — МЕНЬШЕ */
 .pollBtn{
   width:100%;
   border:none;
@@ -293,10 +300,12 @@ body, button, input, textarea, select,
     radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.22), rgba(0,0,0,0) 64%),
     linear-gradient(180deg, rgba(43,182,115,.98), rgba(31,142,87,.96));
   color:#fff;
-  padding:16px 12px;
-  font-size:24px;
+
+  padding:12px 12px;           /* было 16 */
+  font-size:20px;              /* было 24 */
   font-weight:700;
-  letter-spacing:.4px;
+  letter-spacing:.35px;
+
   text-align:center;
   cursor:pointer;
   box-shadow: var(--shadowSoft);
@@ -311,11 +320,6 @@ body, button, input, textarea, select,
   font-size:16px;
   color: rgba(255,255,255,.80);
 }
-
-/* слегка “смягчаем” края блоков */
-.btn, .pollCard, .noticeCard{
-  outline: 1px solid rgba(255,255,255,.08);
-}
 </style>
 </head>
 
@@ -328,12 +332,13 @@ body, button, input, textarea, select,
 
 <!-- ✅ Блок объявления (динамический) -->
 <div id="noticeCard" class="noticeCard cardBase" style="display:none;">
-  <div id="noticeTitle" class="noticeTitle">ОБЪЯВЛЕНИЕ</div>
+  <div id="noticeTitle" class="noticeTitle">СЕГОДНЯ</div>
   <div id="noticeText" class="noticeText"></div>
+  <div id="noticeUntil" class="noticeUntil"></div>
   <button class="meetBtn" id="noticeJoinBtn">ПОДКЛЮЧИТЬСЯ</button>
 </div>
 
-<!-- Плашка активного голосования -->
+<!-- ✅ Блок голосования (динамический) -->
 <div id="pollCard" class="pollCard cardBase" style="display:none;">
   <div class="pollTop">
     <div class="pollBadge">ИДЕТ ГОЛОСОВАНИЕ</div>
@@ -456,16 +461,18 @@ if ("serviceWorker" in navigator) {
     if (!s) return;
 
     /* ✅ Объявление */
-    if (s.notice_active && s.notice_text && s.notice_url) {
-      const card = document.getElementById("noticeCard");
-      const text = document.getElementById("noticeText");
-      const btn  = document.getElementById("noticeJoinBtn");
+    if (s.notice_active && (s.notice_text || s.notice_until) && s.notice_url) {
+      const card  = document.getElementById("noticeCard");
       const title = document.getElementById("noticeTitle");
+      const text  = document.getElementById("noticeText");
+      const until = document.getElementById("noticeUntil");
+      const btn   = document.getElementById("noticeJoinBtn");
 
       title.textContent = s.notice_title || "СЕГОДНЯ";
-      text.textContent  = s.notice_text;
-      btn.onclick = () => openExternal(s.notice_url);
+      text.textContent  = s.notice_text || "";
+      until.textContent = s.notice_until ? ("" + s.notice_until) : "";
 
+      btn.onclick = () => openExternal(s.notice_url);
       card.style.display = "block";
     }
 
