@@ -136,40 +136,40 @@ body, button, input, textarea, select{
 .noticeTitle{
   width:100%;
   text-align:center;
-  padding:10px 12px;           /* чуть компактнее */
+  padding:10px 12px;
   border-radius:12px;
   background:
     radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.26), rgba(0,0,0,0) 62%),
     linear-gradient(180deg, rgba(255,219,160,.78), rgba(240,182,95,.62));
   border: 1px solid rgba(18,31,47,.14);
 
-  font-size:26px;              /* компактнее */
+  font-size:26px;
   font-weight:700;
   letter-spacing:.4px;
   color: var(--titleBlue);
 }
 
-/* ✅ Текст объявления — КРУПНЕЕ */
+/* Текст объявления */
 .noticeText{
   margin:12px 0 6px;
-  font-size:24px;              /* было 20 */
+  font-size:24px;
   font-weight:400;
   line-height:1.18;
   color: var(--ink);
 }
 
-/* ✅ Дата/время объявления отдельной строкой, как “до …” */
+/* ✅ Дата/время объявления — отдельной строкой, крупнее */
 .noticeUntil{
   width:100%;
   text-align:center;
   margin:0 0 12px;
-  font-size:22px;
+  font-size:26px;              /* было 22 */
   font-weight:700;
   color: var(--titleBlue);
   text-shadow: 0 1px 0 rgba(255,255,255,.35);
 }
 
-/* ✅ Кнопка подключения — МЕНЬШЕ */
+/* Кнопка подключения — компактнее */
 .meetBtn{
   width:100%;
   border:none;
@@ -179,8 +179,8 @@ body, button, input, textarea, select{
     linear-gradient(180deg, rgba(47,106,134,.98), rgba(33,78,103,.96));
   color:#fff;
 
-  padding:12px 12px;           /* было 16 */
-  font-size:20px;              /* было 24 */
+  padding:12px 12px;
+  font-size:20px;
   font-weight:700;
   letter-spacing:.35px;
 
@@ -256,10 +256,11 @@ body, button, input, textarea, select{
   margin-bottom:10px;
 }
 
+/* ✅ Убрали "ИДЕТ" -> просто "ГОЛОСОВАНИЕ" */
 .pollBadge{
   width:100%;
   text-align:center;
-  padding:10px 12px;           /* компактнее */
+  padding:10px 12px;
   border-radius:12px;
 
   background:
@@ -267,31 +268,32 @@ body, button, input, textarea, select{
     linear-gradient(180deg, rgba(255,219,160,.78), rgba(240,182,95,.62));
   border: 1px solid rgba(18,31,47,.14);
 
-  font-size:28px;              /* было 30 */
+  font-size:28px;
   font-weight:700;
   letter-spacing:.45px;
   color: var(--titleBlue);
 }
 
+/* ✅ Дата/время голосования — крупнее, без слова "до" */
 .pollUntil{
   width:100%;
   text-align:center;
-  font-size:22px;
+  font-size:26px;              /* было 22 */
   font-weight:700;
   color: var(--titleBlue);
   text-shadow: 0 1px 0 rgba(255,255,255,.35);
 }
 
-/* ✅ “Голосование по названию группы” — КРУПНЕЕ */
+/* “Голосование по названию группы” — крупнее */
 .pollTitle{
-  font-size:24px;              /* было 22 */
+  font-size:24px;
   font-weight:400;
   line-height:1.18;
   margin-bottom:12px;
   color: var(--ink);
 }
 
-/* ✅ Кнопка “ПРОГОЛОСОВАТЬ” — МЕНЬШЕ */
+/* Кнопка “ПРОГОЛОСОВАТЬ” — компактнее */
 .pollBtn{
   width:100%;
   border:none;
@@ -301,8 +303,8 @@ body, button, input, textarea, select{
     linear-gradient(180deg, rgba(43,182,115,.98), rgba(31,142,87,.96));
   color:#fff;
 
-  padding:12px 12px;           /* было 16 */
-  font-size:20px;              /* было 24 */
+  padding:12px 12px;
+  font-size:20px;
   font-weight:700;
   letter-spacing:.35px;
 
@@ -341,7 +343,7 @@ body, button, input, textarea, select{
 <!-- ✅ Блок голосования (динамический) -->
 <div id="pollCard" class="pollCard cardBase" style="display:none;">
   <div class="pollTop">
-    <div class="pollBadge">ИДЕТ ГОЛОСОВАНИЕ</div>
+    <div class="pollBadge">ГОЛОСОВАНИЕ</div>
     <div id="pollUntil" class="pollUntil"></div>
   </div>
   <div id="pollTitle" class="pollTitle"></div>
@@ -484,7 +486,7 @@ if ("serviceWorker" in navigator) {
       const btn   = document.getElementById("pollOpenBtn");
 
       title.textContent = s.polls_title || "Новое голосование";
-      until.textContent = s.polls_until ? ("до " + s.polls_until) : "";
+      until.textContent = s.polls_until ? ("" + s.polls_until) : "";
 
       btn.onclick = () => openTelegram(s.polls_url);
       card.style.display = "block";
