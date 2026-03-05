@@ -41,8 +41,13 @@
   /* Золото для акцентов (дата) */
   --gold:#d39a3a;
 
-  /* ✅ Новый: “тёмный синий из Квартирника” для заголовков */
+  /* ✅ “тёмный синий из Квартирника” для заголовков */
   --titleBlue: var(--deep1);
+
+  /* ✅ Зеленая кнопка “ПРОГОЛОСОВАТЬ” */
+  --green1:#2bb673;
+  --green2:#1f8e57;
+  --green3:#166b41;
 
   --radius:18px;
   --radius2:16px;
@@ -235,18 +240,17 @@ body, button, input, textarea, select,
   color: var(--ink);
 }
 
-/* ✅ Кнопка голосования — цвета фона страницы (deep2), а текст тёмно-синий */
+/* ✅ Кнопка голосования — зеленая */
 .pollBtn{
   width:100%;
   border:none;
   border-radius:var(--radius2);
 
-  /* Цвет = общий фон (deep2) + чуть “света” сверху, чтобы не была плоской */
   background:
-    radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.16), rgba(0,0,0,0) 64%),
-    linear-gradient(180deg, rgba(23,56,74,.98), rgba(23,56,74,.94));
+    radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.22), rgba(0,0,0,0) 64%),
+    linear-gradient(180deg, rgba(43,182,115,.98), rgba(31,142,87,.96));
 
-  color: var(--titleBlue);
+  color:#fff;
   padding:16px 12px;
 
   font-size:24px;
@@ -257,10 +261,8 @@ body, button, input, textarea, select,
   cursor:pointer;
 
   box-shadow: var(--shadowSoft);
-
-  /* чтобы на тёмной кнопке тёмный текст читался: светлый “контур” */
-  text-shadow: 0 1px 0 rgba(255,255,255,.38);
-  outline: 1px solid rgba(255,255,255,.18);
+  outline: 1px solid rgba(255,255,255,.16);
+  text-shadow: 0 1px 0 rgba(0,0,0,.18);
 }
 .pollBtn:active{ transform: translateY(1px); filter: brightness(.96); }
 
