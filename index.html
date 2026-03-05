@@ -122,8 +122,8 @@ body, button, input, textarea, select{
 /* ====== ОБЪЯВЛЕНИЕ ====== */
 .noticeCard{
   border-radius:var(--radius);
-  padding:12px;        /* было 14 */
-  margin-bottom:10px;  /* было 12 */
+  padding:12px;
+  margin-bottom:10px;
 }
 
 .noticeTop{
@@ -133,7 +133,7 @@ body, button, input, textarea, select{
   margin-bottom:10px;
 }
 
-/* ✅ “СЕГОДНЯ” — не выглядит как кнопка: без обводки/тени */
+/* “СЕГОДНЯ” — плашка, не кнопка */
 .noticeTitle{
   width:100%;
   text-align:center;
@@ -157,7 +157,7 @@ body, button, input, textarea, select{
   user-select: none;
 }
 
-/* ✅ Вернули как было: одна строка “когда” */
+/* ✅ одна строка дата+время */
 .noticeUntil{
   width:100%;
   text-align:center;
@@ -177,7 +177,7 @@ body, button, input, textarea, select{
   color: var(--ink);
 }
 
-/* ✅ Кнопка “ПОДКЛЮЧИТЬСЯ” — зеленая и компактная */
+/* Кнопка “ПОДКЛЮЧИТЬСЯ” — зеленая и компактная */
 .meetBtn{
   width:100%;
   border:none;
@@ -203,8 +203,8 @@ body, button, input, textarea, select{
 /* ====== ГОЛОСОВАНИЕ ====== */
 .pollCard{
   border-radius:var(--radius);
-  padding:12px;        /* было 14 */
-  margin-bottom:10px;  /* было 12 */
+  padding:12px;
+  margin-bottom:10px;
 }
 
 .pollTop{
@@ -214,7 +214,7 @@ body, button, input, textarea, select{
   margin-bottom:10px;
 }
 
-/* ✅ “ГОЛОСОВАНИЕ” — не выглядит как кнопка: без обводки/тени */
+/* “ГОЛОСОВАНИЕ” — плашка, не кнопка */
 .pollBadge{
   width:100%;
   text-align:center;
@@ -238,7 +238,7 @@ body, button, input, textarea, select{
   user-select: none;
 }
 
-/* ✅ Дата/время голосования — крупнее, “до” добавляет код */
+/* Дата/время голосования — крупнее */
 .pollUntil{
   width:100%;
   text-align:center;
@@ -289,7 +289,7 @@ body, button, input, textarea, select{
     radial-gradient(800px 140px at 50% 0%, rgba(255,255,255,.22), rgba(0,0,0,0) 60%),
     linear-gradient(180deg, rgba(209,122,47,.95), rgba(180,90,34,.92));
   color: rgba(255,255,255,.96);
-  padding:12px; /* было 14 */
+  padding:12px;
   text-align:left;
   box-shadow: var(--shadowSoft);
   cursor:pointer;
@@ -330,7 +330,7 @@ body, button, input, textarea, select{
 }
 
 .footer{
-  margin-top:10px; /* было 14 */
+  margin-top:10px;
   text-align:center;
   font-size:16px;
   color: rgba(255,255,255,.80);
@@ -345,7 +345,7 @@ body, button, input, textarea, select{
   <img class="logo" src="./logo.png.png" alt='Группа АА "Квартирник"'>
 </header>
 
-<!-- ✅ Блок объявления (динамический) -->
+<!-- Блок объявления (динамический) -->
 <div id="noticeCard" class="noticeCard cardBase" style="display:none;">
   <div class="noticeTop">
     <div id="noticeTitle" class="noticeTitle">СЕГОДНЯ</div>
@@ -356,10 +356,10 @@ body, button, input, textarea, select{
   <button class="meetBtn" id="noticeJoinBtn">ПОДКЛЮЧИТЬСЯ</button>
 </div>
 
-<!-- ✅ Блок голосования (динамический) -->
+<!-- Блок голосования (динамический) -->
 <div id="pollCard" class="pollCard cardBase" style="display:none;">
   <div class="pollTop">
-    <div class="pollBadge">ГОЛОСОВАНИЕ</div>
+    <div id="pollBadge" class="pollBadge">ГОЛОСОВАНИЕ</div>
     <div id="pollUntil" class="pollUntil"></div>
   </div>
   <div id="pollTitle" class="pollTitle"></div>
@@ -449,9 +449,9 @@ const MEETING_LINK = "https://telemost.yandex.ru/j/30538613968161";
 
 const ANNOUNCEMENTS_TOPIC = "https://t.me/c/3835668674/1/5";
 const NEWCOMERS_TOPIC     = "https://t.me/c/3835668674/3/4";
-const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/7/8";
-const POLLS_TOPIC         = "https://t.me/c/3835668674/9/10";
+const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/9/10";
 const SERVANTS_LIST       = "https://t.me/c/3835668674/19/20";
+const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/7/8";
 
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); try { tg.expand(); } catch(e){} }
@@ -478,8 +478,8 @@ if ("serviceWorker" in navigator) {
     const s = await res.json();
     if (!s) return;
 
-    /* ✅ Объявление */
-    if (s.notice_active && (s.notice_text || s.notice_until) && s.notice_url) {
+    /* Объявление */
+    if (s.notice_active && (s.notice_text || s.notice_date || s.notice_time) && s.notice_url) {
       const card  = document.getElementById("noticeCard");
       const title = document.getElementById("noticeTitle");
       const text  = document.getElementById("noticeText");
@@ -488,19 +488,25 @@ if ("serviceWorker" in navigator) {
 
       title.textContent = s.notice_title || "СЕГОДНЯ";
       text.textContent  = s.notice_text || "";
-      until.textContent = s.notice_until ? ("" + s.notice_until) : "";
+
+      const d = (s.notice_date || "").trim();
+      const t = (s.notice_time || "").trim();
+      const whenOneLine = [d, t].filter(Boolean).join(", ");
+      until.textContent = whenOneLine;
 
       btn.onclick = () => openExternal(s.notice_url);
       card.style.display = "block";
     }
 
-    /* ✅ Голосование */
+    /* Голосование */
     if (s.polls_active && s.polls_url) {
       const card  = document.getElementById("pollCard");
+      const badge = document.getElementById("pollBadge");
       const title = document.getElementById("pollTitle");
       const until = document.getElementById("pollUntil");
       const btn   = document.getElementById("pollOpenBtn");
 
+      badge.textContent = s.polls_badge || "ГОЛОСОВАНИЕ";
       title.textContent = s.polls_title || "Новое голосование";
       until.textContent = s.polls_until ? ("до " + s.polls_until) : "";
 
