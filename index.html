@@ -41,13 +41,16 @@
   /* Золото для акцентов (дата) */
   --gold:#d39a3a;
 
-  /* ✅ “тёмный синий из Квартирника” для заголовков */
+  /* “тёмный синий из Квартирника” для заголовков */
   --titleBlue: var(--deep1);
 
-  /* ✅ Зеленая кнопка “ПРОГОЛОСОВАТЬ” */
+  /* Зеленая кнопка “ПРОГОЛОСОВАТЬ” */
   --green1:#2bb673;
   --green2:#1f8e57;
-  --green3:#166b41;
+
+  /* ✅ Синяя кнопка “ПОДКЛЮЧИТЬСЯ” (под фон) */
+  --meet1:#2f6a86;
+  --meet2:#214e67;
 
   --radius:18px;
   --radius2:16px;
@@ -76,7 +79,6 @@ body::before{
   z-index:-2;
 
   background:
-    /* виньетка глубины */
     radial-gradient(1200px 700px at 50% -10%, rgba(255,210,120,.22), rgba(0,0,0,0) 62%),
 
     radial-gradient(900px 700px at 12% 18%, rgba(111,160,183,.35), rgba(0,0,0,0) 60%),
@@ -84,13 +86,12 @@ body::before{
     radial-gradient(900px 820px at 30% 78%, rgba(33,78,103,.45), rgba(0,0,0,0) 65%),
     radial-gradient(1000px 900px at 92% 92%, rgba(14,35,48,.60), rgba(0,0,0,0) 62%),
 
-    /* базовый градиент */
     linear-gradient(180deg, var(--deep1) 0%, var(--deep2) 35%, var(--deep3) 72%, #2a607b 100%);
 
   filter: saturate(1.05) contrast(1.04);
 }
 
-/* ФАКТУРА/БУМАГА: микро-шум через градиенты (без картинок) */
+/* ФАКТУРА/БУМАГА */
 body::after{
   content:"";
   position:fixed;
@@ -109,7 +110,7 @@ body::after{
 }
 
 body, button, input, textarea, select,
-.title, .hint, .pollBadge, .pollTitle, .pollUntil, .footer, h1, .btn, .pollBtn{
+.title, .hint, .pollBadge, .pollTitle, .pollUntil, .footer{
   font-family:var(--font)!important;
 }
 
@@ -127,7 +128,7 @@ body, button, input, textarea, select,
 
 .grid{display:grid;gap:10px;}
 
-/* Подложка карточек — чтобы на тёмном фоне было “встроено”, а не “наклеено” */
+/* Подложка карточек */
 .cardBase{
   background: linear-gradient(180deg, rgba(243,239,231,.92), rgba(239,230,218,.90));
   border: 1px solid rgba(255,255,255,.10);
@@ -135,25 +136,73 @@ body, button, input, textarea, select,
   backdrop-filter: blur(2px);
 }
 
+/* Универсальная карточка “объявление/плашка” */
+.noticeCard{
+  border-radius:var(--radius);
+  padding:14px;
+  margin-bottom:12px;
+}
+
+/* Заголовок внутри карточки */
+.noticeTitle{
+  width:100%;
+  text-align:center;
+  padding:12px;
+  border-radius:12px;
+  background:
+    radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.26), rgba(0,0,0,0) 62%),
+    linear-gradient(180deg, rgba(255,219,160,.78), rgba(240,182,95,.62));
+  border: 1px solid rgba(18,31,47,.14);
+
+  font-size:28px;
+  font-weight:700;
+  letter-spacing:.5px;
+  color: var(--titleBlue);
+}
+
+.noticeText{
+  margin:12px 0 12px;
+  font-size:20px;
+  font-weight:400;
+  line-height:1.25;
+  color: var(--ink);
+}
+
+/* Кнопка подключения (синяя) */
+.meetBtn{
+  width:100%;
+  border:none;
+  border-radius:var(--radius2);
+  background:
+    radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.18), rgba(0,0,0,0) 64%),
+    linear-gradient(180deg, rgba(47,106,134,.98), rgba(33,78,103,.96));
+  color:#fff;
+  padding:16px 12px;
+  font-size:24px;
+  font-weight:700;
+  letter-spacing:.4px;
+  text-align:center;
+  cursor:pointer;
+  box-shadow: var(--shadowSoft);
+  outline: 1px solid rgba(255,255,255,.14);
+  text-shadow: 0 1px 0 rgba(0,0,0,.18);
+}
+.meetBtn:active{ transform: translateY(1px); filter: brightness(.96); }
+
 .btn{
   width:100%;
   border:none;
   border-radius:var(--radius2);
-
-  /* Ржаво-охристая “краска”, но приглушённая + лёгкая текстура */
   background:
     radial-gradient(800px 140px at 50% 0%, rgba(255,255,255,.22), rgba(0,0,0,0) 60%),
     linear-gradient(180deg, rgba(209,122,47,.95), rgba(180,90,34,.92));
-
   color: rgba(255,255,255,.96);
   padding:14px;
   text-align:left;
-
   box-shadow: var(--shadowSoft);
   cursor:pointer;
   transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
 }
-
 .btn:active{
   transform: translateY(1px);
   filter: brightness(.96);
@@ -171,7 +220,6 @@ body, button, input, textarea, select,
   margin-top:2px;
 }
 
-/* ✅ Все заголовки на кнопках — тёмно-синим */
 .title{
   font-size:28px;
   font-weight:700;
@@ -202,7 +250,6 @@ body, button, input, textarea, select,
   margin-bottom:10px;
 }
 
-/* ✅ ИДЁТ ГОЛОСОВАНИЕ — без значка, и тёмно-синим */
 .pollBadge{
   width:100%;
   text-align:center;
@@ -212,17 +259,14 @@ body, button, input, textarea, select,
   background:
     radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.26), rgba(0,0,0,0) 62%),
     linear-gradient(180deg, rgba(255,219,160,.78), rgba(240,182,95,.62));
-
   border: 1px solid rgba(18,31,47,.14);
 
   font-size:30px;
   font-weight:700;
   letter-spacing:.5px;
-
   color: var(--titleBlue);
 }
 
-/* ✅ до ... — тем же тёмным синим */
 .pollUntil{
   width:100%;
   text-align:center;
@@ -240,26 +284,21 @@ body, button, input, textarea, select,
   color: var(--ink);
 }
 
-/* ✅ Кнопка голосования — зеленая */
+/* Зеленая кнопка “ПРОГОЛОСОВАТЬ” */
 .pollBtn{
   width:100%;
   border:none;
   border-radius:var(--radius2);
-
   background:
     radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.22), rgba(0,0,0,0) 64%),
     linear-gradient(180deg, rgba(43,182,115,.98), rgba(31,142,87,.96));
-
   color:#fff;
   padding:16px 12px;
-
   font-size:24px;
   font-weight:700;
   letter-spacing:.4px;
-
   text-align:center;
   cursor:pointer;
-
   box-shadow: var(--shadowSoft);
   outline: 1px solid rgba(255,255,255,.16);
   text-shadow: 0 1px 0 rgba(0,0,0,.18);
@@ -273,8 +312,8 @@ body, button, input, textarea, select,
   color: rgba(255,255,255,.80);
 }
 
-/* слегка “смягчаем” края блоков, чтобы не выглядело наклейками */
-.btn, .pollCard{
+/* слегка “смягчаем” края блоков */
+.btn, .pollCard, .noticeCard{
   outline: 1px solid rgba(255,255,255,.08);
 }
 </style>
@@ -286,6 +325,13 @@ body, button, input, textarea, select,
 <header class="topbar">
   <img class="logo" src="./logo.png.png" alt='Группа АА "Квартирник"'>
 </header>
+
+<!-- ✅ Блок объявления (динамический) -->
+<div id="noticeCard" class="noticeCard cardBase" style="display:none;">
+  <div id="noticeTitle" class="noticeTitle">ОБЪЯВЛЕНИЕ</div>
+  <div id="noticeText" class="noticeText"></div>
+  <button class="meetBtn" id="noticeJoinBtn">ПОДКЛЮЧИТЬСЯ</button>
+</div>
 
 <!-- Плашка активного голосования -->
 <div id="pollCard" class="pollCard cardBase" style="display:none;">
@@ -403,22 +449,39 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/ouraagroup/sw.js");
 }
 
-(async function loadPollStatus(){
+(async function loadDynamicBlocks(){
   try {
     const res = await fetch("./status.json?v=" + Date.now(), { cache: "no-store" });
     const s = await res.json();
-    if (!s || !s.polls_active || !s.polls_url) return;
+    if (!s) return;
 
-    const card  = document.getElementById("pollCard");
-    const title = document.getElementById("pollTitle");
-    const until = document.getElementById("pollUntil");
-    const btn   = document.getElementById("pollOpenBtn");
+    /* ✅ Объявление */
+    if (s.notice_active && s.notice_text && s.notice_url) {
+      const card = document.getElementById("noticeCard");
+      const text = document.getElementById("noticeText");
+      const btn  = document.getElementById("noticeJoinBtn");
+      const title = document.getElementById("noticeTitle");
 
-    title.textContent = s.polls_title || "Новое голосование";
-    until.textContent = s.polls_until ? ("до " + s.polls_until) : "";
+      title.textContent = s.notice_title || "СЕГОДНЯ";
+      text.textContent  = s.notice_text;
+      btn.onclick = () => openExternal(s.notice_url);
 
-    btn.onclick = () => openTelegram(s.polls_url);
-    card.style.display = "block";
+      card.style.display = "block";
+    }
+
+    /* ✅ Голосование */
+    if (s.polls_active && s.polls_url) {
+      const card  = document.getElementById("pollCard");
+      const title = document.getElementById("pollTitle");
+      const until = document.getElementById("pollUntil");
+      const btn   = document.getElementById("pollOpenBtn");
+
+      title.textContent = s.polls_title || "Новое голосование";
+      until.textContent = s.polls_until ? ("до " + s.polls_until) : "";
+
+      btn.onclick = () => openTelegram(s.polls_url);
+      card.style.display = "block";
+    }
   } catch(e){}
 })();
 </script>
