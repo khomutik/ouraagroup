@@ -26,12 +26,6 @@
   --deep4:#2f6a86;
 
   --ink:#121f2f;
-
-  --paper:#f3efe7;
-  --paper2:#efe6da;
-
-  --gold:#d39a3a;
-
   --titleBlue: var(--deep1);
 
   --green1:#2bb673;
@@ -47,7 +41,7 @@
 
 body{
   margin:0;
-  padding:8px; /* было 14px — уменьшаем поля */
+  padding:8px;              /* меньше поля */
   font-family:var(--font);
   color:var(--ink);
   background: var(--deep2);
@@ -97,19 +91,19 @@ body, button, input, textarea, select{
   font-family:var(--font)!important;
 }
 
-.wrap{max-width:620px;margin:0 auto;} /* было 560 */
+.wrap{max-width:620px;margin:0 auto;}
 
 .logo{
   width:100%;
-  height:102px;       /* было 120 */
+  height:102px;             /* меньше высота */
   object-fit:cover;
   border-radius:18px;
-  margin-bottom:8px;  /* было 12 */
+  margin-bottom:8px;        /* меньше отступ */
   box-shadow: var(--shadow);
   border: 1px solid rgba(255,255,255,.14);
 }
 
-.grid{display:grid;gap:8px;} /* было 10 */
+.grid{display:grid;gap:8px;}  /* меньше зазоры */
 
 .cardBase{
   background: linear-gradient(180deg, rgba(243,239,231,.92), rgba(239,230,218,.90));
@@ -133,7 +127,7 @@ body, button, input, textarea, select{
   margin-bottom:10px;
 }
 
-/* “СЕГОДНЯ” — плашка, не кнопка */
+/* “СЕГОДНЯ” — плашка, НЕ кнопка */
 .noticeTitle{
   width:100%;
   text-align:center;
@@ -157,8 +151,8 @@ body, button, input, textarea, select{
   user-select: none;
 }
 
-/* ✅ одна строка дата+время */
-.noticeUntil{
+/* ✅ Одна строка: "5 марта 20:30 МСК" */
+.noticeWhen{
   width:100%;
   text-align:center;
   margin:0 0 12px;
@@ -177,7 +171,7 @@ body, button, input, textarea, select{
   color: var(--ink);
 }
 
-/* Кнопка “ПОДКЛЮЧИТЬСЯ” — зеленая и компактная */
+/* Кнопка “ПОДКЛЮЧИТЬСЯ” — зелёная, компактная */
 .meetBtn{
   width:100%;
   border:none;
@@ -214,7 +208,7 @@ body, button, input, textarea, select{
   margin-bottom:10px;
 }
 
-/* “ГОЛОСОВАНИЕ” — плашка, не кнопка */
+/* “ГОЛОСОВАНИЕ” — плашка, НЕ кнопка */
 .pollBadge{
   width:100%;
   text-align:center;
@@ -238,7 +232,7 @@ body, button, input, textarea, select{
   user-select: none;
 }
 
-/* Дата/время голосования — крупнее */
+/* до ... */
 .pollUntil{
   width:100%;
   text-align:center;
@@ -248,7 +242,7 @@ body, button, input, textarea, select{
   text-shadow: 0 1px 0 rgba(255,255,255,.35);
 }
 
-/* “Голосование по названию группы” — крупнее */
+/* Тема голосования — крупнее */
 .pollTitle{
   font-size:24px;
   font-weight:400;
@@ -257,7 +251,7 @@ body, button, input, textarea, select{
   color: var(--ink);
 }
 
-/* Кнопка “ПРОГОЛОСОВАТЬ” — компактнее */
+/* “ПРОГОЛОСОВАТЬ” — зелёная, компактная */
 .pollBtn{
   width:100%;
   border:none;
@@ -350,9 +344,8 @@ body, button, input, textarea, select{
   <div class="noticeTop">
     <div id="noticeTitle" class="noticeTitle">СЕГОДНЯ</div>
   </div>
-
   <div id="noticeText" class="noticeText"></div>
-  <div id="noticeUntil" class="noticeUntil"></div>
+  <div id="noticeWhen" class="noticeWhen"></div>
   <button class="meetBtn" id="noticeJoinBtn">ПОДКЛЮЧИТЬСЯ</button>
 </div>
 
@@ -449,7 +442,7 @@ const MEETING_LINK = "https://telemost.yandex.ru/j/30538613968161";
 
 const ANNOUNCEMENTS_TOPIC = "https://t.me/c/3835668674/1/5";
 const NEWCOMERS_TOPIC     = "https://t.me/c/3835668674/3/4";
-const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/9/10";
+const POLLS_TOPIC         = "https://t.me/c/3835668674/9/10";
 const SERVANTS_LIST       = "https://t.me/c/3835668674/19/20";
 const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/7/8";
 
@@ -479,20 +472,16 @@ if ("serviceWorker" in navigator) {
     if (!s) return;
 
     /* Объявление */
-    if (s.notice_active && (s.notice_text || s.notice_date || s.notice_time) && s.notice_url) {
+    if (s.notice_active && (s.notice_text || s.notice_when) && s.notice_url) {
       const card  = document.getElementById("noticeCard");
       const title = document.getElementById("noticeTitle");
       const text  = document.getElementById("noticeText");
-      const until = document.getElementById("noticeUntil");
+      const when  = document.getElementById("noticeWhen");
       const btn   = document.getElementById("noticeJoinBtn");
 
       title.textContent = s.notice_title || "СЕГОДНЯ";
       text.textContent  = s.notice_text || "";
-
-      const d = (s.notice_date || "").trim();
-      const t = (s.notice_time || "").trim();
-      const whenOneLine = [d, t].filter(Boolean).join(", ");
-      until.textContent = whenOneLine;
+      when.textContent  = s.notice_when || "";
 
       btn.onclick = () => openExternal(s.notice_url);
       card.style.display = "block";
