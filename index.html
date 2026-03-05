@@ -47,7 +47,7 @@
 
 body{
   margin:0;
-  padding:14px;
+  padding:8px; /* было 14px — уменьшаем поля */
   font-family:var(--font);
   color:var(--ink);
   background: var(--deep2);
@@ -97,19 +97,19 @@ body, button, input, textarea, select{
   font-family:var(--font)!important;
 }
 
-.wrap{max-width:560px;margin:0 auto;}
+.wrap{max-width:620px;margin:0 auto;} /* было 560 */
 
 .logo{
   width:100%;
-  height:120px;
+  height:102px;       /* было 120 */
   object-fit:cover;
   border-radius:18px;
-  margin-bottom:12px;
+  margin-bottom:8px;  /* было 12 */
   box-shadow: var(--shadow);
   border: 1px solid rgba(255,255,255,.14);
 }
 
-.grid{display:grid;gap:10px;}
+.grid{display:grid;gap:8px;} /* было 10 */
 
 .cardBase{
   background: linear-gradient(180deg, rgba(243,239,231,.92), rgba(239,230,218,.90));
@@ -122,8 +122,8 @@ body, button, input, textarea, select{
 /* ====== ОБЪЯВЛЕНИЕ ====== */
 .noticeCard{
   border-radius:var(--radius);
-  padding:14px;
-  margin-bottom:12px;
+  padding:12px;        /* было 14 */
+  margin-bottom:10px;  /* было 12 */
 }
 
 .noticeTop{
@@ -133,37 +133,44 @@ body, button, input, textarea, select{
   margin-bottom:10px;
 }
 
+/* ✅ “СЕГОДНЯ” — не выглядит как кнопка: без обводки/тени */
 .noticeTitle{
   width:100%;
   text-align:center;
   padding:10px 12px;
-  border-radius:12px;
+  border-radius:14px;
+
+  border:none;
+  outline:none;
+  box-shadow:none;
+
   background:
-    radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.26), rgba(0,0,0,0) 62%),
-    linear-gradient(180deg, rgba(255,219,160,.78), rgba(240,182,95,.62));
-  border: 1px solid rgba(18,31,47,.14);
+    radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.18), rgba(0,0,0,0) 62%),
+    linear-gradient(180deg, rgba(255,219,160,.62), rgba(240,182,95,.52));
 
   font-size:26px;
   font-weight:700;
   letter-spacing:.4px;
   color: var(--titleBlue);
+
+  cursor: default;
+  user-select: none;
 }
 
-/* ✅ Дата/время под “СЕГОДНЯ”, на 2 строки */
-.noticeWhen{
+/* ✅ Вернули как было: одна строка “когда” */
+.noticeUntil{
   width:100%;
   text-align:center;
+  margin:0 0 12px;
   font-size:26px;
   font-weight:700;
   color: var(--titleBlue);
   text-shadow: 0 1px 0 rgba(255,255,255,.35);
-  line-height:1.05;
 }
-.noticeWhen .line{ display:block; }
 
 /* Текст объявления — крупнее */
 .noticeText{
-  margin:10px 0 12px;
+  margin:10px 0 6px;
   font-size:24px;
   font-weight:400;
   line-height:1.18;
@@ -196,8 +203,8 @@ body, button, input, textarea, select{
 /* ====== ГОЛОСОВАНИЕ ====== */
 .pollCard{
   border-radius:var(--radius);
-  padding:14px;
-  margin-bottom:12px;
+  padding:12px;        /* было 14 */
+  margin-bottom:10px;  /* было 12 */
 }
 
 .pollTop{
@@ -207,24 +214,31 @@ body, button, input, textarea, select{
   margin-bottom:10px;
 }
 
+/* ✅ “ГОЛОСОВАНИЕ” — не выглядит как кнопка: без обводки/тени */
 .pollBadge{
   width:100%;
   text-align:center;
   padding:10px 12px;
-  border-radius:12px;
+  border-radius:14px;
+
+  border:none;
+  outline:none;
+  box-shadow:none;
 
   background:
-    radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.26), rgba(0,0,0,0) 62%),
-    linear-gradient(180deg, rgba(255,219,160,.78), rgba(240,182,95,.62));
-  border: 1px solid rgba(18,31,47,.14);
+    radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.18), rgba(0,0,0,0) 62%),
+    linear-gradient(180deg, rgba(255,219,160,.62), rgba(240,182,95,.52));
 
   font-size:28px;
   font-weight:700;
   letter-spacing:.45px;
   color: var(--titleBlue);
+
+  cursor: default;
+  user-select: none;
 }
 
-/* ✅ Дата/время голосования — крупнее, и “до” возвращаем */
+/* ✅ Дата/время голосования — крупнее, “до” добавляет код */
 .pollUntil{
   width:100%;
   text-align:center;
@@ -275,7 +289,7 @@ body, button, input, textarea, select{
     radial-gradient(800px 140px at 50% 0%, rgba(255,255,255,.22), rgba(0,0,0,0) 60%),
     linear-gradient(180deg, rgba(209,122,47,.95), rgba(180,90,34,.92));
   color: rgba(255,255,255,.96);
-  padding:14px;
+  padding:12px; /* было 14 */
   text-align:left;
   box-shadow: var(--shadowSoft);
   cursor:pointer;
@@ -316,7 +330,7 @@ body, button, input, textarea, select{
 }
 
 .footer{
-  margin-top:14px;
+  margin-top:10px; /* было 14 */
   text-align:center;
   font-size:16px;
   color: rgba(255,255,255,.80);
@@ -335,10 +349,10 @@ body, button, input, textarea, select{
 <div id="noticeCard" class="noticeCard cardBase" style="display:none;">
   <div class="noticeTop">
     <div id="noticeTitle" class="noticeTitle">СЕГОДНЯ</div>
-    <div id="noticeWhen" class="noticeWhen"></div>
   </div>
 
   <div id="noticeText" class="noticeText"></div>
+  <div id="noticeUntil" class="noticeUntil"></div>
   <button class="meetBtn" id="noticeJoinBtn">ПОДКЛЮЧИТЬСЯ</button>
 </div>
 
@@ -458,35 +472,6 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/ouraagroup/sw.js");
 }
 
-/* ✅ аккуратный авто-перенос: дата и время в две строки */
-function renderWhen(el, dateStr, timeStr){
-  if (!el) return;
-  const d = (dateStr || "").trim();
-  const t = (timeStr || "").trim();
-
-  // Если вдруг пришло одной строкой: "05 марта, 20:30 МСК"
-  if (!t && d && d.includes(",")) {
-    const parts = d.split(",");
-    const d2 = (parts[0] || "").trim();
-    const t2 = (parts.slice(1).join(",") || "").trim();
-    el.innerHTML = `<span class="line">${escapeHtml(d2)}</span><span class="line">${escapeHtml(t2)}</span>`;
-    return;
-  }
-
-  const line1 = d || "";
-  const line2 = t || "";
-  el.innerHTML = `<span class="line">${escapeHtml(line1)}</span><span class="line">${escapeHtml(line2)}</span>`;
-}
-
-function escapeHtml(s){
-  return String(s)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#39;");
-}
-
 (async function loadDynamicBlocks(){
   try {
     const res = await fetch("./status.json?v=" + Date.now(), { cache: "no-store" });
@@ -494,24 +479,16 @@ function escapeHtml(s){
     if (!s) return;
 
     /* ✅ Объявление */
-    if (s.notice_active && (s.notice_text || s.notice_date || s.notice_time || s.notice_when) && s.notice_url) {
+    if (s.notice_active && (s.notice_text || s.notice_until) && s.notice_url) {
       const card  = document.getElementById("noticeCard");
       const title = document.getElementById("noticeTitle");
-      const when  = document.getElementById("noticeWhen");
       const text  = document.getElementById("noticeText");
+      const until = document.getElementById("noticeUntil");
       const btn   = document.getElementById("noticeJoinBtn");
 
       title.textContent = s.notice_title || "СЕГОДНЯ";
       text.textContent  = s.notice_text || "";
-
-      // Поддержка двух вариантов:
-      // 1) notice_date + notice_time (рекомендуется)
-      // 2) notice_when одной строкой (на всякий случай)
-      if (s.notice_date || s.notice_time) {
-        renderWhen(when, s.notice_date, s.notice_time);
-      } else {
-        renderWhen(when, s.notice_when || "", "");
-      }
+      until.textContent = s.notice_until ? ("" + s.notice_until) : "";
 
       btn.onclick = () => openExternal(s.notice_url);
       card.style.display = "block";
@@ -525,7 +502,6 @@ function escapeHtml(s){
       const btn   = document.getElementById("pollOpenBtn");
 
       title.textContent = s.polls_title || "Новое голосование";
-      // ✅ “до” снова добавляется кодом
       until.textContent = s.polls_until ? ("до " + s.polls_until) : "";
 
       btn.onclick = () => openTelegram(s.polls_url);
