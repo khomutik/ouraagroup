@@ -41,7 +41,7 @@
 
 body{
   margin:0;
-  padding:8px;              /* меньше поля */
+  padding:8px;
   font-family:var(--font);
   color:var(--ink);
   background: var(--deep2);
@@ -95,15 +95,15 @@ body, button, input, textarea, select{
 
 .logo{
   width:100%;
-  height:102px;             /* меньше высота */
+  height:102px;
   object-fit:cover;
   border-radius:18px;
-  margin-bottom:8px;        /* меньше отступ */
+  margin-bottom:8px;
   box-shadow: var(--shadow);
   border: 1px solid rgba(255,255,255,.14);
 }
 
-.grid{display:grid;gap:8px;}  /* меньше зазоры */
+.grid{display:grid;gap:8px;}
 
 .cardBase{
   background: linear-gradient(180deg, rgba(243,239,231,.92), rgba(239,230,218,.90));
@@ -117,13 +117,6 @@ body, button, input, textarea, select{
 .noticeCard{
   border-radius:var(--radius);
   padding:12px;
-  margin-bottom:10px;
-}
-
-.noticeTop{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
   margin-bottom:10px;
 }
 
@@ -151,11 +144,11 @@ body, button, input, textarea, select{
   user-select: none;
 }
 
-/* ✅ Одна строка: "5 марта 20:30 МСК" */
+/* ✅ Вот он: блок сразу ПОД “СЕГОДНЯ” */
 .noticeWhen{
   width:100%;
   text-align:center;
-  margin:0 0 12px;
+  margin:8px 0 10px;   /* специально близко к “СЕГОДНЯ” */
   font-size:26px;
   font-weight:700;
   color: var(--titleBlue);
@@ -164,7 +157,7 @@ body, button, input, textarea, select{
 
 /* Текст объявления — крупнее */
 .noticeText{
-  margin:10px 0 6px;
+  margin:0 0 10px;      /* чтобы текст шёл ПОСЛЕ даты */
   font-size:24px;
   font-weight:400;
   line-height:1.18;
@@ -341,11 +334,14 @@ body, button, input, textarea, select{
 
 <!-- Блок объявления (динамический) -->
 <div id="noticeCard" class="noticeCard cardBase" style="display:none;">
-  <div class="noticeTop">
-    <div id="noticeTitle" class="noticeTitle">СЕГОДНЯ</div>
-  </div>
-  <div id="noticeText" class="noticeText"></div>
+  <div id="noticeTitle" class="noticeTitle">СЕГОДНЯ</div>
+
+  <!-- ✅ ДАТА/ВРЕМЯ СРАЗУ ПОД “СЕГОДНЯ” -->
   <div id="noticeWhen" class="noticeWhen"></div>
+
+  <!-- ✅ ТЕКСТ ИДЁТ НИЖЕ -->
+  <div id="noticeText" class="noticeText"></div>
+
   <button class="meetBtn" id="noticeJoinBtn">ПОДКЛЮЧИТЬСЯ</button>
 </div>
 
@@ -371,15 +367,7 @@ body, button, input, textarea, select{
     </div>
   </button>
 
-  <button class="btn" onclick="openExternal(MEETING_LINK)">
-    <div class="row">
-      <div class="icon">🎧</div>
-      <div>
-        <div class="title">Подключиться к собранию</div>
-        <div class="hint">собрание проходит в голосовом чате "Яндекс.Телемост"</div>
-      </div>
-    </div>
-  </button>
+  <!-- ✅ УДАЛЕНО: кнопка "Подключиться к собранию" (общая) -->
 
   <button class="btn" onclick="openTelegram(ANNOUNCEMENTS_TOPIC)">
     <div class="row">
@@ -438,7 +426,6 @@ body, button, input, textarea, select{
 
 <script>
 const CHAT_TME     = "https://t.me/+IrdlX5oOJ-gxMGEy";
-const MEETING_LINK = "https://telemost.yandex.ru/j/30538613968161";
 
 const ANNOUNCEMENTS_TOPIC = "https://t.me/c/3835668674/1/5";
 const NEWCOMERS_TOPIC     = "https://t.me/c/3835668674/3/4";
@@ -475,13 +462,13 @@ if ("serviceWorker" in navigator) {
     if (s.notice_active && (s.notice_text || s.notice_when) && s.notice_url) {
       const card  = document.getElementById("noticeCard");
       const title = document.getElementById("noticeTitle");
-      const text  = document.getElementById("noticeText");
       const when  = document.getElementById("noticeWhen");
+      const text  = document.getElementById("noticeText");
       const btn   = document.getElementById("noticeJoinBtn");
 
       title.textContent = s.notice_title || "СЕГОДНЯ";
-      text.textContent  = s.notice_text || "";
       when.textContent  = s.notice_when || "";
+      text.textContent  = s.notice_text || "";
 
       btn.onclick = () => openExternal(s.notice_url);
       card.style.display = "block";
