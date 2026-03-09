@@ -1,11 +1,11 @@
 {
   "notice_active": true,
   "notice_title": "СЕГОДНЯ",
-  "notice_when": "5 марта 20:30 МСК",
+  "notice_when": "9 марта 15:00 МСК",
   "notice_text": "Собрание для обсуждения организации группы. Телемост",
   "notice_url": "https://telemost.yandex.ru/j/30538613968161",
 
-  "polls_active": true,
+  "polls_active": false,
   "polls_badge": "ГОЛОСОВАНИЕ",
   "polls_title": "Выбираем название для группы",
   "polls_until": "",
