@@ -1,13 +1,24 @@
 {
-  "name": "ГРУППА АА «НАЗВАНИЕ ГРУППЫ»",
-  "short_name": "АА",
-  "start_url": "/ouraagroup/",
-  "scope": "/ouraagroup/",
+  "id": "aa_pn",
+  "name": "Почти нормальные",
+  "short_name": "АА ПН",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#f3eadf",
-  "theme_color": "#f3eadf",
+  "background_color": "#f7efdf",
+  "theme_color": "#f7efdf",
   "icons": [
-    { "src": "/ouraagroup/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/ouraagroup/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icons/icon-192-v2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }

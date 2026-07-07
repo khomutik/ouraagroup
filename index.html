@@ -1,496 +1,121 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Группа АА — меню</title>
-
-<link rel="manifest" href="/ouraagroup/manifest.webmanifest">
-<meta name="theme-color" content="#21465d">
-<link rel="apple-touch-icon" href="/ouraagroup/icons/apple-touch-icon.png">
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<!-- Philosopher -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&display=swap" rel="stylesheet">
-
-<style>
-:root{
-  --font: "Philosopher", serif;
-
-  --deep1:#0e2330;
-  --deep2:#17384a;
-  --deep3:#214e67;
-  --deep4:#2f6a86;
-
-  --ink:#121f2f;
-  --titleBlue: var(--deep1);
-
-  --green1:#2bb673;
-  --green2:#1f8e57;
-
-  --radius:18px;
-  --radius2:16px;
-  --shadow: 0 14px 30px rgba(0,0,0,.22);
-  --shadowSoft: 0 10px 22px rgba(0,0,0,.16);
-}
-
-*{box-sizing:border-box;}
-
-body{
-  margin:0;
-  padding:8px;
-  font-family:var(--font);
-  color:var(--ink);
-  background: var(--deep2);
-  position: relative;
-  overflow-x:hidden;
-}
-
-/* АКВАРЕЛЬНЫЙ ФОН */
-body::before{
-  content:"";
-  position:fixed;
-  inset:-40px;
-  z-index:-2;
-
-  background:
-    radial-gradient(1200px 700px at 50% -10%, rgba(255,210,120,.22), rgba(0,0,0,0) 62%),
-
-    radial-gradient(900px 700px at 12% 18%, rgba(111,160,183,.35), rgba(0,0,0,0) 60%),
-    radial-gradient(820px 640px at 88% 30%, rgba(47,106,134,.38), rgba(0,0,0,0) 62%),
-    radial-gradient(900px 820px at 30% 78%, rgba(33,78,103,.45), rgba(0,0,0,0) 65%),
-    radial-gradient(1000px 900px at 92% 92%, rgba(14,35,48,.60), rgba(0,0,0,0) 62%),
-
-    linear-gradient(180deg, var(--deep1) 0%, var(--deep2) 35%, var(--deep3) 72%, #2a607b 100%);
-
-  filter: saturate(1.05) contrast(1.04);
-}
-
-/* ФАКТУРА */
-body::after{
-  content:"";
-  position:fixed;
-  inset:-40px;
-  z-index:-1;
-
-  background:
-    radial-gradient(3px 3px at 20% 30%, rgba(255,255,255,.10), rgba(0,0,0,0) 60%),
-    radial-gradient(2px 2px at 60% 70%, rgba(0,0,0,.10), rgba(0,0,0,0) 60%),
-    radial-gradient(2px 2px at 80% 20%, rgba(255,255,255,.08), rgba(0,0,0,0) 60%),
-    radial-gradient(3px 3px at 35% 85%, rgba(0,0,0,.08), rgba(0,0,0,0) 60%);
-
-  opacity:.35;
-  mix-blend-mode: overlay;
-  filter: blur(.2px);
-}
-
-body, button, input, textarea, select{
-  font-family:var(--font)!important;
-}
-
-.wrap{max-width:620px;margin:0 auto;}
-
-.logo{
-  width:100%;
-  height:102px;
-  object-fit:cover;
-  border-radius:18px;
-  margin-bottom:8px;
-  box-shadow: var(--shadow);
-  border: 1px solid rgba(255,255,255,.14);
-}
-
-.grid{display:grid;gap:8px;}
-
-.cardBase{
-  background: linear-gradient(180deg, rgba(243,239,231,.92), rgba(239,230,218,.90));
-  border: 1px solid rgba(255,255,255,.10);
-  box-shadow: var(--shadowSoft);
-  backdrop-filter: blur(2px);
-  outline: 1px solid rgba(255,255,255,.08);
-}
-
-/* ====== ОБЪЯВЛЕНИЕ ====== */
-.noticeCard{
-  border-radius:var(--radius);
-  padding:12px;
-  margin-bottom:10px;
-}
-
-/* “СЕГОДНЯ” — плашка, НЕ кнопка */
-.noticeTitle{
-  width:100%;
-  text-align:center;
-  padding:10px 12px;
-  border-radius:14px;
-
-  border:none;
-  outline:none;
-  box-shadow:none;
-
-  background:
-    radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.18), rgba(0,0,0,0) 62%),
-    linear-gradient(180deg, rgba(255,219,160,.62), rgba(240,182,95,.52));
-
-  font-size:26px;
-  font-weight:700;
-  letter-spacing:.4px;
-  color: var(--titleBlue);
-
-  cursor: default;
-  user-select: none;
-}
-
-/* ✅ Вот он: блок сразу ПОД “СЕГОДНЯ” */
-.noticeWhen{
-  width:100%;
-  text-align:center;
-  margin:8px 0 10px;   /* специально близко к “СЕГОДНЯ” */
-  font-size:26px;
-  font-weight:700;
-  color: var(--titleBlue);
-  text-shadow: 0 1px 0 rgba(255,255,255,.35);
-}
-
-/* Текст объявления — крупнее */
-.noticeText{
-  margin:0 0 10px;      /* чтобы текст шёл ПОСЛЕ даты */
-  font-size:24px;
-  font-weight:400;
-  line-height:1.18;
-  color: var(--ink);
-}
-
-/* Кнопка “ПОДКЛЮЧИТЬСЯ” — зелёная, компактная */
-.meetBtn{
-  width:100%;
-  border:none;
-  border-radius:var(--radius2);
-  background:
-    radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.22), rgba(0,0,0,0) 64%),
-    linear-gradient(180deg, rgba(43,182,115,.98), rgba(31,142,87,.96));
-  color:#fff;
-
-  padding:12px 12px;
-  font-size:20px;
-  font-weight:700;
-  letter-spacing:.35px;
-
-  text-align:center;
-  cursor:pointer;
-  box-shadow: var(--shadowSoft);
-  outline: 1px solid rgba(255,255,255,.16);
-  text-shadow: 0 1px 0 rgba(0,0,0,.18);
-}
-.meetBtn:active{ transform: translateY(1px); filter: brightness(.96); }
-
-/* ====== ГОЛОСОВАНИЕ ====== */
-.pollCard{
-  border-radius:var(--radius);
-  padding:12px;
-  margin-bottom:10px;
-}
-
-.pollTop{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  margin-bottom:10px;
-}
-
-/* “ГОЛОСОВАНИЕ” — плашка, НЕ кнопка */
-.pollBadge{
-  width:100%;
-  text-align:center;
-  padding:10px 12px;
-  border-radius:14px;
-
-  border:none;
-  outline:none;
-  box-shadow:none;
-
-  background:
-    radial-gradient(900px 120px at 50% 0%, rgba(255,255,255,.18), rgba(0,0,0,0) 62%),
-    linear-gradient(180deg, rgba(255,219,160,.62), rgba(240,182,95,.52));
-
-  font-size:28px;
-  font-weight:700;
-  letter-spacing:.45px;
-  color: var(--titleBlue);
-
-  cursor: default;
-  user-select: none;
-}
-
-/* до ... */
-.pollUntil{
-  width:100%;
-  text-align:center;
-  font-size:26px;
-  font-weight:700;
-  color: var(--titleBlue);
-  text-shadow: 0 1px 0 rgba(255,255,255,.35);
-}
-
-/* Тема голосования — крупнее */
-.pollTitle{
-  font-size:24px;
-  font-weight:400;
-  line-height:1.18;
-  margin-bottom:12px;
-  color: var(--ink);
-}
-
-/* “ПРОГОЛОСОВАТЬ” — зелёная, компактная */
-.pollBtn{
-  width:100%;
-  border:none;
-  border-radius:var(--radius2);
-  background:
-    radial-gradient(900px 140px at 50% 0%, rgba(255,255,255,.22), rgba(0,0,0,0) 64%),
-    linear-gradient(180deg, rgba(43,182,115,.98), rgba(31,142,87,.96));
-  color:#fff;
-
-  padding:12px 12px;
-  font-size:20px;
-  font-weight:700;
-  letter-spacing:.35px;
-
-  text-align:center;
-  cursor:pointer;
-  box-shadow: var(--shadowSoft);
-  outline: 1px solid rgba(255,255,255,.16);
-  text-shadow: 0 1px 0 rgba(0,0,0,.18);
-}
-.pollBtn:active{ transform: translateY(1px); filter: brightness(.96); }
-
-/* ====== МЕНЮ ====== */
-.btn{
-  width:100%;
-  border:none;
-  border-radius:var(--radius2);
-  background:
-    radial-gradient(800px 140px at 50% 0%, rgba(255,255,255,.22), rgba(0,0,0,0) 60%),
-    linear-gradient(180deg, rgba(209,122,47,.95), rgba(180,90,34,.92));
-  color: rgba(255,255,255,.96);
-  padding:12px;
-  text-align:left;
-  box-shadow: var(--shadowSoft);
-  cursor:pointer;
-  transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
-  outline: 1px solid rgba(255,255,255,.08);
-}
-.btn:active{
-  transform: translateY(1px);
-  filter: brightness(.96);
-  box-shadow: 0 10px 18px rgba(0,0,0,.20);
-}
-
-.row{display:flex;gap:12px;align-items:flex-start;}
-
-.icon{
-  width:40px;height:40px;border-radius:12px;
-  background: rgba(255,255,255,.18);
-  border: 1px solid rgba(255,255,255,.16);
-  display:flex;align-items:center;justify-content:center;
-  font-size:19px;
-  margin-top:2px;
-}
-
-.title{
-  font-size:28px;
-  font-weight:700;
-  margin:0;
-  line-height:1.05;
-  color: var(--titleBlue);
-}
-
-.hint{
-  margin-top:6px;
-  font-size:19px;
-  font-weight:400;
-  opacity:.92;
-  line-height:1.25;
-}
-
-.footer{
-  margin-top:10px;
-  text-align:center;
-  font-size:16px;
-  color: rgba(255,255,255,.80);
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Почти нормальные</title>
+  <meta name="description" content="Группа АА «Почти нормальные»: расписание собраний, ссылки и разделы группы." />
+  <meta name="theme-color" content="#f7efdF" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-v2.png" />
+  <link rel="stylesheet" href="styles.css?v=40" />
 </head>
-
 <body>
-<div class="wrap">
+  <main class="app-shell">
+    <header class="hero" aria-label="Группа АА «Почти нормальные»">
+      <span class="hero__stroke hero__stroke--left" aria-hidden="true"></span>
+      <picture class="hero__logo">
+        <source media="(max-width: 560px)" srcset="assets/pn-text-mobile-tight.png?v=1" />
+        <img class="hero__mark" src="assets/pn-text-tight.png?v=1" alt="Группа АА «Почти нормальные»" />
+      </picture>
+      <span class="hero__stroke hero__stroke--right" aria-hidden="true"></span>
+    </header>
 
-<header class="topbar">
-  <img class="logo" src="./logo.png.png" alt='Группа АА "Квартирник"'>
-</header>
+    <section class="intro">
+      <p><strong>Группа Анонимных Алкоголиков «Почти нормальные»</strong> - это место для алкоголиков, которым нужна трезвость, опыт других алкоголиков, живое общение, человеческое тепло и поддержка.</p>
+      <p>Группа создана для того, чтобы оставаться трезвыми самим и помогать другим алкоголикам обрести трезвость.</p>
+      <p>К нам можно прийти новичком, вернуться после срыва или перерыва, прийти с вопросами, сомнениями, тревогой, выключенным микрофоном и ощущением: «Я вообще не знаю, что делать». Всё нормально, мы сами начинали с этого.</p>
+      <p>Мы не делим людей на "настоящих" или "не настоящих" алкоголиков, у нас нет "правильно" или "не правильно" выздоравливающих. Не надо заранее знать Шаги, Традиции и быть святым. Не надо уметь красиво говорить и понимать всё с полуслова.</p>
+      <p class="intro__lines">Нормальным быть не обязательно.<br>Анонимность уважаем.<br>Атмосферу бережём.<br>Трезвость поддерживаем.</p>
+      <p class="intro__invite">Приходите к нам на собрания.<br>🫶Места хватит всем🫶</p>
+    </section>
 
-<!-- Блок объявления (динамический) -->
-<div id="noticeCard" class="noticeCard cardBase" style="display:none;">
-  <div id="noticeTitle" class="noticeTitle">СЕГОДНЯ</div>
+    <nav class="menu" aria-label="Разделы сайта">
+      <a class="menu-button" href="newcomers.html">
+        <img src="assets/emoji/aa_heart_hands.png" alt="" />
+        <span>
+          <strong>Новичкам</strong>
+        </span>
+      </a>
+      <a class="menu-button" href="schedule.html">
+        <img src="assets/emoji/aa_calendar.png" alt="" />
+        <span>
+          <strong>Расписание собраний</strong>
+        </span>
+      </a>
+      <a class="menu-button" href="announcements.html">
+        <img src="assets/emoji/aa_double_exclamation.png" alt="" />
+        <span>
+          <strong>Объявления</strong>
+        </span>
+      </a>
+      <a class="menu-button" href="library.html">
+        <img src="assets/emoji/aa_book_blue.png" alt="" />
+        <span>
+          <strong>Библиотека</strong>
+        </span>
+      </a>
+      <a class="menu-button" href="https://drive.google.com/drive/folders/1x-bKBZzLpj1uTAnJpWqVFq3JBjXw-su-?usp=sharing" target="_blank" rel="noopener">
+        <img src="assets/emoji/aa_microphone.png" alt="" />
+        <span>
+          <strong>Спикерские</strong>
+        </span>
+      </a>
+      <a class="menu-button" href="service.html">
+        <img src="assets/emoji/aa_people.png" alt="" />
+        <span>
+          <strong>Служения</strong>
+        </span>
+      </a>
+      <a class="menu-button" href="tradition.html">
+        <img src="assets/emoji/aa_check.png" alt="" />
+        <span>
+          <strong>7-я традиция</strong>
+        </span>
+      </a>
+      <a class="menu-button" href="https://docs.google.com/document/d/14c8l7aYBO2R3Gz-PgVV3y0CCMXS4gBflpFp4pQsn9v8/edit?usp=sharing" target="_blank" rel="noopener">
+        <img src="assets/emoji/aa_book_blue.png" alt="" />
+        <span>
+          <strong>Архив решений</strong>
+        </span>
+      </a>
+    </nav>
 
-  <!-- ✅ ДАТА/ВРЕМЯ СРАЗУ ПОД “СЕГОДНЯ” -->
-  <div id="noticeWhen" class="noticeWhen"></div>
+    <nav class="socials" aria-label="Быстрые ссылки">
+      <a class="social-link" href="https://us06web.zoom.us/j/5487249245?pwd=UE3buqca6pTDt8kGPJDW9pRoaC7gkt.1" target="_blank" rel="noopener">
+        <img src="assets/social-zoom-v2.png" alt="" />
+        <small>Zoom</small>
+      </a>
+      <a class="social-link" href="https://t.me/+mta_CKQY2c05ODRi" target="_blank" rel="noopener">
+        <img src="assets/social-telegram-v2.png" alt="" />
+        <small>Telegram</small>
+      </a>
+      <a class="social-link" href="https://max.ru/join/GV-P-08zFtVs6pX-xR5Z8x80MMNPzhjJ1w6JVEYGn9M" target="_blank" rel="noopener">
+        <img src="assets/social-max-v2.png" alt="" />
+        <small>MAX</small>
+      </a>
+    </nav>
+  </main>
 
-  <!-- ✅ ТЕКСТ ИДЁТ НИЖЕ -->
-  <div id="noticeText" class="noticeText"></div>
-
-  <button class="meetBtn" id="noticeJoinBtn">ПОДКЛЮЧИТЬСЯ</button>
-</div>
-
-<!-- Блок голосования (динамический) -->
-<div id="pollCard" class="pollCard cardBase" style="display:none;">
-  <div class="pollTop">
-    <div id="pollBadge" class="pollBadge">ГОЛОСОВАНИЕ</div>
-    <div id="pollUntil" class="pollUntil"></div>
-  </div>
-  <div id="pollTitle" class="pollTitle"></div>
-  <button class="pollBtn" id="pollOpenBtn">ПРОГОЛОСОВАТЬ</button>
-</div>
-
-<div class="grid">
-
-  <button class="btn" onclick="openTelegram(CHAT_TME)">
-    <div class="row">
-      <div class="icon">💬</div>
-      <div>
-        <div class="title">Чат группы</div>
-        <div class="hint">общий чат + текстовое сопровождение собрания</div>
-      </div>
-    </div>
-  </button>
-
-  <!-- ✅ УДАЛЕНО: кнопка "Подключиться к собранию" (общая) -->
-
-  <button class="btn" onclick="openTelegram(ANNOUNCEMENTS_TOPIC)">
-    <div class="row">
-      <div class="icon">📣</div>
-      <div>
-        <div class="title">Объявления</div>
-        <div class="hint">важное и актуальное</div>
-      </div>
-    </div>
-  </button>
-
-  <button class="btn" onclick="openTelegram(NEWCOMERS_TOPIC)">
-    <div class="row">
-      <div class="icon">🧭</div>
-      <div>
-        <div class="title">Новичкам</div>
-        <div class="hint">с чего начать + как проходит собрание</div>
-      </div>
-    </div>
-  </button>
-
-  <button class="btn" onclick="openTelegram(SERVANTS_LIST)">
-    <div class="row">
-      <div class="icon">👥</div>
-      <div>
-        <div class="title">Список служащих</div>
-        <div class="hint">контакты + даты ротации + свободные служения</div>
-      </div>
-    </div>
-  </button>
-
-  <button class="btn" onclick="openTelegram(POLLS_TOPIC)">
-    <div class="row">
-      <div class="icon">🗳</div>
-      <div>
-        <div class="title">Голосования</div>
-        <div class="hint">актуальные опросы группы</div>
-      </div>
-    </div>
-  </button>
-
-  <button class="btn" onclick="openTelegram(ARCHIVE_TOPIC)">
-    <div class="row">
-      <div class="icon">🗂</div>
-      <div>
-        <div class="title">Архив</div>
-        <div class="hint">протоколы Рабочих собраний + решения Группы</div>
-      </div>
-    </div>
-  </button>
-
-</div>
-
-<div class="footer">Если что-то “подвисло” — закрой меню и открой снова через бота.</div>
-</div>
-
-<script>
-const CHAT_TME     = "https://t.me/+IrdlX5oOJ-gxMGEy";
-
-const ANNOUNCEMENTS_TOPIC = "https://t.me/c/3835668674/1/5";
-const NEWCOMERS_TOPIC     = "https://t.me/c/3835668674/3/4";
-const POLLS_TOPIC         = "https://t.me/c/3835668674/9/10";
-const SERVANTS_LIST       = "https://t.me/c/3835668674/19/20";
-const ARCHIVE_TOPIC       = "https://t.me/c/3835668674/7/8";
-
-const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); try { tg.expand(); } catch(e){} }
-
-function openExternal(url){
-  if (!url) return;
-  if (tg && tg.openLink) tg.openLink(url);
-  else window.open(url, "_blank");
-}
-function openTelegram(url){
-  if (!url) return;
-  try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(url); } catch(e){}
-  try { if (tg && tg.openLink) return tg.openLink(url); } catch(e){}
-  window.location.href = url;
-}
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/ouraagroup/sw.js");
-}
-
-(async function loadDynamicBlocks(){
-  try {
-    const res = await fetch("./status.json?v=" + Date.now(), { cache: "no-store" });
-    const s = await res.json();
-    if (!s) return;
-
-    /* Объявление */
-    if (s.notice_active && (s.notice_text || s.notice_when) && s.notice_url) {
-      const card  = document.getElementById("noticeCard");
-      const title = document.getElementById("noticeTitle");
-      const when  = document.getElementById("noticeWhen");
-      const text  = document.getElementById("noticeText");
-      const btn   = document.getElementById("noticeJoinBtn");
-
-      title.textContent = s.notice_title || "СЕГОДНЯ";
-      when.textContent  = s.notice_when || "";
-      text.textContent  = s.notice_text || "";
-
-      btn.onclick = () => openExternal(s.notice_url);
-      card.style.display = "block";
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
     }
-
-    /* Голосование */
-    if (s.polls_active && s.polls_url) {
-      const card  = document.getElementById("pollCard");
-      const badge = document.getElementById("pollBadge");
-      const title = document.getElementById("pollTitle");
-      const until = document.getElementById("pollUntil");
-      const btn   = document.getElementById("pollOpenBtn");
-
-      badge.textContent = s.polls_badge || "ГОЛОСОВАНИЕ";
-      title.textContent = s.polls_title || "Новое голосование";
-      until.textContent = s.polls_until ? ("до " + s.polls_until) : "";
-
-      btn.onclick = () => openTelegram(s.polls_url);
-      card.style.display = "block";
-    }
-  } catch(e){}
-})();
-</script>
+  </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
