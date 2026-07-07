@@ -7,59 +7,60 @@
   const speakersUrl = "https://drive.google.com/drive/folders/1x-bKBZzLpj1uTAnJpWqVFq3JBjXw-su-?usp=sharing";
   const archiveUrl = "https://docs.google.com/document/d/14c8l7aYBO2R3Gz-PgVV3y0CCMXS4gBflpFp4pQsn9v8/edit?usp=sharing";
 
-  const groups = [
-    {
-      title: "Разделы",
-      open: true,
-      links: [
-        { href: "newcomers.html", label: "Новичкам" },
-        { href: "schedule.html", label: "Расписание" },
-        { href: "announcements.html", label: "Объявления" },
-        { href: "library.html", label: "Библиотека" },
-        { href: speakersUrl, label: "Спикерские", external: true },
-        { href: "service.html", label: "Служения" },
-        { href: "tradition.html", label: "7-я традиция" },
-        { href: archiveUrl, label: "Архив решений", external: true }
-      ]
-    },
+  const navItems = [
     {
       title: "Новичкам",
+      href: "newcomers.html",
       openOn: "newcomers.html",
       links: [
-        { href: "newcomers.html#aa", label: "Кто такие АА?" },
-        { href: "newcomers.html#twelve-steps", label: "12 шагов АА" },
-        { href: "newcomers.html#program-help", label: "Всем ли помогает АА?" },
-        { href: "newcomers.html#aa-community", label: "Общение с АА" },
-        { href: "newcomers.html#sponsor", label: "Кто такой спонсор?" },
+        { href: "newcomers.html", label: "Новичкам - главное меню раздела" },
+        { href: "newcomers.html#aa", label: "Кто такие Анонимные Алкоголики?" },
+        { href: "newcomers.html#twelve-steps", label: "Программа «Двенадцать Шагов» АА" },
+        { href: "newcomers.html#program-help", label: "Всем ли помогает Программа АА?" },
+        { href: "newcomers.html#aa-community", label: "Зачем мне общение с анонимными алкоголиками?" },
+        { href: "newcomers.html#sponsor", label: "Кто такой спонсор в АА?" },
         { href: "newcomers.html#sponsor-steps", label: "12 шагов спонсора" },
         { href: "newcomers.html#alcoholism", label: "Немного об алкоголизме" },
-        { href: "newcomers.html#alcoholism-learned", label: "Что мы узнали?" },
-        { href: "newcomers.html#alcoholism-disease", label: "Алкоголизм - болезнь" },
+        { href: "newcomers.html#alcoholism-learned", label: "Что мы узнали об алкоголизме?" },
+        { href: "newcomers.html#alcoholism-disease", label: "Алкоголизм - это болезнь" },
         { href: "newcomers.html#meetings", label: "Собрания АА" },
-        { href: "newcomers.html#meeting-process", label: "Что происходит?" },
-        { href: "newcomers.html#pn-meetings", label: "Наши собрания" },
-        { href: "newcomers.html#recommendations", label: "Рекомендации" },
-        { href: "newcomers.html#today-only", label: "Только сегодня" }
+        { href: "newcomers.html#meeting-process", label: "Что происходит на собраниях Анонимных Алкоголиков?" },
+        { href: "newcomers.html#pn-meetings", label: "Как проходят собрания на группе «Почти нормальные»?" },
+        { href: "newcomers.html#recommendations", label: "Практические рекомендации" },
+        { href: "newcomers.html#today-only", label: "Принцип «Только сегодня»" }
       ]
     },
+    { title: "Расписание собраний", href: "schedule.html" },
+    { title: "Объявления", href: "announcements.html" },
+    {
+      title: "Библиотека",
+      href: "library.html",
+      openOn: "library.html",
+      links: [
+        { href: "library.html", label: "Библиотека - книги и брошюры АА" },
+        { href: "https://drive.google.com/drive/folders/1vKX6abhQRFOKIhHaqXmYcUWgjVcCpmHu?usp=sharing", label: "Другая литература", external: true }
+      ]
+    },
+    { title: "Спикерские", href: speakersUrl, external: true },
     {
       title: "Служения",
-      open: true,
+      href: "service.html",
       openOn: "service.html",
       links: [
-        { href: "service.html", label: "Все служения" },
+        { href: "service.html", label: "Служения - список служений группы" },
         { href: serviceSheetUrl, label: "График служений", external: true }
       ]
     },
     {
       title: "7-я традиция",
-      open: true,
+      href: "tradition.html",
       openOn: "tradition.html",
       links: [
-        { href: "tradition.html", label: "Реквизиты" },
+        { href: "tradition.html", label: "7-я традиция - реквизиты" },
         { href: treasurerReportUrl, label: "Отчет казначея", external: true }
       ]
-    }
+    },
+    { title: "Архив решений", href: archiveUrl, external: true }
   ];
 
   const currentPage = location.pathname.split("/").pop() || "index.html";
@@ -71,21 +72,27 @@
     return false;
   };
 
-  const linkHtml = (item) => {
+  const linkHtml = (item, className = "site-nav__link") => {
     const active = !item.external && isActive(item.href) ? " is-active" : "";
     const current = active ? ' aria-current="page"' : "";
     const target = item.external ? ' target="_blank" rel="noopener"' : "";
-    return `<a class="site-nav__link${active}" href="${item.href}"${current}${target}>${item.label}</a>`;
+    return `<a class="${className}${active}" href="${item.href}"${current}${target}>${item.label || item.title}</a>`;
   };
 
-  const groupHtml = groups.map((group) => {
-    const isOpen = group.open || group.openOn === currentPage;
+  const navHtml = navItems.map((item) => {
+    if (!item.links) {
+      return linkHtml(item, "site-nav__main-link");
+    }
+
+    const isOpen = item.openOn === currentPage;
     const open = isOpen ? " open" : "";
+    const active = !item.external && item.href === currentPage ? " is-active" : "";
+
     return `
       <details class="site-nav__group"${open}>
-        <summary class="site-nav__summary">${group.title}</summary>
+        <summary class="site-nav__summary${active}">${item.title}</summary>
         <div class="site-nav__links">
-          ${group.links.map(linkHtml).join("")}
+          ${item.links.map((link) => linkHtml(link)).join("")}
         </div>
       </details>
     `;
@@ -94,7 +101,7 @@
   shell.insertAdjacentHTML("beforeend", `
     <aside class="site-side-nav" aria-label="Меню сайта">
       <p class="site-side-nav__title">Меню</p>
-      <nav class="site-nav">${groupHtml}</nav>
+      <nav class="site-nav">${navHtml}</nav>
     </aside>
 
     <nav class="mobile-bottom-nav" aria-label="Навигация">
@@ -115,7 +122,7 @@
     <div class="mobile-menu-panel" data-site-menu-panel hidden>
       <div class="mobile-menu-panel__sheet" role="dialog" aria-modal="true" aria-label="Меню сайта">
         <button class="mobile-menu-panel__close" type="button" data-site-menu-close>Закрыть</button>
-        <nav class="site-nav">${groupHtml}</nav>
+        <nav class="site-nav">${navHtml}</nav>
       </div>
     </div>
   `);
@@ -141,7 +148,7 @@
       return;
     }
 
-    if (event.target.closest(".mobile-menu-panel .site-nav__link")) {
+    if (event.target.closest(".mobile-menu-panel .site-nav__link, .mobile-menu-panel .site-nav__main-link")) {
       closeMenu();
       return;
     }

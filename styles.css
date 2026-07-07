@@ -856,6 +856,7 @@ a {
   padding: 7px 0 4px;
 }
 
+.site-nav__main-link,
 .site-nav__link {
   display: flex;
   align-items: center;
@@ -874,6 +875,20 @@ a {
   box-shadow: var(--soft-shadow);
 }
 
+.site-nav__main-link {
+  min-height: 52px;
+  font-size: 16px;
+}
+
+.site-nav__summary-link {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-nav__summary.is-active,
+.site-nav__main-link.is-active,
 .site-nav__link.is-active {
   border-color: rgba(223, 91, 11, 0.46);
   color: var(--orange-dark);
@@ -965,6 +980,10 @@ a {
 .mobile-menu-panel .site-nav__summary::after {
   color: var(--cream-2);
   background: var(--blue);
+}
+
+.mobile-menu-panel .site-nav__main-link {
+  min-height: 54px;
 }
 
 .mobile-menu-panel__close {
