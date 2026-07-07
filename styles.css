@@ -142,6 +142,56 @@ a {
   font-weight: 900;
 }
 
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.quick-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 76px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  color: var(--blue);
+  text-decoration: none;
+  background:
+    linear-gradient(90deg, rgba(223, 91, 11, 0.14), transparent 44%),
+    var(--cream-2);
+  box-shadow: var(--soft-shadow);
+}
+
+.quick-action--primary {
+  border-color: rgba(223, 91, 11, 0.34);
+}
+
+.quick-action img {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+
+.quick-action strong {
+  display: block;
+  font-size: 19px;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.quick-action small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.16;
+}
+
 @media (min-width: 561px) {
   .hero {
     column-gap: 8px;
@@ -149,6 +199,14 @@ a {
 }
 
 @media (max-width: 560px) {
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-action {
+    min-height: 68px;
+  }
+
   .intro strong,
   .intro__lines,
   .intro__invite {
@@ -597,7 +655,7 @@ a {
 .newcomers-card h2 {
   margin: 0 0 10px;
   color: var(--blue);
-  font-size: clamp(24px, 6vw, 34px);
+  font-size: clamp(22px, 5.4vw, 30px);
   line-height: 1.08;
   text-align: center;
   text-transform: uppercase;
@@ -640,15 +698,15 @@ a {
 .newcomers-text p {
   margin: 0;
   color: var(--muted);
-  font-size: 16px;
-  line-height: 1.38;
+  font-size: 15px;
+  line-height: 1.45;
   text-align: justify;
 }
 
 .newcomers-text h3 {
   margin: 8px 0 0;
   color: var(--blue);
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1.15;
   text-align: center;
   text-transform: uppercase;
@@ -699,8 +757,8 @@ a {
 
 .newcomers-steps li {
   color: var(--muted);
-  font-size: 16px;
-  line-height: 1.36;
+  font-size: 15px;
+  line-height: 1.44;
   text-align: justify;
 }
 
@@ -718,8 +776,8 @@ a {
 
 .newcomers-list li {
   color: var(--muted);
-  font-size: 16px;
-  line-height: 1.36;
+  font-size: 15px;
+  line-height: 1.44;
   text-align: justify;
 }
 
@@ -852,12 +910,11 @@ a {
 
 .site-nav__links {
   display: grid;
-  gap: 7px;
-  padding: 7px 0 4px;
+  gap: 0;
+  padding: 7px 2px 4px 10px;
 }
 
-.site-nav__main-link,
-.site-nav__link {
+.site-nav__main-link {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -881,6 +938,25 @@ a {
   font-size: 16px;
 }
 
+.site-nav__link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 0;
+  padding: 8px 4px 8px 14px;
+  border: 0;
+  border-left: 3px solid rgba(223, 91, 11, 0.42);
+  border-radius: 0;
+  color: var(--cream-2);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.24;
+  text-align: left;
+  text-decoration: none;
+  background: transparent;
+  box-shadow: none;
+}
+
 .site-nav__summary-link {
   flex: 1 1 auto;
   min-width: 0;
@@ -889,13 +965,18 @@ a {
 }
 
 .site-nav__summary.is-active,
-.site-nav__main-link.is-active,
-.site-nav__link.is-active {
+.site-nav__main-link.is-active {
   border-color: rgba(223, 91, 11, 0.46);
   color: var(--orange-dark);
   background:
     linear-gradient(90deg, rgba(223, 91, 11, 0.24), transparent 48%),
     var(--cream-2);
+}
+
+.site-nav__link.is-active {
+  border-color: var(--orange-dark);
+  color: var(--orange);
+  background: transparent;
 }
 
 .site-nav-socials {
@@ -1019,6 +1100,14 @@ a {
 
 .mobile-menu-panel .site-nav__main-link {
   min-height: 56px;
+}
+
+.mobile-menu-panel .site-nav__link {
+  color: var(--muted);
+}
+
+.mobile-menu-panel .site-nav__link.is-active {
+  color: var(--orange-dark);
 }
 
 .mobile-menu-panel .site-nav-socials {
