@@ -667,6 +667,14 @@ a {
   font-weight: 900;
 }
 
+.newcomers-text__credit {
+  margin-top: 4px !important;
+  color: rgba(64, 78, 104, 0.78) !important;
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+  text-align: center !important;
+}
+
 .newcomers-text__note {
   display: block;
   padding: 10px 12px;
