@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#f7efdF" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="styles.css?v=41" />
+  <link rel="stylesheet" href="styles.css?v=42" />
 </head>
 <body>
   <main class="page-shell">
@@ -61,7 +61,6 @@
           <button class="flow-button" type="button" data-target="program-help">Всем ли помогает Программа АА?</button>
           <button class="flow-button" type="button" data-target="aa-community">Зачем мне общение с анонимными алкоголиками?</button>
           <button class="flow-button" type="button" data-target="sponsor">Кто такой спонсор в АА?</button>
-          <button class="inline-nav-button" type="button" data-menu>К меню раздела</button>
         </div>
       </article>
 
@@ -205,7 +204,6 @@
           <button class="flow-button" type="button" data-target="alcoholism-learned">Что мы узнали об алкоголизме?</button>
           <button class="flow-button" type="button" data-target="alcoholism-disease">Алкоголизм - это болезнь</button>
           <a class="flow-button" href="https://aarussia.ru/test-aa" target="_blank" rel="noopener">Тест "Подходит ли тебе АА?"</a>
-          <button class="inline-nav-button" type="button" data-menu>К меню раздела</button>
         </div>
       </article>
 
@@ -258,7 +256,6 @@
           <a class="flow-button" href="https://www.aarusassembly.org/groups" target="_blank" rel="noopener">Русскоязычные группы за рубежом</a>
           <button class="flow-button" type="button" data-target="meeting-process">Что происходит на собраниях</button>
           <button class="flow-button" type="button" data-target="pn-meetings">Как проходят наши собрания</button>
-          <button class="inline-nav-button" type="button" data-menu>К меню раздела</button>
         </div>
       </article>
 
@@ -355,7 +352,6 @@
         </div>
         <div class="newcomers-actions">
           <button class="flow-button" type="button" data-target="today-only">Принцип "Только сегодня"</button>
-          <button class="inline-nav-button" type="button" data-menu>К меню раздела</button>
         </div>
       </article>
 
@@ -390,15 +386,22 @@
   <script>
     (() => {
       const pages = [...document.querySelectorAll("[data-page]")];
-      const history = [];
+      const pageHistory = [];
       let currentPage = "menu";
 
-      const showPage = (pageName, keepHistory = true) => {
+      const hasPage = (pageName) => pages.some((page) => page.dataset.page === pageName);
+
+      const setHash = (pageName) => {
+        const hash = pageName === "menu" ? "" : `#${pageName}`;
+        window.history.replaceState(null, "", `${location.pathname}${hash}`);
+      };
+
+      const showPage = (pageName, keepHistory = true, updateHash = true) => {
         const nextPage = pages.find((page) => page.dataset.page === pageName);
         if (!nextPage || pageName === currentPage) return;
 
         if (keepHistory) {
-          history.push(currentPage);
+          pageHistory.push(currentPage);
         }
 
         pages.forEach((page) => {
@@ -406,19 +409,31 @@
         });
 
         currentPage = pageName;
+        if (updateHash) {
+          setHash(pageName);
+        }
         window.scrollTo({ top: 0, behavior: "smooth" });
       };
 
       window.handleNewcomersBack = () => {
         if (currentPage === "menu") return false;
-        showPage(history.pop() || "menu", false);
+        showPage(pageHistory.pop() || "menu", false);
         return true;
       };
+
+      const showHashPage = () => {
+        const pageName = decodeURIComponent(location.hash.replace(/^#/, ""));
+        if (pageName && hasPage(pageName)) {
+          showPage(pageName, false, false);
+        }
+      };
+
+      showHashPage();
+      window.addEventListener("hashchange", showHashPage);
 
       document.addEventListener("click", (event) => {
         const targetButton = event.target.closest("[data-target]");
         const backButton = event.target.closest("[data-back]");
-        const menuButton = event.target.closest("[data-menu]");
 
         if (targetButton) {
           showPage(targetButton.dataset.target);
@@ -429,14 +444,9 @@
           window.handleNewcomersBack();
           return;
         }
-
-        if (menuButton) {
-          history.length = 0;
-          showPage("menu", false);
-        }
       });
     })();
   </script>
-  <script src="site-nav.js?v=1"></script>
+  <script src="site-nav.js?v=2"></script>
 </body>
 </html>
