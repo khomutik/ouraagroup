@@ -6,8 +6,12 @@
   const treasurerReportUrl = "https://docs.google.com/spreadsheets/d/1uFKVQ6Orlz2GMTyIWsB4ux7eDRKejFTQ120p6JowZSE/edit?usp=sharing";
   const speakersUrl = "https://drive.google.com/drive/folders/1x-bKBZzLpj1uTAnJpWqVFq3JBjXw-su-?usp=sharing";
   const archiveUrl = "https://docs.google.com/document/d/14c8l7aYBO2R3Gz-PgVV3y0CCMXS4gBflpFp4pQsn9v8/edit?usp=sharing";
+  const zoomUrl = "https://us06web.zoom.us/j/5487249245?pwd=UE3buqca6pTDt8kGPJDW9pRoaC7gkt.1";
+  const telegramUrl = "https://t.me/+mta_CKQY2c05ODRi";
+  const maxUrl = "https://max.ru/join/GV-P-08zFtVs6pX-xR5Z8x80MMNPzhjJ1w6JVEYGn9M";
 
   const navItems = [
+    { title: "Главная страница", href: "index.html" },
     {
       title: "Новичкам",
       href: "newcomers.html",
@@ -98,10 +102,28 @@
     `;
   }).join("");
 
+  const socialHtml = `
+    <div class="site-nav-socials" aria-label="Соцсети и быстрые ссылки">
+      <a class="site-nav-socials__link" href="${zoomUrl}" target="_blank" rel="noopener">
+        <img src="assets/social-zoom-v2.png" alt="" />
+        <span>Zoom</span>
+      </a>
+      <a class="site-nav-socials__link" href="${telegramUrl}" target="_blank" rel="noopener">
+        <img src="assets/social-telegram-v2.png" alt="" />
+        <span>Telegram</span>
+      </a>
+      <a class="site-nav-socials__link" href="${maxUrl}" target="_blank" rel="noopener">
+        <img src="assets/social-max-v2.png" alt="" />
+        <span>MAX</span>
+      </a>
+    </div>
+  `;
+
   shell.insertAdjacentHTML("beforeend", `
     <aside class="site-side-nav" aria-label="Меню сайта">
       <p class="site-side-nav__title">Меню</p>
       <nav class="site-nav">${navHtml}</nav>
+      ${socialHtml}
     </aside>
 
     <nav class="mobile-bottom-nav" aria-label="Навигация">
@@ -123,6 +145,7 @@
       <div class="mobile-menu-panel__sheet" role="dialog" aria-modal="true" aria-label="Меню сайта">
         <button class="mobile-menu-panel__close" type="button" data-site-menu-close>Закрыть</button>
         <nav class="site-nav">${navHtml}</nav>
+        ${socialHtml}
       </div>
     </div>
   `);
