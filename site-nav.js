@@ -29,7 +29,7 @@
         { href: "newcomers.html#alcoholism-disease", label: "Алкоголизм - это болезнь" },
         { href: "newcomers.html#meetings", label: "Собрания АА" },
         { href: "newcomers.html#meeting-process", label: "Что происходит на собраниях Анонимных Алкоголиков?" },
-        { href: "newcomers.html#pn-meetings", label: "Как проходят собрания на группе «Почти нормальные»?" },
+        { href: "newcomers.html#pn-meetings", label: "Как проходят собрания в группе «Почти нормальные»?" },
         { href: "newcomers.html#recommendations", label: "Практические рекомендации" },
         { href: "newcomers.html#today-only", label: "Принцип «Только сегодня»" }
       ]
