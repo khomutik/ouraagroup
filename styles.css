@@ -924,7 +924,7 @@ a {
 .site-nav__main-link {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 56px;
   padding: 10px 12px;
   border: 1px solid rgba(7, 27, 68, 0.16);
@@ -933,7 +933,7 @@ a {
   font-size: 15px;
   font-weight: 900;
   line-height: 1.1;
-  text-align: center;
+  text-align: left;
   text-decoration: none;
   background:
     linear-gradient(90deg, rgba(223, 91, 11, 0.12), transparent 42%),
