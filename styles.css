@@ -732,6 +732,10 @@ a {
   font-weight: 900;
 }
 
+.newcomers-text__intro {
+  text-align: center !important;
+}
+
 .newcomers-text__credit {
   margin-top: 4px !important;
   color: rgba(64, 78, 104, 0.78) !important;
