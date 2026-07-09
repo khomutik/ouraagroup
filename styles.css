@@ -1176,6 +1176,29 @@ a {
   margin-top: 12px;
 }
 
+.library-note {
+  padding: 14px 16px;
+  border: 1px solid rgba(247, 239, 223, 0.24);
+  border-radius: 14px;
+  color: var(--cream-2);
+  background: var(--blue);
+  box-shadow: var(--soft-shadow);
+}
+
+.library-note p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.42;
+  text-align: center;
+}
+
+.library-note a {
+  color: var(--cream);
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .library-card {
   display: grid;
   gap: 14px;
