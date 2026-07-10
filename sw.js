@@ -1,4 +1,4 @@
-const CACHE_NAME = "aa-pn-v102";
+const CACHE_NAME = "aa-pn-v103";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -25,6 +25,10 @@ const APP_SHELL = [
   "./assets/announcement-speaker-stas-2026-07-10.jpg",
   "./assets/announcement-zoom-training.png",
   "./manifest.webmanifest",
+  "./favicon.ico",
+  "./icons/favicon-16.png",
+  "./icons/favicon-32.png",
+  "./icons/favicon-48.png",
   "./assets/pn-text-tight.png?v=1",
   "./assets/pn-text-mobile-tight.png?v=1",
   "./assets/header-strokes-left-v2.png?v=1",
@@ -36,9 +40,9 @@ const APP_SHELL = [
   "./assets/emoji/aa_ballot.png",
   "./assets/emoji/aa_book_blue.png",
   "./assets/emoji/aa_heart_hands.png",
-  "./icons/icon-192-v2.png",
-  "./icons/icon-512-v2.png",
-  "./icons/apple-touch-icon-v2.png"
+  "./icons/icon-192-v3.png",
+  "./icons/icon-512-v3.png",
+  "./icons/apple-touch-icon-v3.png"
 ];
 
 self.addEventListener("install", (event) => {
