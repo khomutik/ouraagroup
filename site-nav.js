@@ -7,7 +7,7 @@
   const speakersUrl = "https://drive.google.com/drive/folders/1x-bKBZzLpj1uTAnJpWqVFq3JBjXw-su-?usp=sharing";
   const archiveUrl = "https://docs.google.com/document/d/14c8l7aYBO2R3Gz-PgVV3y0CCMXS4gBflpFp4pQsn9v8/edit?usp=sharing";
   const zoomUrl = "https://us06web.zoom.us/j/5487249245?pwd=UE3buqca6pTDt8kGPJDW9pRoaC7gkt.1";
-  const telegramUrl = "https://t.me/+mta_CKQY2c05ODRi";
+  const telegramUrl = "https://telegram.me/+mta_CKQY2c05ODRi";
   const maxUrl = "https://max.ru/join/GV-P-08zFtVs6pX-xR5Z8x80MMNPzhjJ1w6JVEYGn9M";
 
   const navItems = [
