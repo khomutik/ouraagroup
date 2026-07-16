@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pochtinormalnye.ru/sitemap.xml
