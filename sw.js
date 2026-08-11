@@ -26,6 +26,7 @@ const APP_SHELL = [
   "./assets/sponsorship-questions-answers.pdf",
   "./assets/announcement-working-meeting-2026-07-25.jpg",
   "./assets/announcement-speaker-darya-2026-07-24.jpg",
+  "./assets/announcement-speaker-sasha-2026-08-14.png",
   "./assets/announcement-speaker-stas-2026-07-10.jpg",
   "./assets/announcement-zoom-training.png",
   "./manifest.webmanifest",

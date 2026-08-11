@@ -1159,6 +1159,35 @@ a {
   border-radius: 14px;
 }
 
+.announcement-card--with-copy {
+  display: grid;
+  gap: 14px;
+}
+
+.announcement-copy {
+  display: grid;
+  gap: 12px;
+  padding: 2px 4px 2px;
+  color: var(--blue);
+  font-size: 18px;
+  line-height: 1.45;
+  font-weight: 800;
+}
+
+.announcement-copy p {
+  margin: 0;
+}
+
+.announcement-copy-title {
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.announcement-copy a {
+  color: var(--orange);
+  word-break: break-word;
+}
+
 .content-card {
   margin-top: 12px;
   padding: 14px;
