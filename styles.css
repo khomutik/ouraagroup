@@ -892,14 +892,14 @@ a {
   justify-content: space-between;
   min-height: 56px;
   padding: 10px 12px;
-  border: 1px solid rgba(247, 239, 223, 0.24);
+  border: 1px solid rgba(7, 27, 68, 0.16);
   border-radius: 14px;
   color: var(--cream-2);
   font-size: 14px;
   font-weight: 900;
   line-height: 1.05;
   text-transform: uppercase;
-  background: rgba(255, 248, 234, 0.08);
+  background: linear-gradient(90deg, rgba(223, 91, 11, 0.12), transparent 42%), var(--cream-2);
   cursor: pointer;
   list-style: none;
 }
@@ -1303,7 +1303,7 @@ a {
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--blue);
-  color: var(--cream-2);
+  color: var(--blue);
   font: inherit;
   font-size: 16px;
   font-weight: 900;
