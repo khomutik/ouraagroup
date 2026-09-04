@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=51" />
+  <link rel="stylesheet" href="styles.css?v=52" />
 </head>
 <body>
   <main class="page-shell">
@@ -66,8 +66,14 @@
       <img src="assets/emoji/aa_microphone.png" alt="" />
       <span>Открыть спикерские на Google Диске</span>
     </a>
+    <button class="back-to-top" type="button" aria-label="Вернуться наверх">↑ Наверх</button>
   </main>
   <script src="site-nav.js?v=7"></script>
+  <script>
+    document.querySelector(".back-to-top")?.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
 </body>
 </html>
 
