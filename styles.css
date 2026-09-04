@@ -1207,10 +1207,12 @@ a {
 .speakers-intro h2,
 .speakers-materials h2,
 .speakers-privacy h2 {
-  margin: 0;
+  margin: 0 0 10px;
   color: var(--blue);
-  font-size: 21px;
-  line-height: 1.18;
+  font-size: clamp(22px, 5.4vw, 30px);
+  line-height: 1.08;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .speakers-intro p,
@@ -1218,8 +1220,8 @@ a {
 .speakers-privacy p {
   margin: 0;
   color: var(--muted);
-  font-size: 16px;
-  line-height: 1.42;
+  font-size: 15px;
+  line-height: 1.45;
   text-align: justify;
 }
 
@@ -1234,11 +1236,12 @@ a {
   display: grid;
   gap: 10px;
   margin-top: 12px;
-  padding: 16px;
-  border: 2px solid var(--orange);
-  border-radius: var(--radius);
-  background: linear-gradient(135deg, rgba(223, 91, 11, 0.18), rgba(255, 248, 234, 0.95));
-  box-shadow: var(--soft-shadow);
+  padding: 14px 14px 16px;
+  border-left: 6px solid var(--orange);
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, rgba(223, 91, 11, 0.08), transparent 38%),
+    rgba(255, 255, 255, 0.62);
 }
 
 .speakers-privacy p:first-of-type {
@@ -1256,12 +1259,12 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 12px;
-  border-left: 5px solid var(--orange);
+  padding: 10px 12px;
+  border-left: 6px solid var(--orange);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.52);
   color: var(--blue);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   line-height: 1.25;
   text-decoration: none;
