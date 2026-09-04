@@ -1,4 +1,4 @@
-const CACHE_NAME = "aa-pn-v112";
+const CACHE_NAME = "aa-pn-v113";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -29,6 +29,9 @@ const APP_SHELL = [
   "./assets/announcement-speaker-sasha-2026-08-14.png",
   "./assets/announcement-speaker-anastasia-2026-08-28.jpg",
   "./assets/announcement-rotation-2026-08-29.jpg",
+  "./assets/MG-18_1025.pdf",
+  "./assets/MG-25_Safety_and_AA_Groups_ONLINE.pdf",
+  "./assets/P-47_Anonymity_Our_Spiritual_Foundation_ONLINE.pdf",
   "./assets/announcement-speaker-stas-2026-07-10.jpg",
   "./assets/announcement-zoom-training.png",
   "./manifest.webmanifest",

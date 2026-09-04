@@ -45,7 +45,7 @@
         { href: "https://drive.google.com/drive/folders/1vKX6abhQRFOKIhHaqXmYcUWgjVcCpmHu?usp=sharing", label: "Другая литература", external: true }
       ]
     },
-    { title: "Спикерские", href: speakersUrl, external: true },
+    { title: "Спикерские", href: "speakers.html" },
     {
       title: "Служения",
       href: "service.html",
