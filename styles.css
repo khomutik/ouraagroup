@@ -867,30 +867,12 @@ a {
 
 .site-side-nav,
 .mobile-menu-panel__sheet {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(247, 239, 223, 0.48) transparent;
+  scrollbar-width: none;
 }
 
 .site-side-nav::-webkit-scrollbar,
 .mobile-menu-panel__sheet::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.site-side-nav::-webkit-scrollbar-track,
-.mobile-menu-panel__sheet::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.site-side-nav::-webkit-scrollbar-thumb,
-.mobile-menu-panel__sheet::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: rgba(247, 239, 223, 0.48);
-}
-
-.site-side-nav::-webkit-scrollbar-thumb:hover,
-.mobile-menu-panel__sheet::-webkit-scrollbar-thumb:hover {
-  background: rgba(247, 239, 223, 0.7);
+  display: none;
 }
 
 .site-side-nav__title {
