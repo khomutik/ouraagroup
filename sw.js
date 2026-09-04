@@ -1,4 +1,4 @@
-const CACHE_NAME = "aa-pn-v128";
+const CACHE_NAME = "aa-pn-v129";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -12,8 +12,8 @@ const APP_SHELL = [
   "./tradition.html",
   "./robots.txt",
   "./sitemap.xml",
-  "./styles.css?v=60",
-  "./site-nav.js?v=9",
+  "./styles.css?v=61",
+  "./site-nav.js?v=10",
   "./assets/book-big-book.webp",
   "./assets/big-book-with-stories.pdf",
   "./assets/book-12x12.webp",
