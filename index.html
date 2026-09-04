@@ -111,14 +111,20 @@
         <small>MAX</small>
       </a>
     </nav>
+    <button class="back-to-top" type="button" aria-label="Вернуться наверх">↑ Наверх</button>
   </main>
 
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=115").catch(() => {});
+        navigator.serviceWorker.register("./sw.js?v=118").catch(() => {});
       });
     }
+  </script>
+  <script>
+    document.querySelector(".back-to-top")?.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   </script>
 </body>
 </html>

@@ -977,10 +977,10 @@ a {
 
 .site-nav__summary.is-active,
 .site-nav__main-link.is-active {
-  border-color: rgba(223, 91, 11, 0.46);
-  color: var(--orange-dark);
+  border-color: rgba(7, 27, 68, 0.16);
+  color: var(--blue);
   background:
-    linear-gradient(90deg, rgba(223, 91, 11, 0.24), transparent 48%),
+    linear-gradient(90deg, rgba(223, 91, 11, 0.12), transparent 42%),
     var(--cream-2);
 }
 

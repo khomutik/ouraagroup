@@ -120,6 +120,8 @@
   `;
 
   shell.insertAdjacentHTML("beforeend", `
+    <button class="back-to-top" type="button" aria-label="Вернуться наверх">↑ Наверх</button>
+
     <aside class="site-side-nav" aria-label="Меню сайта">
       <p class="site-side-nav__title">Меню</p>
       <nav class="site-nav">${navHtml}</nav>
@@ -183,6 +185,10 @@
       } else {
         location.href = "index.html";
       }
+    }
+
+    if (event.target.closest(".back-to-top")) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   });
 
