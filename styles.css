@@ -1307,8 +1307,12 @@ a {
 }
 
 .back-to-top {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 25;
   display: block;
-  margin: 16px auto 0;
+  margin: 0;
   padding: 10px 18px;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -1319,6 +1323,13 @@ a {
   font-weight: 900;
   cursor: pointer;
   box-shadow: var(--soft-shadow);
+}
+
+@media (max-width: 899px) {
+  .back-to-top {
+    right: 14px;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+  }
 }
 
 .back-to-top:hover,
