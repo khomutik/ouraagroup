@@ -88,10 +88,14 @@ a {
   display: block;
   width: 100%;
   min-width: 0;
-  height: 48px;
+  height: 44px;
   background-position: center;
   background-repeat: no-repeat;
   background-size: 100% auto;
+  opacity: 0.78;
+  filter: blur(0.7px);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
 }
 
 .hero__stroke--left {
@@ -977,10 +981,10 @@ a {
 
 .site-nav__summary.is-active,
 .site-nav__main-link.is-active {
-  border-color: rgba(7, 27, 68, 0.16);
-  color: var(--blue);
+  border-color: rgba(223, 91, 11, 0.46);
+  color: var(--orange-dark);
   background:
-    linear-gradient(90deg, rgba(223, 91, 11, 0.12), transparent 42%),
+    linear-gradient(90deg, rgba(223, 91, 11, 0.24), transparent 48%),
     var(--cream-2);
 }
 
@@ -1119,6 +1123,15 @@ a {
 
 .mobile-menu-panel .site-nav__link.is-active {
   color: var(--orange-dark);
+}
+
+.mobile-menu-panel .site-nav__main-link.is-active,
+.mobile-menu-panel .site-nav__summary.is-active {
+  border-color: rgba(223, 91, 11, 0.46);
+  color: var(--orange-dark);
+  background:
+    linear-gradient(90deg, rgba(223, 91, 11, 0.24), transparent 48%),
+    var(--cream-2);
 }
 
 .mobile-menu-panel .site-nav-socials {
