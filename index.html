@@ -12,10 +12,10 @@
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=61" />
+  <link rel="stylesheet" href="styles.css?v=102" />
 </head>
 <body>
-  <main class="app-shell">
+  <main class="app-shell" id="top">
     <header class="hero" aria-label="Группа АА «Почти нормальные»">
       <span class="hero__stroke hero__stroke--left" aria-hidden="true"></span>
       <picture class="hero__logo">
@@ -95,6 +95,7 @@
           <strong>Архив решений</strong>
         </span>
       </a>
+      <a class="menu-admin-link" href="admin/">↗ Вход в админку</a>
     </nav>
 
     <nav class="socials" aria-label="Быстрые ссылки">
@@ -111,21 +112,10 @@
         <small>MAX</small>
       </a>
     </nav>
-    <button class="back-to-top" type="button" aria-label="Вернуться наверх">↑ Наверх</button>
+    <a class="back-to-top" href="#top">↑ Наверх</a>
   </main>
 
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=121").catch(() => {});
-      });
-    }
-  </script>
-  <script>
-    document.querySelector(".back-to-top")?.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  </script>
+  <script src="pwa-install.js?v=10"></script>
 </body>
 </html>
 

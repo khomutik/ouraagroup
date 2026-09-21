@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "pn-support-chat",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://pochtinormalnye.ru,https://www.pochtinormalnye.ru",
+    "OWNER_TELEGRAM_ID": "2077822616",
+    "TRUSTED_PROXY_IP": "89.124.123.138",
+    "RETENTION_DAYS": "30",
+    "MAX_MESSAGE_LENGTH": "2000"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pn-support-chat",
+      "database_id": "09a4b21f-8155-41ba-8cd5-7b0a7d1bd613",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": {
+    "crons": ["17 2 * * *"]
+  }
+}

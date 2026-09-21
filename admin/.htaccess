@@ -1,0 +1,4 @@
+Options -Indexes
+<FilesMatch "\.(?:json|log)$">
+  Require all denied
+</FilesMatch>

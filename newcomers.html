@@ -12,10 +12,10 @@
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=61" />
+  <link rel="stylesheet" href="styles.css?v=102" />
 </head>
 <body>
-  <main class="page-shell">
+  <main class="page-shell" id="top">
     <header class="page-header">
       <h1 class="page-title">Новичкам</h1>
     </header>
@@ -217,7 +217,7 @@
         <div class="newcomers-actions">
           <button class="flow-button" type="button" data-target="alcoholism-learned">Что мы узнали об алкоголизме?</button>
           <button class="flow-button" type="button" data-target="alcoholism-disease">Алкоголизм - это болезнь</button>
-          <a class="flow-button" href="https://aarussia.ru/test-aa" target="_blank" rel="noopener">Тест "Подходит ли тебе АА?"</a>
+          <button class="flow-button" type="button" data-target="aa-test">Тест "Подходит ли тебе АА?"</button>
         </div>
       </article>
 
@@ -387,7 +387,7 @@
         </div>
       </article>
     </section>
-    <button class="back-to-top" type="button" aria-label="Вернуться наверх">↑ Наверх</button>
+    <a class="back-to-top" href="#top">↑ Наверх</a>
   </main>
 
   <script>
@@ -448,6 +448,7 @@
       });
     })();
   </script>
-  <script src="site-nav.js?v=10"></script>
+  <script src="site-nav.js?v=17"></script>
+  <script src="pwa-install.js?v=10"></script>
 </body>
 </html>

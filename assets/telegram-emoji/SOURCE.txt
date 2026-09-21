@@ -1,0 +1,3 @@
+Telegram for Android static emoji assets
+https://github.com/DrKLO/Telegram
+License: GNU GPL v2 or later (see LICENSE)

@@ -1,16 +1,16 @@
-(() => {
+(async () => {
   const shell = document.querySelector(".page-shell");
   if (!shell) return;
 
-  const serviceSheetUrl = "https://docs.google.com/spreadsheets/d/1VAWzdnevTgTmfyx83wfSig9BW6PfdKK1wZorpW0bIvU/edit?usp=sharing";
-  const treasurerReportUrl = "https://docs.google.com/spreadsheets/d/1uFKVQ6Orlz2GMTyIWsB4ux7eDRKejFTQ120p6JowZSE/edit?usp=sharing";
   const speakersUrl = "https://drive.google.com/drive/folders/1x-bKBZzLpj1uTAnJpWqVFq3JBjXw-su-?usp=sharing";
-  const archiveUrl = "https://docs.google.com/document/d/14c8l7aYBO2R3Gz-PgVV3y0CCMXS4gBflpFp4pQsn9v8/edit?usp=sharing";
+  const archiveUrl = "archive.html";
   const zoomUrl = "https://us06web.zoom.us/j/5487249245?pwd=UE3buqca6pTDt8kGPJDW9pRoaC7gkt.1";
   const telegramUrl = "https://telegram.me/+mta_CKQY2c05ODRi";
   const maxUrl = "https://max.ru/join/GV-P-08zFtVs6pX-xR5Z8x80MMNPzhjJ1w6JVEYGn9M";
+  const escapeHtml = (value) => String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+  const siteUrl = (value) => /^(?:https?:|tel:|mailto:|#|\/)/i.test(String(value || '')) ? String(value || '') : `/${value}`;
 
-  const navItems = [
+  let navItems = [
     { title: "Главная страница", href: "index.html" },
     {
       title: "Новичкам",
@@ -41,8 +41,7 @@
       href: "library.html",
       openOn: "library.html",
       links: [
-        { href: "library.html", label: "Библиотека - книги и брошюры АА" },
-        { href: "https://drive.google.com/drive/folders/1vKX6abhQRFOKIhHaqXmYcUWgjVcCpmHu?usp=sharing", label: "Другая литература", external: true }
+        { href: "library.html", label: "Библиотека - книги и брошюры АА" }
       ]
     },
     { title: "Спикерские", href: "speakers.html" },
@@ -51,8 +50,7 @@
       href: "service.html",
       openOn: "service.html",
       links: [
-        { href: "service.html", label: "Служения - список служений группы" },
-        { href: serviceSheetUrl, label: "График служений", external: true }
+        { href: "service.html", label: "Служения - список служений группы" }
       ]
     },
     {
@@ -60,12 +58,35 @@
       href: "tradition.html",
       openOn: "tradition.html",
       links: [
-        { href: "tradition.html", label: "7-я традиция - реквизиты" },
-        { href: treasurerReportUrl, label: "Отчет казначея", external: true }
+        { href: "tradition.html", label: "7-я традиция - реквизиты" }
       ]
     },
-    { title: "Архив решений", href: archiveUrl, external: true }
+    { title: "Архив", href: archiveUrl }
   ];
+
+  let socialLinks = [
+    {title:'Zoom', url:zoomUrl, icon:'/assets/social-zoom-v2.png'},
+    {title:'Telegram', url:telegramUrl, icon:'/assets/social-telegram-v2.png'},
+    {title:'MAX', url:maxUrl, icon:'/assets/social-max-v2.png'}
+  ];
+  try {
+    const response = await fetch('/cms-navigation.json', {cache:'no-store'});
+    if (response.ok) {
+      const config = await response.json();
+      const hiddenMenuLabels = new Set(["Другая литература", "График служений", "Отчет казначея", "Отчёт казначея"]);
+      const rows = (Array.isArray(config.items) ? config.items : [])
+        .filter((row) => !hiddenMenuLabels.has(String(row.title || "")))
+        .map((row) => ({...row,url:siteUrl(row.url),icon:row.icon ? siteUrl(row.icon) : ''}));
+      const roots = rows.filter((row) => !row.parent);
+      navItems = roots.map((row) => {
+        const children = rows.filter((child) => child.parent === row.id || child.parent === row.title).map((child) => ({href:child.url,label:child.title,external:!!child.external}));
+        const base = {title:row.title,href:row.url,external:!!row.external};
+        if (children.length) return {...base,openOn:String(row.url).split('/').pop().split('#')[0],links:[{href:row.url,label:row.title,external:!!row.external},...children]};
+        return base;
+      });
+      if (Array.isArray(config.socials) && config.socials.length) socialLinks = config.socials.map((row) => ({...row,url:siteUrl(row.url),icon:row.icon ? siteUrl(row.icon) : ''}));
+    }
+  } catch (_) { /* Keep the built-in menu when the CMS is temporarily unavailable. */ }
 
   const currentPage = location.pathname.split("/").pop() || "index.html";
   const activeHref = `${currentPage}${location.hash}`;
@@ -80,21 +101,24 @@
     const active = !item.external && isActive(item.href) ? " is-active" : "";
     const current = active ? ' aria-current="page"' : "";
     const target = item.external ? ' target="_blank" rel="noopener"' : "";
-    return `<a class="${className}${active}" href="${item.href}"${current}${target}>${item.label || item.title}</a>`;
+    return `<a class="${className}${active}" href="${escapeHtml(item.href)}"${current}${target}>${escapeHtml(item.label || item.title)}</a>`;
   };
 
   const navHtml = navItems.map((item) => {
+    const divider = String(item.href || '').replace(/^\//, '').split('#')[0] === 'service.html'
+      ? '<span class="site-nav__divider" aria-hidden="true"></span>'
+      : '';
     if (!item.links) {
-      return linkHtml(item, "site-nav__main-link");
+      return divider + linkHtml(item, "site-nav__main-link");
     }
 
     const isOpen = item.openOn === currentPage;
     const open = isOpen ? " open" : "";
     const active = !item.external && item.href === currentPage ? " is-active" : "";
 
-    return `
+    return divider + `
       <details class="site-nav__group"${open}>
-        <summary class="site-nav__summary${active}">${item.title}</summary>
+        <summary class="site-nav__summary${active}">${escapeHtml(item.title)}</summary>
         <div class="site-nav__links">
           ${item.links.map((link) => linkHtml(link)).join("")}
         </div>
@@ -102,28 +126,15 @@
     `;
   }).join("");
 
-  const socialHtml = `
-    <div class="site-nav-socials" aria-label="Соцсети и быстрые ссылки">
-      <a class="site-nav-socials__link" href="${zoomUrl}" target="_blank" rel="noopener">
-        <img src="assets/social-zoom-v2.png" alt="" />
-        <span>Zoom</span>
-      </a>
-      <a class="site-nav-socials__link" href="${telegramUrl}" target="_blank" rel="noopener">
-        <img src="assets/social-telegram-v2.png" alt="" />
-        <span>Telegram</span>
-      </a>
-      <a class="site-nav-socials__link" href="${maxUrl}" target="_blank" rel="noopener">
-        <img src="assets/social-max-v2.png" alt="" />
-        <span>MAX</span>
-      </a>
-    </div>
-  `;
+ const socialHtml = `<div class="site-nav-socials" aria-label="Соцсети и быстрые ссылки">${socialLinks.map((item) => `<a class="site-nav-socials__link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${item.icon ? `<img src="${escapeHtml(item.icon)}" alt="" />` : ''}<span>${escapeHtml(item.title)}</span></a>`).join('')}</div>`;
+  const adminLinkHtml = `<a class="site-nav__admin-link" href="admin/" aria-label="Вход в админку">Вход в админку</a>`;
 
   shell.insertAdjacentHTML("beforeend", `
     <aside class="site-side-nav" aria-label="Меню сайта">
-      <p class="site-side-nav__title">Меню</p>
-      <nav class="site-nav">${navHtml}</nav>
-      ${socialHtml}
+     <p class="site-side-nav__title">Меню</p>
+     <nav class="site-nav">${navHtml}</nav>
+      ${adminLinkHtml}
+     ${socialHtml}
     </aside>
 
     <nav class="mobile-bottom-nav" aria-label="Навигация">
@@ -143,9 +154,10 @@
 
     <div class="mobile-menu-panel" data-site-menu-panel hidden>
       <div class="mobile-menu-panel__sheet" role="dialog" aria-modal="true" aria-label="Меню сайта">
-        <button class="mobile-menu-panel__close" type="button" data-site-menu-close>Закрыть</button>
-        <nav class="site-nav">${navHtml}</nav>
-        ${socialHtml}
+       <button class="mobile-menu-panel__close" type="button" data-site-menu-close>Закрыть</button>
+       <nav class="site-nav">${navHtml}</nav>
+        ${adminLinkHtml}
+       ${socialHtml}
       </div>
     </div>
   `);
@@ -185,9 +197,6 @@
       }
     }
 
-    if (event.target.closest(".back-to-top")) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
   });
 
   document.addEventListener("keydown", (event) => {

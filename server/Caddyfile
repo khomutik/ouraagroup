@@ -1,0 +1,59 @@
+memory.khomutik.ru {
+	reverse_proxy 127.0.0.1:8000
+}
+
+pochtinormalnye.ru, www.pochtinormalnye.ru {
+	root * /home/masha/pochtinormalnye-site
+	encode zstd gzip
+
+	handle_path /nafanya-zoom-control/vnc/* {
+		forward_auth 127.0.0.1:3098 {
+			uri /auth/check
+		}
+		reverse_proxy 127.0.0.1:6080
+	}
+
+	handle_path /nafanya-zoom-control/* {
+		reverse_proxy 127.0.0.1:3098
+	}
+
+	handle_path /support-chat-api/* {
+		reverse_proxy https://pn-support-chat.pochtinormalnye.workers.dev {
+			header_up Host pn-support-chat.pochtinormalnye.workers.dev
+			header_up X-PN-Visitor-IP {http.request.header.CF-Connecting-IP}
+			transport http {
+				tls_server_name pn-support-chat.pochtinormalnye.workers.dev
+			}
+		}
+	}
+
+	handle_path /support-chat-max-api-{$MAX_PROXY_SECRET}/* {
+		reverse_proxy https://platform-api2.max.ru {
+			header_up Host platform-api2.max.ru
+			transport http {
+				tls_server_name platform-api2.max.ru
+				tls_trust_pool file /etc/caddy/max-russian-trusted-ca.pem
+			}
+		}
+	}
+
+	@private path /.git* /.agents* /.codex* /.gitignore /.htaccess /admin/.htaccess /cms.php /site-page.php /cms-config.php /cms-config.example.php /cms-data* /cms-backups* /support-chat-worker*
+	handle @private {
+		respond 404
+	}
+
+	@cms path / /index.html /newcomers.html /tradition.html /cms-navigation.json /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html
+	handle @cms {
+		header Cache-Control "no-store"
+		reverse_proxy 127.0.0.1:8091
+	}
+
+	handle {
+		header Cache-Control "public, max-age=300"
+		file_server
+	}
+}
+
+jora.khomutik.ru {
+	reverse_proxy 127.0.0.1:8030
+}

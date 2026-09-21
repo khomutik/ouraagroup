@@ -12,10 +12,10 @@
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=61" />
+  <link rel="stylesheet" href="styles.css?v=102" />
 </head>
 <body>
-  <main class="page-shell">
+  <main class="page-shell" id="top">
     <header class="page-header">
       <h1 class="page-title">Библиотека</h1>
     </header>
@@ -32,7 +32,7 @@
         <div class="library-card__body">
           <h2>Большая Книга «Анонимные Алкоголики»</h2>
           <p>Большая книга с историями. В ней описан опыт первых членов Содружества и принципы, которые помогают алкоголикам оставаться трезвыми.</p>
-          <a class="flow-button" href="assets/big-book-with-stories.pdf" target="_blank" rel="noopener">Открыть PDF</a>
+          <a class="flow-button" href="assets/big-book-with-stories.pdf" target="_blank" rel="noopener">Читать</a>
         </div>
       </article>
       <article class="library-card">
@@ -42,7 +42,7 @@
         <div class="library-card__body">
           <h2>Двенадцать шагов и Двенадцать традиций</h2>
           <p>Книга подробно раскрывает Двенадцать Шагов как путь личного выздоровления и Двенадцать Традиций как основу единства и работы групп АА.</p>
-          <a class="flow-button" href="assets/twelve-steps-twelve-traditions.pdf" target="_blank" rel="noopener">Открыть PDF</a>
+          <a class="flow-button" href="assets/twelve-steps-twelve-traditions.pdf" target="_blank" rel="noopener">Читать</a>
         </div>
       </article>
       <article class="library-card">
@@ -52,7 +52,7 @@
         <div class="library-card__body">
           <h2>Жить трезвыми</h2>
           <p>Практическая книга с методами сохранения трезвости, которые используют члены АА: как не пить первую рюмку, справляться с тягой и оставаться трезвым сегодня.</p>
-          <a class="flow-button" href="assets/living-sober.pdf" target="_blank" rel="noopener">Открыть PDF</a>
+          <a class="flow-button" href="assets/living-sober.pdf" target="_blank" rel="noopener">Читать</a>
         </div>
       </article>
       <article class="library-card">
@@ -62,7 +62,7 @@
         <div class="library-card__body">
           <h2>Брошюра «44 вопроса и ответа»</h2>
           <p>Короткая брошюра с простыми ответами на частые вопросы об Анонимных Алкоголиках, собраниях, членстве, анонимности и том, как АА помогает алкоголикам оставаться трезвыми.</p>
-          <a class="flow-button" href="assets/forty-four-questions-answers.pdf" target="_blank" rel="noopener">Открыть PDF</a>
+          <a class="flow-button" href="assets/forty-four-questions-answers.pdf" target="_blank" rel="noopener">Читать</a>
         </div>
       </article>
       <article class="library-card">
@@ -72,7 +72,7 @@
         <div class="library-card__body">
           <h2>Брошюра «Вопросы и ответы о наставничестве»</h2>
           <p>Краткое руководство о наставничестве в АА: как выбрать наставника, как строится помощь новичку и какую роль спонсорство играет в работе по Программе.</p>
-          <a class="flow-button" href="assets/sponsorship-questions-answers.pdf" target="_blank" rel="noopener">Открыть PDF</a>
+          <a class="flow-button" href="assets/sponsorship-questions-answers.pdf" target="_blank" rel="noopener">Читать</a>
         </div>
       </article>
     </section>
@@ -85,8 +85,9 @@
         </span>
       </a>
     </nav>
-    <button class="back-to-top" type="button" aria-label="Вернуться наверх">↑ Наверх</button>
+    <a class="back-to-top" href="#top">↑ Наверх</a>
   </main>
-  <script src="site-nav.js?v=10"></script>
+  <script src="site-nav.js?v=17"></script>
+  <script src="pwa-install.js?v=10"></script>
 </body>
 </html>

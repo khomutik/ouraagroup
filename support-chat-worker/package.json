@@ -1,0 +1,22 @@
+{
+  "name": "pn-support-chat",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cf-typegen": "wrangler types worker-configuration.d.ts",
+    "typecheck": "npm run cf-typegen && tsc --noEmit",
+    "test": "vitest run",
+    "setup:telegram-token": "node scripts/set-telegram-token.mjs",
+    "setup:max-token": "node scripts/set-max-token.mjs",
+    "dev": "wrangler dev --local",
+    "deploy:dry": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11",
+    "wrangler": "4.129.1"
+  }
+}
