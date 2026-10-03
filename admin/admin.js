@@ -656,6 +656,11 @@
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape') setAdminMenu(false); });
   smallScreen.addEventListener?.('change', () => setAdminMenu(false));
 
+  // Keep each page's headings and permanent labels next to its editor.
+  const pageTexts = document.querySelector('.admin-page-texts');
+  const pageHeading = document.querySelector('.admin-main h1');
+  if (pageTexts && pageHeading) (document.querySelector('.admin-page-links') || pageHeading.closest('.section-heading') || pageHeading).after(pageTexts);
+
   // Одна заметная кнопка сохранения снизу, когда пальцем уже далеко от верха формы.
   const editableForms = [...document.querySelectorAll('form.admin-form')];
   let dirtyForm = null;

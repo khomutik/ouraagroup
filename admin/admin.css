@@ -147,3 +147,10 @@ h1,h2,h3{font-family:"Unbounded",Arial,sans-serif}
   color:#123464;
 }
 .admin-main h1,.admin-main h2,.admin-main h3{overflow-wrap:anywhere}
+.admin-page-links{margin:18px 0 26px;padding:18px;border:1px solid #bfd4f1;border-radius:14px;background:#eef5ff}
+.admin-page-links h2{margin:0 0 12px;font-size:20px}
+.admin-page-links__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:9px}
+.admin-page-links__grid a{display:flex;align-items:center;min-height:48px;padding:10px 12px;border:1px solid #bfd4f1;border-radius:9px;background:#fff;color:var(--ink);font-weight:700;text-decoration:none}
+.admin-page-links__grid a:hover,.admin-page-links__grid a:focus-visible{border-color:#2860aa;background:#dcecff}
+.admin-page-links p{margin:12px 0 0;color:#24446f;font-size:14px}
+.admin-page-texts{margin:16px 0 22px;border-color:#bfd4f1;background:#f8fbff}
