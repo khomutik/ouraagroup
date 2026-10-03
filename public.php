@@ -75,7 +75,6 @@ if ($section === 'archive') { $data=$content['archive']??[]; $items=$data['items
 
 if ($section === 'schedule') { $data = $content['schedule'] ?? []; ?>
   <p class="schedule-time"><?= h($data['time'] ?? '') ?></p>
-  <p class="schedule-lead"><?=h(cms_site_text($content, 'schedule_lead'))?></p>
   <section class="schedule schedule-page" aria-label="Темы собраний"><div class="schedule-list">
     <?php foreach (($data['days'] ?? []) as $day): ?><article class="schedule-item"><h2><?= h($day['day'] ?? '') ?></h2><p><?= cms_rich((string)($day['topic'] ?? '')) ?></p></article><?php endforeach; ?>
   </div></section>

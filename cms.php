@@ -350,9 +350,6 @@ function cms_content(): array {
         if (!array_key_exists('order', $content['announcements'][$index])) $content['announcements'][$index]['order'] = $index;
     }
     if (!isset($content['archive']) || !is_array($content['archive'])) $content['archive'] = $defaults['archive'];
-    foreach (($content['navigation']['items'] ?? []) as $index => $item) {
-        if (($item['id'] ?? '') === 'archive') { $content['navigation']['items'][$index]['title'] = 'Архив'; $content['navigation']['items'][$index]['url'] = 'archive.html'; $content['navigation']['items'][$index]['external'] = false; }
-    }
     return $content;
 }
 function cms_site_text_fields(): array {
@@ -370,7 +367,6 @@ function cms_site_text_fields(): array {
         'newcomers_lead'=>['Новичкам','Вводный текст','Если алкоголь стал проблемой и ты не знаешь, с чего начать, здесь можно узнать, как устроены наши собрания и как прийти впервые. Не нужно заранее знать программу АА или решать, что говорить: можно подключиться и послушать.'],
         'schedule_heading'=>['Расписание','Заголовок страницы','Расписание собраний'],
         'schedule_description'=>['Расписание','Описание для поисковиков','Онлайн-собрания АА «Почти нормальные» проходят по понедельникам, вторникам, четвергам, пятницам и воскресеньям в 21:30 по Москве. Темы и вход в Zoom.'],
-        'schedule_lead'=>['Расписание','Вводный текст','Онлайн-собрания группы «Почти нормальные» проходят по понедельникам, вторникам, четвергам, пятницам и воскресеньям в 21:30 по московскому времени. Ниже — темы встреч; ссылка для входа в Zoom есть на главной странице.'],
         'announcements_heading'=>['Объявления','Заголовок страницы','Объявления'],
         'announcements_description'=>['Объявления','Описание для поисковиков','Объявления онлайн-группы АА «Почти нормальные»: новости и события группы.'],
         'no_announcements'=>['Объявления','Текст, если объявлений нет','Сейчас новых объявлений нет.'],
