@@ -1,0 +1,114 @@
+194-60-132-53.nip.io {
+    root * /srv/vdsina-test
+    header Cache-Control "no-store"
+    file_server
+}
+
+pochtinormalnye.ru {
+    root * /srv/pochtinormalnye-site
+    encode zstd gzip
+
+    handle /nafanya-zoom-control/* {
+        reverse_proxy https://89.124.123.138 {
+            header_up Host pochtinormalnye.ru
+            transport http {
+                tls_server_name pochtinormalnye.ru
+            }
+        }
+    }
+
+    handle_path /support-chat-api/* {
+        reverse_proxy https://pn-support-chat.pochtinormalnye.workers.dev {
+            header_up Host pn-support-chat.pochtinormalnye.workers.dev
+            header_up X-PN-Visitor-IP {http.request.header.CF-Connecting-IP}
+            transport http {
+                tls_server_name pn-support-chat.pochtinormalnye.workers.dev
+            }
+        }
+    }
+
+    handle /support-chat-max-api-* {
+        reverse_proxy https://89.124.123.138 {
+            header_up Host pochtinormalnye.ru
+            transport http {
+                tls_server_name pochtinormalnye.ru
+            }
+        }
+    }
+
+    @private path /.git* /.agents* /.codex* /.gitignore /.htaccess /README.md /admin/.htaccess /cms.php /site-page.php /cms-config.php /cms-config.example.php /cms-data* /cms-backups* /support-chat-worker*
+    handle @private {
+        respond 404
+    }
+
+    @cms path / /index.html /newcomers.html /tradition.html /cms-navigation.json /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html
+    handle @cms {
+        header Cache-Control "no-store"
+        reverse_proxy 127.0.0.1:8091
+    }
+
+    handle {
+        header Cache-Control "public, max-age=300"
+        file_server
+    }
+}
+
+www.pochtinormalnye.ru {
+    redir https://pochtinormalnye.ru{uri} permanent
+}
+
+site.194-60-132-53.nip.io {
+    header X-Robots-Tag "noindex, nofollow"
+    root * /srv/pochtinormalnye-site
+    encode zstd gzip
+
+    handle /nafanya-zoom-control/* {
+        reverse_proxy https://89.124.123.138 {
+            header_up Host pochtinormalnye.ru
+            transport http {
+                tls_server_name pochtinormalnye.ru
+            }
+        }
+    }
+
+    handle_path /support-chat-api/* {
+        reverse_proxy https://pn-support-chat.pochtinormalnye.workers.dev {
+            header_up Host pn-support-chat.pochtinormalnye.workers.dev
+            header_up X-PN-Visitor-IP {http.request.header.CF-Connecting-IP}
+            transport http {
+                tls_server_name pn-support-chat.pochtinormalnye.workers.dev
+            }
+        }
+    }
+
+    handle /support-chat-max-api-* {
+        reverse_proxy https://89.124.123.138 {
+            header_up Host pochtinormalnye.ru
+            transport http {
+                tls_server_name pochtinormalnye.ru
+            }
+        }
+    }
+
+    @private path /.git* /.agents* /.codex* /.gitignore /.htaccess /README.md /admin/.htaccess /cms.php /site-page.php /cms-config.php /cms-config.example.php /cms-data* /cms-backups* /support-chat-worker*
+    handle @private {
+        respond 404
+    }
+
+    @cms path / /index.html /newcomers.html /tradition.html /cms-navigation.json /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html
+    handle @cms {
+        header Cache-Control "no-store"
+        reverse_proxy 127.0.0.1:8091
+    }
+
+    handle {
+        header Cache-Control "public, max-age=300"
+        file_server
+    }
+}
+
+http://194.60.132.53 {
+    root * /srv/vdsina-test
+    header Cache-Control "no-store"
+    file_server
+}
