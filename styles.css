@@ -148,6 +148,28 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
   font-weight: 900;
 }
 
+.intro__heading {
+  margin: 0 0 12px;
+  color: var(--blue);
+  font-size: clamp(21px, 5vw, 30px);
+  line-height: 1.15;
+  text-align: center;
+}
+
+.intro p.seo-lead,
+.newcomers-card p.seo-lead,
+.schedule-lead {
+  color: var(--blue);
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.intro p.seo-lead,
+.newcomers-card p.seo-lead {
+  margin-bottom: 14px;
+}
+
 .intro__lines,
 .intro__invite {
   color: var(--blue) !important;
@@ -310,6 +332,14 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
   text-align: center;
   text-transform: none;
   text-shadow: 0 2px 0 rgba(0, 0, 0, 0.22);
+}
+
+.schedule-lead {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--cream-2);
+  font-size: 17px;
 }
 
 .schedule-list {

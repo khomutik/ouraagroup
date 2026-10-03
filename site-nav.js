@@ -89,19 +89,20 @@
   } catch (_) { /* Keep the built-in menu when the CMS is temporarily unavailable. */ }
 
   const currentPage = location.pathname.split("/").pop() || "index.html";
-  const activeHref = `${currentPage}${location.hash}`;
+  const currentPath = location.pathname === "/" ? "/index.html" : location.pathname;
 
   const isActive = (href) => {
-    if (href === activeHref) return true;
-    if (!href.includes("#") && href === currentPage) return true;
-    return false;
+    const target = new URL(siteUrl(href), location.origin);
+    const targetPath = target.pathname === "/" ? "/index.html" : target.pathname;
+    return target.origin === location.origin && targetPath === currentPath && (!target.hash || target.hash === location.hash);
   };
 
   const linkHtml = (item, className = "site-nav__link") => {
-    const active = !item.external && isActive(item.href) ? " is-active" : "";
+    const href = siteUrl(item.href);
+    const active = !item.external && isActive(href) ? " is-active" : "";
     const current = active ? ' aria-current="page"' : "";
     const target = item.external ? ' target="_blank" rel="noopener"' : "";
-    return `<a class="${className}${active}" href="${escapeHtml(item.href)}"${current}${target}>${escapeHtml(item.label || item.title)}</a>`;
+    return `<a class="${className}${active}" href="${escapeHtml(href)}"${current}${target}>${escapeHtml(item.label || item.title)}</a>`;
   };
 
   const navHtml = navItems.map((item) => {
@@ -114,7 +115,7 @@
 
     const isOpen = item.openOn === currentPage;
     const open = isOpen ? " open" : "";
-    const active = !item.external && item.href === currentPage ? " is-active" : "";
+    const active = !item.external && isActive(item.href) ? " is-active" : "";
 
     return divider + `
       <details class="site-nav__group"${open}>
@@ -127,7 +128,7 @@
   }).join("");
 
  const socialHtml = `<div class="site-nav-socials" aria-label="Соцсети и быстрые ссылки">${socialLinks.map((item) => `<a class="site-nav-socials__link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${item.icon ? `<img src="${escapeHtml(item.icon)}" alt="" />` : ''}<span>${escapeHtml(item.title)}</span></a>`).join('')}</div>`;
-  const adminLinkHtml = `<a class="site-nav__admin-link" href="admin/" aria-label="Вход в админку">Вход в админку</a>`;
+  const adminLinkHtml = `<a class="site-nav__admin-link" href="/admin/" aria-label="Вход в админку">Вход в админку</a>`;
 
   shell.insertAdjacentHTML("beforeend", `
     <aside class="site-side-nav" aria-label="Меню сайта">
@@ -146,7 +147,7 @@
         <span aria-hidden="true">☰</span>
         <span>Меню</span>
       </button>
-      <a class="mobile-bottom-nav__item" href="index.html">
+      <a class="mobile-bottom-nav__item" href="/">
         <span aria-hidden="true">⌂</span>
         <span>Дом</span>
       </a>
@@ -193,7 +194,7 @@
       if (history.length > 1) {
         history.back();
       } else {
-        location.href = "index.html";
+        location.href = "/";
       }
     }
 

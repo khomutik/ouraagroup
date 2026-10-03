@@ -13,7 +13,7 @@
   "vars": {
     "ALLOWED_ORIGINS": "https://pochtinormalnye.ru,https://www.pochtinormalnye.ru",
     "OWNER_TELEGRAM_ID": "2077822616",
-    "TRUSTED_PROXY_IP": "89.124.123.138",
+    "TRUSTED_PROXY_IP": "89.124.123.138,194.60.132.53",
     "RETENTION_DAYS": "30",
     "MAX_MESSAGE_LENGTH": "2000"
   },

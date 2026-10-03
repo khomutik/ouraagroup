@@ -44,7 +44,7 @@
     banner.setAttribute("aria-describedby", "pwa-install-description");
     banner.setAttribute("aria-live", "polite");
     banner.innerHTML = `
-      <img class="pwa-install-banner__icon" src="icons/icon-192-v3.png" alt="" width="56" height="56" />
+      <img class="pwa-install-banner__icon" src="/icons/icon-192-v3.png" alt="" width="56" height="56" />
       <div class="pwa-install-banner__content">
         <strong id="pwa-install-title" class="pwa-install-banner__title">Установить приложение?</strong>
         <span id="pwa-install-description" class="pwa-install-banner__description">Сайт будет открываться с главного экрана телефона.</span>

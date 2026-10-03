@@ -92,8 +92,11 @@ export function rateLimitAddress(
   trustedProxyIp: string | undefined,
 ): string {
   const direct = normalizeIpAddress(directAddress);
-  const trusted = normalizeIpAddress(trustedProxyIp);
-  if (direct && trusted && direct === trusted) {
+  const trusted = String(trustedProxyIp || "")
+    .split(",")
+    .map((address) => normalizeIpAddress(address))
+    .filter((address): address is string => address !== null);
+  if (direct && trusted.includes(direct)) {
     const forwarded = normalizeIpAddress(proxyAddress);
     if (forwarded) return forwarded;
   }
@@ -139,6 +142,7 @@ function base64UrlToBytes(value: string): Uint8Array<ArrayBuffer> {
   const binary = atob(padded);
   const bytes = new Uint8Array(new ArrayBuffer(binary.length));
   for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+  if (bytesToBase64Url(bytes) !== value) throw new Error("invalid_encrypted_value");
   return bytes;
 }
 

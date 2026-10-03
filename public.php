@@ -13,7 +13,7 @@ $content = cms_content();
 $titles = ['announcements'=>'Объявления','schedule'=>'Расписание собраний','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','archive'=>'Решения группы'];
 $descriptions = [
     'announcements'=>'Объявления онлайн-группы АА «Почти нормальные»: новости и события группы.',
-    'schedule'=>'Расписание онлайн-собраний группы АА «Почти нормальные».',
+    'schedule'=>'Онлайн-собрания АА «Почти нормальные» проходят по понедельникам, вторникам, четвергам, пятницам и воскресеньям в 21:30 по Москве. Темы и вход в Zoom.',
     'library'=>'Книги, брошюры и литература АА для группы «Почти нормальные».',
     'speakers'=>'Спикерские и материалы об анонимности группы АА «Почти нормальные».',
     'services'=>'Служения группы АА «Почти нормальные».',
@@ -34,7 +34,7 @@ function page_head(string $title, string $description, string $canonical): void 
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=103" />
+  <link rel="stylesheet" href="styles.css?v=104" />
 </head>
 <body>
   <main class="page-shell" id="top">
@@ -43,8 +43,8 @@ function page_head(string $title, string $description, string $canonical): void 
 function page_foot(): void { ?>
     <a class="back-to-top" href="#top">↑ Наверх</a>
   </main>
-  <script src="site-nav.js?v=17"></script>
-  <script src="pwa-install.js?v=10"></script>
+  <script src="site-nav.js?v=18"></script>
+  <script src="pwa-install.js?v=11"></script>
   <script src="site-chat.js?v=6" data-api="/support-chat-api"></script>
 </body>
 </html>
@@ -82,6 +82,7 @@ if ($section === 'archive') { $data=$content['archive']??[]; $items=$data['items
 
 if ($section === 'schedule') { $data = $content['schedule'] ?? []; ?>
   <p class="schedule-time"><?= h($data['time'] ?? '') ?></p>
+  <p class="schedule-lead">Онлайн-собрания группы «Почти нормальные» проходят по понедельникам, вторникам, четвергам, пятницам и воскресеньям в 21:30 по московскому времени. Ниже — темы встреч; ссылка для входа в Zoom есть на главной странице.</p>
   <section class="schedule schedule-page" aria-label="Темы собраний"><div class="schedule-list">
     <?php foreach (($data['days'] ?? []) as $day): ?><article class="schedule-item"><h2><?= h($day['day'] ?? '') ?></h2><p><?= cms_rich((string)($day['topic'] ?? '')) ?></p></article><?php endforeach; ?>
   </div></section>

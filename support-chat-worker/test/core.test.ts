@@ -71,6 +71,8 @@ describe("request safety", () => {
     expect(rateLimitAddress("89.124.123.138", "203.0.113.7", "89.124.123.138")).toBe("203.0.113.7");
     expect(rateLimitAddress("198.51.100.4", "203.0.113.7", "89.124.123.138")).toBe("198.51.100.4");
     expect(rateLimitAddress("89.124.123.138", "not-an-ip", "89.124.123.138")).toBe("89.124.123.138");
+    expect(rateLimitAddress("194.60.132.53", "203.0.113.7", "89.124.123.138,194.60.132.53")).toBe("203.0.113.7");
+    expect(rateLimitAddress("198.51.100.4", "203.0.113.7", "89.124.123.138,194.60.132.53")).toBe("198.51.100.4");
   });
 
   it("encrypts a Telegram chat address and rejects tampering", async () => {
@@ -78,6 +80,6 @@ describe("request safety", () => {
     const encrypted = await encryptSecretString(secret, "123456789");
     expect(encrypted).not.toContain("123456789");
     await expect(decryptSecretString(secret, encrypted)).resolves.toBe("123456789");
-    await expect(decryptSecretString(secret, encrypted.slice(0, -1) + "A")).rejects.toThrow();
+    await expect(decryptSecretString(secret, encrypted.slice(0, -1) + (encrypted.endsWith("A") ? "B" : "A"))).rejects.toThrow();
   });
 });
