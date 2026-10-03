@@ -656,22 +656,6 @@
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape') setAdminMenu(false); });
   smallScreen.addEventListener?.('change', () => setAdminMenu(false));
 
-  // Длинные подсказки на телефоне не отбирают пол-экрана: их можно раскрыть по желанию.
-  const compactAdminTips = () => {
-    if (!smallScreen.matches) return;
-    document.querySelectorAll('.admin-tip').forEach((tip) => {
-      if (tip.dataset.mobileCompact === 'true' || tip.textContent.trim().length < 145) return;
-      tip.dataset.mobileCompact = 'true';
-      const details = document.createElement('details');
-      details.className = 'admin-tip-details';
-      const summary = document.createElement('summary');
-      summary.textContent = 'Что это?';
-      details.append(summary, tip.cloneNode(true));
-      tip.replaceWith(details);
-    });
-  };
-  compactAdminTips();
-
   // Одна заметная кнопка сохранения снизу, когда пальцем уже далеко от верха формы.
   const editableForms = [...document.querySelectorAll('form.admin-form')];
   let dirtyForm = null;

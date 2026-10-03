@@ -37,12 +37,12 @@ pochtinormalnye.ru, www.pochtinormalnye.ru {
 		}
 	}
 
-	@private path /.git* /.agents* /.codex* /.gitignore /.htaccess /admin/.htaccess /cms.php /site-page.php /cms-config.php /cms-config.example.php /cms-data* /cms-backups* /support-chat-worker*
+	@private path /.git* /.agents* /.codex* /.gitignore /.htaccess /admin/.htaccess /cms.php /site-page.php /sitemap.php /cms-config.php /cms-config.example.php /cms-data* /cms-backups* /support-chat-worker*
 	handle @private {
 		respond 404
 	}
 
-	@cms path / /index.html /newcomers.html /tradition.html /cms-navigation.json /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html
+	@cms path / /index.html /newcomers.html /tradition.html /cms-navigation.json /sitemap.xml /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html
 	handle @cms {
 		header Cache-Control "no-store"
 		reverse_proxy 127.0.0.1:8091

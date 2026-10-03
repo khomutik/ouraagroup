@@ -429,11 +429,11 @@ $structureMobileLanding = $structureGraph !== null && !isset($_GET['page']);
 ?>
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=23"></head><body class="<?=$structureMobileLanding?'admin-structure--landing':''?>"><header class="admin-header"><button type="button" class="admin-menu-toggle" data-admin-menu-toggle aria-controls="admin-nav" aria-expanded="false">☰ <span>Разделы</span></button><a href="/" class="admin-brand">Почти нормальные <small>админка</small></a><form method="post"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><button class="link-button">Выйти (<?=h($user['username'])?>)</button></form></header><div class="admin-layout"><aside id="admin-nav" class="admin-nav" aria-label="Разделы админки"><div class="admin-nav__mobile-heading"><strong>Разделы</strong><button type="button" class="admin-nav__close" data-admin-menu-close aria-label="Закрыть разделы">×</button></div><a href="/admin/" class="<?=(!$section && $tab==='home')?'is-active':''?>">Главная</a><a href="?tab=structure" class="<?=($tab==='structure')?'is-active':''?>">Структура сайта</a><?php if ($structureGraph): ?><section class="admin-nav__explorer" aria-label="Проводник реальных переходов"><p>Переходы страниц</p><?php foreach ($structureGroups as $group=>$keys): if (!$keys) continue; ?><section class="site-explorer__group"><h3><?=h($group)?></h3><ul class="site-explorer__list"><?php foreach ($keys as $key) admin_structure_tree_node($structureGraph, $key, $structureSelectedPage); ?></ul></section><?php endforeach; ?></section><?php endif; ?><?php foreach (cms_section_labels() as $key=>$label): if (cms_can($key) && !in_array($key, ['navigation','pages'], true)): ?><a href="?section=<?=$key?>" class="<?=$section===$key?'is-active':''?>"><?=h($label)?></a><?php endif; endforeach; ?><?php if (cms_is_admin()): ?><a href="?tab=users" class="<?=($tab==='users')?'is-active':''?>">Пользователи</a><?php endif; ?></aside><main class="admin-main"><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?>
 <?php if (!$section && $tab === 'home'): ?>
-<p class="admin-tip">На сайте — аккуратная витрина. Здесь — подсобка с хорошим светом и без паутины.</p>
+<p class="admin-tip">Здесь можно изменить содержимое сайта. Выберите нужный раздел, внесите правки и нажмите кнопку сохранения в этой форме. После сохранения проверьте результат на сайте.</p>
 <?php endif; ?>
 <?php if ($structureGraph): ?>
   <h1>Структура сайта</h1>
-  <p class="admin-tip">Это проводник реальных переходов: дочерняя страница появляется только под той страницей, где стоит ведущая к ней кнопка. Кнопки главной показаны как переходы именно с Главной страницы.</p>
+  <p class="admin-tip">Здесь показано, как страницы связаны кнопками. Выберите страницу в списке, чтобы изменить её содержимое или кнопки перехода.</p>
   <button type="button" class="mobile-open-explorer button button--quiet" data-admin-menu-toggle>Открыть проводник</button>
   <section class="site-explorer site-explorer--detail-only" aria-label="Настройки выбранной страницы">
     <?php admin_structure_page_detail($content, $structureGraph, $structureSelectedPage); ?>
@@ -466,7 +466,7 @@ $structureMobileLanding = $structureGraph !== null && !isset($_GET['page']);
     foreach($items as $item) if(($item['id']??'')===$editId) $edit=$item;
 ?>
   <div class="section-heading"><h1>Решения группы</h1><a class="button button--quiet" href="?section=archive&edit=new">Новое решение</a></div>
-  <p class="admin-tip">У решения можно добавить несколько настраиваемых кнопок — ровно как у страниц.</p>
+  <p class="admin-tip">К каждому решению можно добавить кнопки со ссылками. Для каждой кнопки можно выбрать текст, адрес и внешний вид.</p>
   <form method="post" class="admin-form">
     <input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="archive"><input type="hidden" name="archive_mode" value="settings"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
     <?php admin_input('archive_drive_url',$data['drive_url']??'','url','Ссылка на Google Диск'); admin_document_position('drive_position',$data['drive_position']??'bottom','Где показывать кнопку Google Диска'); ?>
