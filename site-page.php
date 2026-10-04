@@ -60,9 +60,11 @@ function site_foot(bool $siteNav = true): void { global $content; ?>
 
 if ($kind === 'home') {
     $pages=$content['pages']??[]; $nav=$content['navigation']??cms_default_navigation();
-    site_head(cms_site_text($content, 'home_heading'), cms_site_text($content, 'home_description'), '', 'app-shell'); ?>
+    $homeHeading = cms_site_text($content, 'home_heading');
+    $homeTitle = preg_replace('/\s+/u', ' ', trim($homeHeading)) ?? $homeHeading;
+    site_head($homeTitle, cms_site_text($content, 'home_description'), '', 'app-shell'); ?>
     <header class="hero" aria-label="Группа АА «Почти нормальные»"><span class="hero__stroke hero__stroke--left" aria-hidden="true"></span><picture class="hero__logo"><source media="(max-width:560px)" srcset="/assets/pn-text-mobile-tight.png?v=1"><img class="hero__mark" src="/assets/pn-text-tight.png?v=1" alt="Группа АА «Почти нормальные»"></picture><span class="hero__stroke hero__stroke--right" aria-hidden="true"></span></header>
-    <section class="intro"><h1 class="intro__heading"><?=h(cms_site_text($content, 'home_heading'))?></h1><?=cms_rich((string)($pages['home_intro']??''))?></section>
+    <section class="intro"><h1 class="intro__heading"><?=nl2br(h($homeHeading), false)?></h1><?=cms_rich((string)($pages['home_intro']??''))?></section>
     <?php $socials=$nav['socials']??[]; $zoom=$socials[0]??[]; ?><nav class="quick-actions" aria-label="Быстрый вход"><?php if($url=cms_safe_url($zoom['url']??'')):?><a class="quick-action quick-action--primary" href="<?=h($url)?>" target="_blank" rel="noopener"><img src="<?=h(cms_safe_url($zoom['icon']??''))?>" alt=""><span><strong><?=h(rtrim(cms_site_text($content, 'zoom_prefix')))?> <?=cms_display_text($zoom['title']??'Zoom')?></strong><small><?=h(cms_site_text($content, 'zoom_subtitle'))?></small></span></a><?php endif;?><a class="quick-action" href="/schedule.html"><img src="/assets/emoji/aa_calendar.png" alt=""><span><strong><?=h(cms_site_text($content, 'schedule_button_title'))?></strong><small><?=h(cms_site_text($content, 'schedule_button_subtitle'))?></small></span></a></nav>
     <nav class="menu" aria-label="Разделы сайта">
       <?php foreach(($nav['items']??[]) as $item):
