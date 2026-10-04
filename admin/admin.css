@@ -154,3 +154,14 @@ h1,h2,h3{font-family:"Unbounded",Arial,sans-serif}
 .admin-page-links__grid a:hover,.admin-page-links__grid a:focus-visible{border-color:#2860aa;background:#dcecff}
 .admin-page-links p{margin:12px 0 0;color:#24446f;font-size:14px}
 .admin-page-texts{margin:16px 0 22px;border-color:#bfd4f1;background:#f8fbff}
+
+/* The editor previews the same reading type scale as the public site. */
+.rich-editor{font-family:"Manrope",Arial,"Segoe UI",sans-serif;font-size:19px;line-height:1.52}
+.rich-editor p{margin:.55em 0;font-family:"Manrope",Arial,"Segoe UI",sans-serif;font-size:19px;line-height:1.52}
+.rich-editor h2{margin:.8em 0 .4em;font-family:"Unbounded",Arial,sans-serif;font-size:clamp(22px,3vw,26px);line-height:1.24;text-transform:none;overflow-wrap:anywhere}
+.rich-editor h3{margin:.75em 0 .35em;font-family:"Unbounded",Arial,sans-serif;font-size:clamp(19px,2.5vw,22px);line-height:1.25;text-transform:none;overflow-wrap:anywhere}
+.editor-menu-item--body{font-family:"Manrope",Arial,sans-serif!important;font-size:18px!important;font-weight:400!important}
+.editor-menu-item--heading{font-family:"Unbounded",Arial,sans-serif!important;font-size:19px!important;font-weight:800!important}
+.editor-menu-item--subheading{font-family:"Unbounded",Arial,sans-serif!important;font-size:17px!important;font-weight:700!important}
+.rich-editor-help{margin:0;padding:8px 11px;border:1px solid #bfd4f1;border-top:0;border-radius:0 0 9px 9px;background:#eef5ff;color:#24446f;font-size:14px;line-height:1.42}
+.rich-editor-wrap .rich-editor{border-radius:0}

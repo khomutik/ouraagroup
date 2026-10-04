@@ -79,7 +79,7 @@
     editor.contentEditable = 'true';
     editor.setAttribute('role', 'textbox');
     editor.setAttribute('aria-multiline', 'true');
-    editor.setAttribute('aria-label', textarea.closest('.field')?.querySelector('span')?.textContent || 'Текст');
+    editor.setAttribute('aria-label', textarea.dataset.label || textarea.closest('.field')?.querySelector('span')?.textContent || 'Текст');
     editor.dataset.placeholder = 'Введите текст…';
     editor.innerHTML = textarea.value;
 
@@ -175,10 +175,10 @@
     addTool('↶', 'Отменить', () => run('undo'));
     addTool('↷', 'Повторить', () => run('redo'));
 
-    addMenu('Aa', 'Стиль абзаца', [
-      {label:'Обычный текст', action:() => run('formatBlock', 'p')},
-      {label:'Заголовок', action:() => run('formatBlock', 'h2')},
-      {label:'Подзаголовок', action:() => run('formatBlock', 'h3')},
+    addMenu('Стиль текста', 'Выберите вид абзаца: обычный текст или заголовок', [
+      {label:'Обычный текст', className:'editor-menu-item--body', action:() => run('formatBlock', 'p')},
+      {label:'Заголовок раздела', className:'editor-menu-item--heading', action:() => run('formatBlock', 'h2')},
+      {label:'Подзаголовок', className:'editor-menu-item--subheading', action:() => run('formatBlock', 'h3')},
       {label:'Цитата', action:() => run('formatBlock', 'blockquote')},
       {label:'Выносная цитата', action:() => insertWrapped('blockquote', 'pull-quote', 'Текст цитаты')},
       {label:'Код', action:() => insertHtml(`<pre><code>${escapeHtml(selectionText('Код'))}</code></pre>`)},
@@ -373,6 +373,10 @@
     });
 
     wrapper.prepend(toolbar, editor);
+    const formattingHelp = document.createElement('p');
+    formattingHelp.className = 'rich-editor-help';
+    formattingHelp.textContent = 'Поставьте курсор в абзац или выделите его, затем откройте «Стиль текста». Обычный текст и заголовки будут выглядеть так же, как на сайте.';
+    wrapper.append(formattingHelp);
     textarea.before(wrapper);
     textarea.form?.addEventListener('submit', (event) => {
       textarea.value = editor.innerHTML;

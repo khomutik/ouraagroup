@@ -26,7 +26,7 @@ function page_head(string $title, string $description, string $canonical): void 
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=105" />
+  <link rel="stylesheet" href="styles.css?v=106" />
   <script defer src="/site-analytics.js?v=1"></script>
 </head>
 <body>
@@ -76,7 +76,7 @@ if ($section === 'archive') { $data=$content['archive']??[]; $items=$data['items
 if ($section === 'schedule') { $data = $content['schedule'] ?? []; ?>
   <p class="schedule-time"><?= h($data['time'] ?? '') ?></p>
   <section class="schedule schedule-page" aria-label="Темы собраний"><div class="schedule-list">
-    <?php foreach (($data['days'] ?? []) as $day): ?><article class="schedule-item"><h2><?= h($day['day'] ?? '') ?></h2><p><?= cms_rich((string)($day['topic'] ?? '')) ?></p></article><?php endforeach; ?>
+    <?php foreach (($data['days'] ?? []) as $day): ?><article class="schedule-item"><h2><?= h($day['day'] ?? '') ?></h2><div class="schedule-topic"><?= cms_rich((string)($day['topic'] ?? '')) ?></div></article><?php endforeach; ?>
   </div></section>
   <?=cms_actions_html(cms_page_actions($content,'schedule'))?>
 <?php }
@@ -88,7 +88,7 @@ if ($section === 'library') { $data = $content['library'] ?? []; $other=cms_safe
     <?php foreach (($data['items'] ?? []) as $item): $resource = cms_safe_url($item['resource'] ?? ''); ?>
       <article class="library-card">
         <?php if (!empty($item['cover'])): ?><a class="library-card__cover-link" href="<?= h($resource) ?>" target="_blank" rel="noopener"><img class="library-card__cover" src="<?= h(cms_safe_url($item['cover'])) ?>" alt="Обложка: <?= h($item['title'] ?? '') ?>" /></a><?php endif; ?>
-        <div class="library-card__body"><h2><?= cms_display_text($item['title'] ?? '') ?></h2><p><?= cms_display_text($item['description'] ?? '') ?></p><?php if ($resource): ?><a class="flow-button" href="<?= h($resource) ?>" target="_blank" rel="noopener"><?=h(cms_site_text($content, 'library_read_button'))?></a><?php endif; ?></div>
+        <div class="library-card__body"><h2><?= cms_display_text($item['title'] ?? '') ?></h2><div class="library-card__description"><?= cms_rich((string)($item['description'] ?? '')) ?></div><?php if ($resource): ?><a class="flow-button" href="<?= h($resource) ?>" target="_blank" rel="noopener"><?=h(cms_site_text($content, 'library_read_button'))?></a><?php endif; ?></div>
       </article>
     <?php endforeach; ?>
   </section>
@@ -108,7 +108,7 @@ if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms
 
 if ($section === 'services') { $data = $content['services'] ?? []; $chartUrl=cms_safe_url($data['chart_url']??''); $chartTop=($data['chart_position']??'top')!=='bottom'; ?>
   <?php if ($chartUrl && $chartTop): ?><a class="document-link" href="<?= h($chartUrl) ?>" target="_blank" rel="noopener"><img src="assets/emoji/aa_calendar.png" alt="" /><span><?=h(cms_site_text($content, 'services_chart_button'))?></span></a><?php endif; ?>
-  <p class="service-lead"><?= cms_display_text($data['lead'] ?? '') ?></p>
+  <div class="service-lead"><?= cms_rich((string)($data['lead'] ?? '')) ?></div>
   <section class="content-card service-list">
     <?php foreach (($data['items'] ?? []) as $item): ?><article class="service-item"><h2><?= cms_display_text($item['title'] ?? '') ?><?php if (!empty($item['open'])): ?> - <span class="service-open"><?=h(cms_site_text($content, 'services_open_label'))?></span><?php endif; ?></h2><p><em>Ценз трезвости — <?= cms_display_text($item['sobriety'] ?? '') ?>; срок служения — <?= cms_display_text($item['term'] ?? '') ?></em></p><?php $holders = $item['holders'] ?? []; if (count($holders) > 1): ?><ol><?php foreach ($holders as $holder): ?><li><?= cms_display_text($holder['name'] ?? '') ?><?php if (!empty($holder['rotation'])): ?><br>Дата ротации: <?= h(date('d.m.Y', strtotime($holder['rotation']))) ?><?php endif; ?></li><?php endforeach; ?></ol><?php else: foreach ($holders as $holder): ?><p><?= cms_display_text($holder['name'] ?? '') ?></p><?php if (!empty($holder['rotation'])): ?><p>Дата ротации: <?= h(date('d.m.Y', strtotime($holder['rotation']))) ?></p><?php endif; endforeach; endif; ?><?=cms_actions_html($item['actions']??[], 'service-actions')?></article><?php endforeach; ?>
   </section>

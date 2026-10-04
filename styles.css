@@ -738,7 +738,7 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
   margin: 0 auto 10px;
 }
 
-.newcomers-card h2 {
+.newcomers-card > h2 {
   margin: 0 0 10px;
   color: var(--blue);
   font-size: clamp(22px, 5.4vw, 30px);
@@ -792,10 +792,20 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 .newcomers-text h3 {
   margin: 8px 0 0;
   color: var(--blue);
-  font-size: 20px;
-  line-height: 1.15;
+  font-size: clamp(20px, 2.7vw, 23px);
+  line-height: 1.25;
   text-align: center;
-  text-transform: uppercase;
+  text-transform: none;
+}
+
+.newcomers-text h2 {
+  margin: 16px 0 8px;
+  color: var(--blue);
+  font-size: clamp(22px, 3vw, 26px);
+  line-height: 1.24;
+  text-align: center;
+  text-transform: none;
+  overflow-wrap: anywhere;
 }
 
 .newcomers-text a {
@@ -2018,7 +2028,7 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
   box-shadow: var(--soft-shadow);
 }
 
-/* Единый размер обычного текста во всех разделах — как в расписании. */
+/* Читаемый обычный текст во всех содержательных блоках сайта. */
 .intro p,
 .announcement-copy,
 .newcomers-card p,
@@ -2035,8 +2045,59 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 .service-item li,
 .payment-card p,
 .content-card,
-.rich-content {
-  font-size: 17px;
+.rich-content,
+.schedule-topic,
+.library-card__description,
+.service-lead,
+.payment-comment,
+.custom-text-block,
+.tradition-lead {
+  font-size: 19px;
+  line-height: 1.52;
+}
+
+.library-card__description,
+.schedule-topic,
+.payment-comment {
+  color: var(--muted);
+  text-align: left;
+}
+
+:is(.intro,.announcement-text,.library-note,.library-card__description,.speakers-intro,.speakers-privacy,.service-lead,.schedule-topic,.tradition-lead,.payment-comment,.custom-text-block) :is(h2,h3) {
+  margin: 14px 0 8px;
+  font-family: "Unbounded", Arial, sans-serif;
+  line-height: 1.25;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+:is(.intro,.announcement-text,.library-note,.library-card__description,.speakers-intro,.speakers-privacy,.service-lead,.schedule-topic,.tradition-lead,.payment-comment,.custom-text-block) h2 {
+  font-size: clamp(22px, 3vw, 26px);
+}
+
+:is(.intro,.announcement-text,.library-note,.library-card__description,.speakers-intro,.speakers-privacy,.service-lead,.schedule-topic,.tradition-lead,.payment-comment,.custom-text-block) h3 {
+  font-size: clamp(19px, 2.5vw, 22px);
+}
+
+.service-lead :is(h2,h3),
+.tradition-lead :is(h2,h3) {
+  color: var(--cream-2);
+}
+
+.schedule-topic :is(h2,h3),
+.library-card__description :is(h2,h3),
+.payment-comment :is(h2,h3) {
+  font-size: 20px;
+}
+
+:is(.schedule-topic,.library-card__description,.service-lead,.payment-comment) p {
+  margin: 0 0 10px;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+:is(.schedule-topic,.library-card__description,.service-lead,.payment-comment) p:last-child {
+  margin-bottom: 0;
 }
 
 .text-color-blue { color: var(--blue) !important; }
