@@ -27,7 +27,7 @@ function page_head(string $title, string $description, string $canonical): void 
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=112" />
+  <link rel="stylesheet" href="styles.css?v=114" />
   <script defer src="/site-analytics.js?v=1"></script>
 </head>
 <body>
@@ -41,7 +41,7 @@ function page_foot(): void { global $content; ?>
   <script src="site-nav.js?v=21"></script>
   <script src="pwa-install.js?v=11"></script>
   <script src="site-chat.js?v=7" data-api="/support-chat-api"></script>
-  <script src="site-search.js?v=2"></script>
+  <script src="site-search.js?v=5"></script>
 </body>
 </html>
 <?php }
@@ -71,9 +71,22 @@ if ($section === 'announcements') {
 
 if ($section === 'archive') { $data=$content['archive']??[]; $items=$data['items']??[]; $driveUrl=cms_safe_url($data['drive_url']??''); $driveTop=($data['drive_position']??'bottom')==='top'; usort($items, static fn($a,$b)=>(int)($a['order']??PHP_INT_MAX)<=>(int)($b['order']??PHP_INT_MAX)); ?>
   <?php if ($driveUrl && $driveTop): ?><div class="page-actions"><a class="flow-button flow-button--soft flow-button--align-center" href="<?=h($driveUrl)?>" target="_blank" rel="noopener"><?=h(cms_site_text($content, 'archive_drive_button'))?></a></div><?php endif; ?>
-  <?php foreach ($items as $i => $item): ?><section class="announcement-card archive-card" id="<?=h(site_search_anchor('archive', $item['id'] ?? '', (int)$i))?>"><?php if (!empty($item['image'])): ?><img src="<?=h(cms_safe_url($item['image']))?>" alt="<?=h($item['title']??'')?>"><?php endif; ?><div class="announcement-copy"><div class="announcement-meta"><time><?=h(cms_date_ru($item['event_date']??''))?></time><?php if (!empty($item['event_time'])): ?><time><?=h($item['event_time'])?> по МСК</time><?php endif; ?></div><h2 class="announcement-title"><?=cms_display_text($item['title']??'')?></h2><div class="announcement-text"><?=cms_rich((string)($item['body']??''))?></div><?=cms_actions_html($item['links']??[], 'announcement-links')?></div></section><?php endforeach; ?>
+  <?php foreach ($items as $i => $item):
+      $archiveId = (string)($item['id'] ?? '');
+      $agendaText = archive_plain_text((string)($item['body'] ?? ''), true);
+      $protocolText = archive_plain_text((string)($item['protocol_text'] ?? ''));
+  ?><section class="announcement-card archive-card" id="<?=h(site_search_anchor('archive', $archiveId, (int)$i))?>">
+    <?php if (!empty($item['image'])): ?><img src="<?=h(cms_safe_url($item['image']))?>" alt="<?=h($item['title']??'')?>"><?php endif; ?>
+    <div class="announcement-copy">
+      <div class="announcement-meta"><time><?=h(cms_date_ru($item['event_date']??''))?></time><?php if (!empty($item['event_time'])): ?><time><?=h($item['event_time'])?> по МСК</time><?php endif; ?></div>
+      <h2 class="announcement-title"><?=cms_display_text($item['title']??'')?></h2>
+      <div class="announcement-text"><?=archive_document_html($agendaText, 'agenda', $archiveId)?><?=archive_document_html($protocolText, 'protocol', $archiveId)?></div>
+      <?=cms_actions_html(archive_public_links($item), 'announcement-links')?>
+    </div>
+  </section><?php endforeach; ?>
   <?php if ($driveUrl && !$driveTop): ?><div class="page-actions"><a class="flow-button flow-button--soft flow-button--align-center" href="<?=h($driveUrl)?>" target="_blank" rel="noopener"><?=h(cms_site_text($content, 'archive_drive_button'))?></a></div><?php endif; ?>
   <?=cms_actions_html(cms_page_actions($content,'archive'))?>
+  <script>(()=>{const reveal=()=>{const id=decodeURIComponent(location.hash.slice(1));const target=document.getElementById(id);if(!target)return;for(let node=target.parentElement;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;if(id.includes('-point-'))requestAnimationFrame(()=>target.scrollIntoView({block:'start'}))};addEventListener('hashchange',reveal);reveal()})();</script>
 <?php }
 
 if ($section === 'schedule') { $data = $content['schedule'] ?? []; ?>

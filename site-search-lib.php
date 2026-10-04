@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/cms.php';
+require_once __DIR__ . '/archive-lib.php';
 
 /** Search only text which a visitor can already see on a published page. */
 function site_search_text($value): string {
@@ -31,29 +32,30 @@ function site_search_documents(array $content, ?string $today = null): array {
         ];
     };
 
-    $add('Главная', 'Группа АА «Почти нормальные»', '/', ($content['pages']['home_intro'] ?? '') . ' ' . cms_site_text($content, 'home_heading'), 'анонимные алкоголики онлайн группа аа поддержка трезвость');
+    $add('Главная', 'Группа АА «Почти нормальные»', '/', ($content['pages']['home_intro'] ?? '') . ' ' . cms_site_text($content, 'home_heading'), 'анонимные алкоголики онлайн группа аа поддержка трезвость zoom зум войти ссылка подключиться чат написать телеграм telegram связь');
 
     foreach (($content['newcomers']['pages'] ?? []) as $page) {
         if (empty($page['published'])) continue;
         $slug = (string)($page['slug'] ?? '');
         if ($slug === 'aa-test') {
-            $add('Тест', 'Тест «Подходит ли тебе АА?»', '/p/test-na-alkogolizm', $page['body'] ?? '', 'тест на алкоголизм проверить употребление алкоголя вопросы аа');
+            $add('Тест', 'Тест «Подходит ли тебе АА?»', '/p/test-na-alkogolizm', $page['body'] ?? '', 'тест на алкоголизм подходит ли мне аа проверить употребление алкоголя вопросы аа');
             continue;
         }
         if (!preg_match('/^[a-z0-9-]+$/', $slug)) continue;
         $title = $slug === 'menu' ? 'Новичкам: с чего начать' : (string)($page['title'] ?? 'Новичкам');
         $actions = implode(' ', array_map(static fn($action): string => (string)($action['label'] ?? ''), (array)($page['actions'] ?? [])));
-        $keywords = $slug === 'menu' ? 'бросить пить перестать пить помощь алкоголику найти группу аа онлайн собрание' : '';
+        $keywords = $slug === 'menu' ? 'бросить пить перестать пить помощь алкоголику найти группу аа онлайн собрание первый раз впервые' : '';
+        if ($slug === 'aa') $keywords = 'что такое аа';
         $add('Новичкам', $title, '/newcomers.html' . ($slug === 'menu' ? '' : '#' . $slug), (string)($page['body'] ?? '') . ' ' . $actions, $keywords);
     }
 
     $schedule = $content['schedule'] ?? [];
-    $add('Расписание', 'Расписание онлайн-собраний АА', '/schedule.html', $schedule['time'] ?? '', 'когда собрание zoom дни время темы');
+    $add('Расписание', 'Расписание онлайн-собраний АА', '/schedule.html', $schedule['time'] ?? '', 'когда собрание zoom зум дни время темы сегодня во сколько вечером');
     foreach (($schedule['days'] ?? []) as $i => $day) {
         $add('Расписание', 'Собрание: ' . ($day['day'] ?? ''), '/schedule.html#' . site_search_anchor('day', $day['day'] ?? '', (int)$i), $day['topic'] ?? '', (string)($schedule['time'] ?? ''));
     }
 
-    $add('Объявления', 'Объявления группы', '/announcements.html', '', 'новости анонсы события');
+    $add('Объявления', 'Объявления группы', '/announcements.html', '', 'новости группы анонсы события');
     foreach (($content['announcements'] ?? []) as $i => $item) {
         if (!empty($item['hide_after']) && (string)$item['hide_after'] < $today) continue;
         $add('Объявления', (string)($item['title'] ?? ''), '/announcements.html#' . site_search_anchor('announcement', $item['id'] ?? '', (int)$i), $item['body'] ?? '', 'новости анонс', (string)($item['event_date'] ?? ''));
@@ -85,9 +87,35 @@ function site_search_documents(array $content, ?string $today = null): array {
     $add('7-я традиция', '7-я традиция и пожертвования', '/tradition.html', ($tradition['lead'] ?? '') . ' ' . $paymentTitles, 'поддержать группу добровольные взносы');
 
     $archive = $content['archive'] ?? [];
-    $add('Архив решений', 'Архив решений группы', '/archive.html', '', 'протоколы рабочие собрания решения');
+    $add('Архив решений', 'Архив решений группы', '/archive.html', '', 'протоколы повестки рабочие собрания решения');
     foreach (($archive['items'] ?? []) as $i => $item) {
-        $add('Архив решений', (string)($item['title'] ?? ''), '/archive.html#' . site_search_anchor('archive', $item['id'] ?? '', (int)$i), $item['body'] ?? '', 'решение группы протокол', (string)($item['event_date'] ?? ''));
+        $id = (string)($item['id'] ?? '');
+        $date = (string)($item['event_date'] ?? '');
+        $displayDate = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? date('d.m.Y', strtotime($date)) : $date;
+        $cardUrl = '/archive.html#' . site_search_anchor('archive', $id, (int)$i);
+        $agendaText = archive_plain_text((string)($item['body'] ?? ''), true);
+        if ($agendaText !== '') {
+            $agenda = archive_sections($agendaText);
+            $add('Повестка РС', 'Повестка РС ' . $displayDate, $cardUrl, $agenda['intro'], 'повестка РС рабочее собрание группа', $date);
+            foreach ($agenda['items'] as $point) {
+                $body = preg_replace('~https?://[^\s<>]+~u', ' ', $point['text']) ?? $point['text'];
+                $add('Повестка РС', $point['number'] . '. ' . cms_text($point['heading'], 140), '/archive.html#' . archive_section_id('agenda', $id, $point['index']), $body, 'повестка РС группа', $date);
+            }
+        }
+        $protocolText = archive_plain_text((string)($item['protocol_text'] ?? ''));
+        if ($protocolText !== '') {
+            $protocol = archive_protocol_sections($protocolText);
+            $voteCategory = $protocol['items'] ? 'Протокол РС' : 'Голосование группы';
+            $add($voteCategory, ($protocol['items'] ? 'Протокол РС ' : 'Голосование группы ') . $displayDate, $cardUrl, $protocol['intro'], 'протокол РС рабочее собрание голосования решения', $date);
+            foreach ($protocol['items'] as $point) {
+                $body = preg_replace('~https?://[^\s<>]+~u', ' ', $point['text']) ?? $point['text'];
+                $add('Протокол РС', $point['number'] . '. ' . cms_text($point['heading'], 140), '/archive.html#' . archive_section_id('protocol', $id, $point['index']), $body, 'протокол РС голосование группа', $date);
+            }
+            foreach ($protocol['votes'] as $vote) {
+                $body = preg_replace('~https?://[^\s<>]+~u', ' ', $vote['text']) ?? $vote['text'];
+                $add($voteCategory, 'Голосование: ' . cms_text($vote['heading'], 140), '/archive.html#' . archive_vote_id($id, $vote['index']), $body, 'протокол РС результаты голосования решение', $date);
+            }
+        }
     }
 
     foreach (($content['pages']['custom'] ?? []) as $page) {

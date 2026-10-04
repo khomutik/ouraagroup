@@ -27,7 +27,7 @@ RewriteRule ^p/([a-z0-9-]+)/?$ site-page.php?kind=custom&slug=$1 [L,QSA]
 
 # CMS data and local configuration must never be served as files.
 RewriteRule ^(?:cms-data|cms-backups|support-chat-worker)(?:/|$) - [F,L]
-<FilesMatch "^(?:cms-config\.php|cms-config\.example\.php)$">
+<FilesMatch "^(?:cms-config\.php|cms-config\.example\.php|archive-lib\.php|archive-protocol-import\.php)$">
   Require all denied
 </FilesMatch>
 

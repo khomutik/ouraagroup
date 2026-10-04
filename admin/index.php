@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__) . '/cms.php';
+require dirname(__DIR__) . '/archive-lib.php';
 cms_start_session();
 
 function admin_flash(string $message, string $type = 'ok'): void { $_SESSION['admin_flash'] = [$type, $message]; }
@@ -414,7 +415,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $title=cms_text($_POST['title']??'',180); if($title==='')throw new RuntimeException('Введите тему решения.');
                     $date=cms_text($_POST['event_date']??'',10); if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date))throw new RuntimeException('Укажите дату решения.');
                     $current=$index===null?[]:$items[$index]; $image=cms_upload('image_file','image')?:cms_safe_url($_POST['image_url']??($current['image']??''));
-                    $record=['id'=>$id?:cms_id(),'title'=>$title,'event_date'=>$date,'event_time'=>cms_text($_POST['event_time']??'',5),'order'=>$index===null?0:(int)($current['order']??$index),'image'=>$image,'body'=>cms_sanitize_html(cms_replace_inline_uploads($_POST['body']??'','body_inline_images')),'links'=>admin_collect_actions('card_action')];
+                    $record=['id'=>$id?:cms_id(),'title'=>$title,'event_date'=>$date,'event_time'=>cms_text($_POST['event_time']??'',5),'order'=>$index===null?0:(int)($current['order']??$index),'image'=>$image,'body'=>cms_sanitize_html(cms_replace_inline_uploads($_POST['body']??'','body_inline_images')),'protocol_text'=>archive_plain_text(cms_text($_POST['protocol_text']??($current['protocol_text']??''),200000)),'links'=>admin_collect_actions('card_action')];
                     if($index===null)array_unshift($items,$record);else $items[$index]=$record; foreach($items as $i=>$item)$items[$i]['order']=$i;
                     $content['archive']=['drive_url'=>$driveUrl,'drive_position'=>$drivePosition,'items'=>$items]; $target='/admin/?section=archive';
                 }
@@ -595,7 +596,9 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
       <h2><?= $edit?'Редактировать решение':'Добавить решение' ?></h2>
       <?php admin_file('image',$edit['image']??'','1. Картинка (необязательно)','image/jpeg,image/png,image/webp'); ?>
       <div class="form-grid"><?php admin_input('event_date',$edit['event_date']??'','date','2. Дата решения *',true); admin_input('event_time',$edit['event_time']??'','time','3. Время (необязательно)'); ?></div>
-      <?php admin_input('title',$edit['title']??'','text','4. Тема решения *',true); admin_rich('body',$edit['body']??'','5. Текст решения',false,true); admin_card_actions_fieldset($edit['links']??[], 'card_action'); ?>
+      <?php admin_input('title',$edit['title']??'','text','4. Тема решения *',true); admin_rich('body',$edit['body']??'','5. Повестка РС',false,true); ?>
+      <label class="field"><span>6. Протокол РС и результаты голосований</span><textarea name="protocol_text" rows="18"><?=h($edit['protocol_text']??'')?></textarea></label>
+      <?php admin_card_actions_fieldset($edit['links']??[], 'card_action'); ?>
       <div class="form-actions"><button class="button">Опубликовать решение</button><a class="button button--quiet" href="?section=archive">Отмена</a></div>
     </form>
   <?php endif; ?>

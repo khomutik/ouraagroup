@@ -1,4 +1,4 @@
-const CACHE_NAME = "aa-pn-v170";
+const CACHE_NAME = "aa-pn-v173";
 // Dynamic CMS pages are deliberately excluded: visitors must receive a fresh
 // version after publication, rather than a copy saved by the service worker.
 const APP_SHELL = [
@@ -8,11 +8,11 @@ const APP_SHELL = [
   "./tradition.html",
   "./robots.txt",
   "./sitemap.xml",
-  "./styles.css?v=112",
+  "./styles.css?v=114",
   "./site-nav.js?v=21",
   "./pwa-install.js?v=11",
   "./site-chat.js?v=7",
-  "./site-search.js?v=2",
+  "./site-search.js?v=5",
   "./manifest.webmanifest",
   "./favicon.ico",
   "./icons/favicon-16.png",
