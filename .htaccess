@@ -20,6 +20,8 @@ RewriteRule ^index\.html$ site-page.php?kind=home [L,QSA]
 RewriteRule ^newcomers\.html$ site-page.php?kind=newcomers [L,QSA]
 RewriteRule ^tradition\.html$ site-page.php?kind=tradition [L,QSA]
 RewriteRule ^cms-navigation\.json$ site-page.php?navigation=1 [L,QSA]
+# This retired page is kept as a draft in the CMS; send old search links to the relevant page.
+RewriteRule ^p/kak-perestat-pit/?$ https://pochtinormalnye.ru/newcomers.html [R=301,L]
 RewriteRule ^p/([a-z0-9-]+)/?$ site-page.php?kind=custom&slug=$1 [L,QSA]
 
 # CMS data and local configuration must never be served as files.

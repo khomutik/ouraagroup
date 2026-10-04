@@ -94,7 +94,7 @@ function admin_home_navigation_fields(array $navigation): void { ?>
 <?php }
 function admin_page_catalog(array $content): array {
     $pages = [['key'=>'home','title'=>'Главная страница','section'=>'pages','group'=>'Основные страницы','published'=>true]];
-    foreach (['schedule'=>'Расписание собраний','announcements'=>'Объявления','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','tradition'=>'7-я традиция','archive'=>'Решения группы'] as $key=>$title) {
+    foreach (['schedule'=>'Расписание собраний','announcements'=>'Объявления','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','tradition'=>'7-я традиция','archive'=>'Архив решений'] as $key=>$title) {
         $pages[]=['key'=>$key,'title'=>$title,'section'=>$key,'group'=>'Основные страницы','published'=>true];
     }
     foreach (($content['newcomers']['pages'] ?? []) as $page) {
@@ -253,7 +253,7 @@ function admin_action_link_options(): array {
         'speakers.html' => 'Спикерские',
         'service.html' => 'Служения',
         'tradition.html' => '7-я традиция',
-        'archive.html' => 'Решения группы',
+        'archive.html' => 'Архив решений',
     ];
     foreach (($content['newcomers']['pages'] ?? []) as $page) {
         if (empty($page['published']) || ($page['slug'] ?? '') === 'menu') continue;
@@ -540,7 +540,7 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
     $data=$content['archive']??[]; $items=$data['items']??[]; $editId=(string)($_GET['edit']??''); $edit=[];
     foreach($items as $item) if(($item['id']??'')===$editId) $edit=$item;
 ?>
-  <div class="section-heading"><h1>Решения группы</h1><a class="button button--quiet" href="?section=archive&edit=new">Новое решение</a></div>
+  <div class="section-heading"><h1>Архив решений</h1><a class="button button--quiet" href="?section=archive&edit=new">Новое решение</a></div>
   <p class="admin-tip">К каждому решению можно добавить кнопки со ссылками. Для каждой кнопки можно выбрать текст, адрес и внешний вид.</p>
   <form method="post" class="admin-form">
     <input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="archive"><input type="hidden" name="archive_mode" value="settings"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">

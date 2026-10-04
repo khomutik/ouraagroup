@@ -6,7 +6,7 @@ const CMS_DATA = CMS_ROOT . '/cms-data';
 const CMS_BACKUPS = CMS_ROOT . '/cms-backups';
 const CMS_UPLOADS = CMS_ROOT . '/uploads';
 const CMS_SECTIONS = ['announcements', 'schedule', 'library', 'speakers', 'services', 'newcomers', 'tradition', 'archive', 'pages', 'navigation', 'site_texts'];
-function cms_section_labels(): array { return ['announcements'=>'Объявления','schedule'=>'Расписание собраний','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','newcomers'=>'Новичкам','tradition'=>'7-я традиция','archive'=>'Решения группы','pages'=>'Главная и пользовательские страницы','navigation'=>'Кнопки и меню','site_texts'=>'Заголовки и подписи']; }
+function cms_section_labels(): array { return ['announcements'=>'Объявления','schedule'=>'Расписание собраний','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','newcomers'=>'Новичкам','tradition'=>'7-я традиция','archive'=>'Архив решений','pages'=>'Главная и пользовательские страницы','navigation'=>'Кнопки и меню','site_texts'=>'Заголовки и подписи']; }
 
 function cms_config(): array {
     static $config = null;
