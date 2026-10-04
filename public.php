@@ -41,7 +41,7 @@ function page_foot(): void { global $content; ?>
   <script src="site-nav.js?v=21"></script>
   <script src="pwa-install.js?v=11"></script>
   <script src="site-chat.js?v=7" data-api="/support-chat-api"></script>
-  <script src="site-search.js?v=1"></script>
+  <script src="site-search.js?v=2"></script>
 </body>
 </html>
 <?php }

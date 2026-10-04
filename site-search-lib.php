@@ -48,12 +48,12 @@ function site_search_documents(array $content, ?string $today = null): array {
     }
 
     $schedule = $content['schedule'] ?? [];
-    $add('Расписание', 'Расписание онлайн-собраний АА', '/schedule.html', cms_site_text($content, 'schedule_description') . ' ' . ($schedule['time'] ?? ''), 'когда собрание zoom дни время темы');
+    $add('Расписание', 'Расписание онлайн-собраний АА', '/schedule.html', $schedule['time'] ?? '', 'когда собрание zoom дни время темы');
     foreach (($schedule['days'] ?? []) as $i => $day) {
         $add('Расписание', 'Собрание: ' . ($day['day'] ?? ''), '/schedule.html#' . site_search_anchor('day', $day['day'] ?? '', (int)$i), $day['topic'] ?? '', (string)($schedule['time'] ?? ''));
     }
 
-    $add('Объявления', 'Объявления группы', '/announcements.html', cms_site_text($content, 'announcements_description'), 'новости анонсы события');
+    $add('Объявления', 'Объявления группы', '/announcements.html', '', 'новости анонсы события');
     foreach (($content['announcements'] ?? []) as $i => $item) {
         if (!empty($item['hide_after']) && (string)$item['hide_after'] < $today) continue;
         $add('Объявления', (string)($item['title'] ?? ''), '/announcements.html#' . site_search_anchor('announcement', $item['id'] ?? '', (int)$i), $item['body'] ?? '', 'новости анонс', (string)($item['event_date'] ?? ''));
@@ -85,7 +85,7 @@ function site_search_documents(array $content, ?string $today = null): array {
     $add('7-я традиция', '7-я традиция и пожертвования', '/tradition.html', ($tradition['lead'] ?? '') . ' ' . $paymentTitles, 'поддержать группу добровольные взносы');
 
     $archive = $content['archive'] ?? [];
-    $add('Архив решений', 'Архив решений группы', '/archive.html', cms_site_text($content, 'archive_description'), 'протоколы рабочие собрания решения');
+    $add('Архив решений', 'Архив решений группы', '/archive.html', '', 'протоколы рабочие собрания решения');
     foreach (($archive['items'] ?? []) as $i => $item) {
         $add('Архив решений', (string)($item['title'] ?? ''), '/archive.html#' . site_search_anchor('archive', $item['id'] ?? '', (int)$i), $item['body'] ?? '', 'решение группы протокол', (string)($item['event_date'] ?? ''));
     }
@@ -96,7 +96,7 @@ function site_search_documents(array $content, ?string $today = null): array {
         if (!preg_match('/^[a-z0-9-]+$/', $slug) || $slug === 'kak-perestat-pit') continue;
         $blocks = is_array($page['blocks'] ?? null) ? $page['blocks'] : [];
         $body = $blocks ? implode(' ', array_map(static fn($block): string => (string)($block['body'] ?? ''), $blocks)) : (string)($page['body'] ?? '');
-        $add('Страницы', (string)($page['title'] ?? ''), '/p/' . $slug, $body . ' ' . ($page['description'] ?? ''));
+        $add('Страницы', (string)($page['title'] ?? ''), '/p/' . $slug, $body);
     }
 
     return $documents;

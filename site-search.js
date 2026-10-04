@@ -5,9 +5,31 @@
   const normalize = (value) => String(value ?? "").normalize("NFKC").toLocaleLowerCase("ru").replaceAll("ё", "е");
   const words = (value) => normalize(value).match(/[\p{L}\p{N}]+/gu) || [];
   const queryWords = (query) => words(query).filter((word) => !stopWords.has(word)).slice(0, 8);
-  const matches = (sourceWords, queryWord) => {
-    const stem = queryWord.length > 5 ? queryWord.slice(0, 5) : queryWord;
-    return sourceWords.some((word) => word === queryWord || (queryWord.length > 4 && word.startsWith(stem)));
+  const matchesWord = (word, queryWord) => {
+    if (word === queryWord) return true;
+    if (queryWord.length < 3 || /^\d+$/u.test(queryWord)) return false;
+    const stem = queryWord.slice(0, queryWord.length > 5 ? 5 : queryWord.length);
+    return word.startsWith(stem);
+  };
+  const closestSpan = (sourceWords, tokens) => {
+    if (!sourceWords.length) return Infinity;
+    const counts = new Array(tokens.length).fill(0);
+    let found = 0;
+    let left = 0;
+    let best = Infinity;
+    for (let right = 0; right < sourceWords.length; right++) {
+      tokens.forEach((token, index) => {
+        if (matchesWord(sourceWords[right], token) && counts[index]++ === 0) found++;
+      });
+      while (found === tokens.length) {
+        best = Math.min(best, right - left + 1);
+        tokens.forEach((token, index) => {
+          if (matchesWord(sourceWords[left], token) && --counts[index] === 0) found--;
+        });
+        left++;
+      }
+    }
+    return best;
   };
   const prepare = (documents) => documents.map((document, index) => ({
     document,
@@ -18,6 +40,7 @@
     titleWords: words(document.title),
     keywordWords: words(document.keywords),
     textWords: words(document.text),
+    combinedWords: [...words(document.title), ...words(document.keywords), ...words(document.text)],
   }));
   const search = (prepared, query) => {
     const tokens = queryWords(query);
@@ -25,15 +48,17 @@
     const phrase = normalize(query).trim();
     const ranked = [];
     for (const row of prepared) {
+      const titleSpan = closestSpan(row.titleWords, tokens);
+      const keywordSpan = closestSpan(row.keywordWords, tokens);
+      const textSpan = closestSpan(row.textWords, tokens);
+      const combinedSpan = closestSpan(row.combinedWords, tokens);
+      const limit = tokens.some((token) => /^\d+$/u.test(token)) ? 2 : 8;
       let score = 0;
-      let foundAll = true;
-      for (const token of tokens) {
-        if (matches(row.titleWords, token)) score += 30;
-        else if (matches(row.keywordWords, token)) score += 16;
-        else if (matches(row.textWords, token)) score += 3;
-        else { foundAll = false; break; }
-      }
-      if (!foundAll) continue;
+      if (titleSpan <= limit) score = 60 - titleSpan + Math.max(0, 20 - row.titleWords.length);
+      else if (keywordSpan <= limit) score = 32 - keywordSpan;
+      else if (textSpan <= limit) score = 14 - textSpan;
+      else if (combinedSpan <= limit) score = 8 - combinedSpan;
+      else continue;
       if (phrase.length > 2 && row.title.includes(phrase)) score += 45;
       else if (phrase.length > 2 && row.keywords.includes(phrase)) score += 18;
       else if (phrase.length > 2 && row.text.includes(phrase)) score += 6;
@@ -107,7 +132,7 @@
   const loadIndex = () => {
     if (prepared || pending) return pending;
     status.textContent = "Загружаю материалы…";
-    pending = fetch("/site-search.json", {credentials: "omit"})
+    pending = fetch("/site-search.json?v=2", {credentials: "omit"})
       .then((response) => { if (!response.ok) throw new Error("Search unavailable"); return response.json(); })
       .then((payload) => {
         if (!Array.isArray(payload.documents)) throw new Error("Invalid search index");
