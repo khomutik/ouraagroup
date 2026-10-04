@@ -77,6 +77,11 @@ function archive_vote_id(string $id, int $index): string {
     return archive_section_id('vote', $id, $index);
 }
 
+function archive_treasurer_id(string $id): string {
+    $safeId = trim((string)preg_replace('/[^a-z0-9_-]+/i', '-', $id), '-');
+    return 'treasurer-' . ($safeId !== '' ? $safeId : 'item');
+}
+
 function archive_protocol_date(string $text): string {
     if (!preg_match('/^\s*(?:Протокол\s+РС|Протокол\s+рабочего\s+собрания)\s+(\d{2})\.(\d{2})\.(\d{4})/iu', archive_plain_text($text), $match)) return '';
     return $match[3] . '-' . $match[2] . '-' . $match[1];

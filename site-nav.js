@@ -33,7 +33,10 @@
       navItems = roots.map((row) => {
         const children = rows.filter((child) => child.parent === row.id || child.parent === row.title).map((child) => ({href:child.url,label:child.title,external:!!child.external}));
         const base = {title:row.title,href:row.url,external:!!row.external};
-        if (children.length) return {...base,openOn:String(row.url).split('/').pop().split('#')[0],links:[...children,{href:row.url,label:`Открыть раздел «${row.title}»`,external:!!row.external}]};
+        if (children.length) {
+          const landing = {href:row.url,label:row.title === 'Новичкам' ? 'Обращение к новичку' : `Открыть раздел «${row.title}»`,external:!!row.external};
+          return {...base,openOn:String(row.url).split('/').pop().split('#')[0],links:row.title === 'Новичкам' ? [landing,...children] : [...children,landing]};
+        }
         return base;
       });
       if (Array.isArray(config.socials) && config.socials.length) socialLinks = config.socials.map((row) => ({...row,url:siteUrl(row.url),icon:row.icon ? siteUrl(row.icon) : ''}));

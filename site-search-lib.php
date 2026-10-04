@@ -116,6 +116,10 @@ function site_search_documents(array $content, ?string $today = null): array {
                 $add($voteCategory, 'Голосование: ' . cms_text($vote['heading'], 140), '/archive.html#' . archive_vote_id($id, $vote['index']), $body, 'протокол РС результаты голосования решение', $date);
             }
         }
+        $treasurerText = archive_plain_text((string)($item['treasurer_report'] ?? ''), true);
+        if ($treasurerText !== '') {
+            $add('Отчёт казначея', 'Отчёт казначея · ' . $displayDate, '/archive.html#' . archive_treasurer_id($id), $treasurerText, 'отчёт казначей приход расход остаток резерв', $date);
+        }
     }
 
     foreach (($content['pages']['custom'] ?? []) as $page) {

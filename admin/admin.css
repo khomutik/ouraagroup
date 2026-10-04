@@ -165,3 +165,15 @@ h1,h2,h3{font-family:"Unbounded",Arial,sans-serif}
 .editor-menu-item--subheading{font-family:"Unbounded",Arial,sans-serif!important;font-size:17px!important;font-weight:700!important}
 .rich-editor-help{margin:0;padding:8px 11px;border:1px solid #bfd4f1;border-top:0;border-radius:0 0 9px 9px;background:#eef5ff;color:#24446f;font-size:14px;line-height:1.42}
 .rich-editor-wrap .rich-editor{border-radius:0}
+
+/* На телефоне полное имя кнопки важнее повторяющего его мини-превью. */
+@media(max-width:760px){
+  .button-editor__mobile-toggle{grid-template-columns:minmax(0,1fr) auto}
+  .button-editor__summary-label{overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:anywhere}
+  .button-preview--summary{display:none!important}
+}
+@media(max-width:520px){
+  .button-editor__settings{grid-template-columns:minmax(0,1fr)}
+  .button-option__choices{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .button-choice{min-width:0;overflow-wrap:anywhere}
+}

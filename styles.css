@@ -1681,6 +1681,7 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 .announcement-copy {
   display: grid;
   gap: 14px;
+  min-width: 0;
   padding: 2px 6px 6px;
   color: var(--blue);
   font-size: 16px;
@@ -2904,6 +2905,7 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 .site-search__result:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
 
 .announcement-text .archive-document {
+  min-width: 0;
   margin: 12px 0;
   padding: 0;
   border: 1px solid var(--line);
@@ -2934,6 +2936,19 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 .archive-document__number { color: var(--orange-dark); }
 .archive-document__body p, .archive-document__intro p { margin: 0 0 10px; }
 .archive-document__body p:last-child, .archive-document__intro p:last-child { margin-bottom: 0; }
+.announcement-text,
+.archive-document__intro,
+.archive-document__body,
+.archive-document__vote,
+.archive-document__item,
+.archive-document__body a,
+.archive-document__intro a { min-width: 0; overflow-wrap: anywhere; }
+.archive-treasurer__body { padding: 14px 16px 16px; overflow-wrap: anywhere; }
+.archive-treasurer__body table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+.archive-treasurer__body :is(th,td) { padding: 7px 9px; border: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.archive-treasurer__body :is(th,td):last-child { width: 36%; text-align: right; }
+.archive-treasurer__body p { margin: 0 0 10px; }
+.archive-treasurer__body p:last-child { margin-bottom: 0; }
 .archive-document__votes-heading { margin: 0; padding: 16px; border-top: 2px solid var(--line); color: var(--blue); font-size: clamp(18px, 2vw, 23px); }
 .archive-document__vote { padding: 13px 16px; border-top: 1px solid var(--line); scroll-margin-top: 90px; }
 .archive-document__vote:target { background: #fff0df; }

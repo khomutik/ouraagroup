@@ -286,6 +286,20 @@ function admin_page_actions_fieldset(array $actions, string $prefix = 'page_acti
 function admin_card_actions_fieldset(array $actions, string $prefix = 'card_action'): void { ?>
 <fieldset class="repeatable page-actions-editor" data-repeat="card-actions"><legend>Кнопки внизу карточки</legend><p class="admin-tip">Кнопки показываются под содержимым карточки. Для каждой укажите название и ссылку; внешний вид можно проверить по образцу.</p><div data-repeat-items><?php foreach ($actions as $action) admin_action_row($action, $prefix, false); ?></div><button type="button" class="button button--quiet" data-add-row>Добавить кнопку</button><template><?php admin_action_row(['type'=>'tab','color'=>'orange','shape'=>'pill','align'=>'left'], $prefix, false); ?></template></fieldset>
 <?php }
+function admin_library_button_editor(array $item, array $content): void {
+    $button = is_array($item['read_button'] ?? null) ? $item['read_button'] : [];
+    $label = (string)($button['label'] ?? cms_site_text($content, 'library_read_button'));
+    $types = ['classic'=>'Как сейчас','primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст'];
+    $colors = ['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый'];
+    $shapes = ['rounded'=>'Скруглённая','pill'=>'Пилюля','square'=>'Прямоугольная'];
+    $aligns = ['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину'];
+?>
+<article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($label)?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body">
+  <label class="field"><span>Название кнопки «Читать»</span><input name="lib_button_label[]" value="<?=h($label)?>" data-action-label></label>
+  <p class="admin-tip">Кнопка открывает PDF или ссылку из поля выше. Если адрес не задан, кнопка не показывается.</p>
+  <div class="button-editor__settings"><?php admin_action_select('lib_button_type','Вид',$types,$button['type']??'classic'); admin_action_select('lib_button_color','Цвет',$colors,$button['color']??'orange'); admin_action_select('lib_button_shape','Форма',$shapes,$button['shape']??'rounded'); admin_action_select('lib_button_align','Выравнивание',$aligns,$button['align']??'full'); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div>
+</div></article>
+<?php }
 function admin_service_action_select(string $field, string $label, array $options, string $selected, int $serviceIndex): void { ?>
 <fieldset class="button-option" data-button-kind="<?=h($field)?>"><legend><?=h($label)?></legend><input type="hidden" name="service_action_<?=h($field)?>[<?=h((string)$serviceIndex)?>][]" value="<?=h($selected)?>" data-button-option="<?=h($field)?>"><div class="button-option__choices"><?php foreach($options as $value=>$caption): ?><button type="button" class="button-choice button-choice--<?=h($field)?>-<?=h($value)?> <?=$selected===$value?'is-selected':''?>" data-button-value="<?=h($value)?>" aria-pressed="<?=$selected===$value?'true':'false'?>"><span><?=h($caption)?></span></button><?php endforeach; ?></div></fieldset>
 <?php }
@@ -415,7 +429,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $title=cms_text($_POST['title']??'',180); if($title==='')throw new RuntimeException('Введите тему решения.');
                     $date=cms_text($_POST['event_date']??'',10); if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date))throw new RuntimeException('Укажите дату решения.');
                     $current=$index===null?[]:$items[$index]; $image=cms_upload('image_file','image')?:cms_safe_url($_POST['image_url']??($current['image']??''));
-                    $record=['id'=>$id?:cms_id(),'title'=>$title,'event_date'=>$date,'event_time'=>cms_text($_POST['event_time']??'',5),'order'=>$index===null?0:(int)($current['order']??$index),'image'=>$image,'body'=>cms_sanitize_html(cms_replace_inline_uploads($_POST['body']??'','body_inline_images')),'protocol_text'=>archive_plain_text(cms_text($_POST['protocol_text']??($current['protocol_text']??''),200000)),'links'=>admin_collect_actions('card_action')];
+                    $record=['id'=>$id?:cms_id(),'title'=>$title,'event_date'=>$date,'event_time'=>cms_text($_POST['event_time']??'',5),'order'=>$index===null?0:(int)($current['order']??$index),'image'=>$image,'body'=>cms_sanitize_html(cms_replace_inline_uploads($_POST['body']??'','body_inline_images')),'protocol_text'=>archive_plain_text(cms_text($_POST['protocol_text']??($current['protocol_text']??''),200000)),'treasurer_report'=>cms_sanitize_html($_POST['treasurer_report']??($current['treasurer_report']??'')),'links'=>admin_collect_actions('card_action')];
                     if($index===null)array_unshift($items,$record);else $items[$index]=$record; foreach($items as $i=>$item)$items[$i]['order']=$i;
                     $content['archive']=['drive_url'=>$driveUrl,'drive_position'=>$drivePosition,'items'=>$items]; $target='/admin/?section=archive';
                 }
@@ -423,7 +437,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $days=[]; foreach (($_POST['day'] ?? []) as $i=>$day) { if (cms_text($day,60)!=='') $days[]=['day'=>cms_text($day,60),'topic'=>cms_sanitize_html($_POST['topic'][$i] ?? '')]; }
                 $content['schedule']=['time'=>cms_text($_POST['time'] ?? '',80),'zoom_url'=>cms_safe_url($_POST['zoom_url'] ?? ''),'days'=>$days]; $target='/admin/?section=schedule';
             } elseif ($section === 'library') {
-                $items=[]; foreach (($_POST['lib_title'] ?? []) as $i=>$title) { if (cms_text($title,180)==='') continue; $items[]=['id'=>cms_text($_POST['lib_id'][$i]??'',40) ?: cms_id(),'title'=>cms_text($title,180),'description'=>cms_sanitize_html($_POST['lib_description'][$i]??''),'cover'=>admin_upload_value('cover',$i,(string)($_POST['cover_url'][$i]??''),'image'),'resource'=>admin_upload_value('resource',$i,(string)($_POST['resource_url'][$i]??''),'pdf')]; }
+                $items=[]; foreach (($_POST['lib_title'] ?? []) as $i=>$title) {
+                    if (cms_text($title,180)==='') continue;
+                    $readButton = [
+                        'label'=>cms_text($_POST['lib_button_label'][$i]??cms_site_text($content,'library_read_button'),160),
+                        'type'=>cms_text($_POST['lib_button_type'][$i]??'classic',20),
+                        'color'=>cms_text($_POST['lib_button_color'][$i]??'orange',20),
+                        'shape'=>cms_text($_POST['lib_button_shape'][$i]??'rounded',20),
+                        'align'=>cms_text($_POST['lib_button_align'][$i]??'full',20),
+                    ];
+                    $items[]=['id'=>cms_text($_POST['lib_id'][$i]??'',40) ?: cms_id(),'title'=>cms_text($title,180),'description'=>cms_sanitize_html($_POST['lib_description'][$i]??''),'cover'=>admin_upload_value('cover',$i,(string)($_POST['cover_url'][$i]??''),'image'),'resource'=>admin_upload_value('resource',$i,(string)($_POST['resource_url'][$i]??''),'pdf'),'read_button'=>$readButton];
+                }
                 $content['library']=['note'=>cms_sanitize_html($_POST['note'] ?? ''),'other_url'=>cms_safe_url($_POST['other_url'] ?? ''),'other_position'=>(($_POST['other_position']??'bottom')==='top'?'top':'bottom'),'items'=>$items]; $target='/admin/?section=library';
             } elseif ($section === 'speakers') {
                 $data=$content['speakers']??[];
@@ -598,6 +622,7 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
       <div class="form-grid"><?php admin_input('event_date',$edit['event_date']??'','date','2. Дата решения *',true); admin_input('event_time',$edit['event_time']??'','time','3. Время (необязательно)'); ?></div>
       <?php admin_input('title',$edit['title']??'','text','4. Тема решения *',true); admin_rich('body',$edit['body']??'','5. Повестка РС',false,true); ?>
       <label class="field"><span>6. Протокол РС и результаты голосований</span><textarea name="protocol_text" rows="18"><?=h($edit['protocol_text']??'')?></textarea></label>
+      <?php admin_rich('treasurer_report',$edit['treasurer_report']??'','7. Отчёт казначея (отдельный раскрывающийся блок)'); ?>
       <?php admin_card_actions_fieldset($edit['links']??[], 'card_action'); ?>
       <div class="form-actions"><button class="button">Опубликовать решение</button><a class="button button--quiet" href="?section=archive">Отмена</a></div>
     </form>
@@ -607,7 +632,33 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
 <?php if ($section === 'schedule'): $data=$content['schedule']??[]; ?>
 <h1>Расписание</h1><form method="post" class="admin-form"><input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="schedule"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><div class="form-grid"><?php admin_input('time',$data['time']??'','text','Время собрания'); admin_input('zoom_url',$data['zoom_url']??'','url','Ссылка на Zoom'); ?></div>
 <fieldset class="repeatable" data-repeat="days"><legend>Дни и темы</legend><p class="admin-tip">Слева — день недели, справа — текст темы. В теме можно выбрать «Обычный текст» или заголовок через меню «Стиль текста».</p><div data-repeat-items><?php foreach(($data['days']??[]) as $day): ?><div class="schedule-row"><label class="field schedule-row__day"><span>День недели</span><input name="day[]" value="<?=h($day['day']??'')?>" placeholder="Например: Понедельник"></label><div class="field schedule-row__topic"><span>Тема собрания</span><textarea name="topic[]" class="js-rich" data-label="Тема собрания" rows="4"><?=h($day['topic']??'')?></textarea></div><button type="button" class="remove-row">Убрать</button></div><?php endforeach; ?></div><button type="button" class="button button--quiet" data-add-row>Добавить день</button><template><div class="schedule-row"><label class="field schedule-row__day"><span>День недели</span><input name="day[]" placeholder="Например: Понедельник"></label><div class="field schedule-row__topic"><span>Тема собрания</span><textarea name="topic[]" class="js-rich" data-label="Тема собрания" rows="4"></textarea></div><button type="button" class="remove-row">Убрать</button></div></template></fieldset><button class="button">Сохранить расписание</button></form><?php endif; ?>
-<?php if ($section === 'library'): $data=$content['library']??[]; ?><h1>Библиотека</h1><form method="post" enctype="multipart/form-data" class="admin-form"><input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="library"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><?php admin_rich('note',$data['note']??'','Текст над карточками',false,true); admin_input('other_url',$data['other_url']??'','url','Ссылка «Другая литература»'); admin_document_position('other_position',$data['other_position']??'bottom','Где показывать кнопку Google Диска'); ?><fieldset class="repeatable" data-repeat="library"><legend>Карточки книг и брошюр</legend><div data-repeat-items><?php foreach(($data['items']??[]) as $item): ?><div class="card-editor"><input type="hidden" name="lib_id[]" value="<?=h($item['id']??'')?>"><input name="lib_title[]" value="<?=h($item['title']??'')?>" placeholder="Название"><div class="field"><span>Описание книги</span><textarea name="lib_description[]" class="js-rich" data-label="Описание книги" rows="3"><?=h(admin_rich_legacy_text((string)($item['description']??'')))?></textarea></div><label>Обложка: ссылка<input name="cover_url[]" value="<?=h($item['cover']??'')?>"></label><input type="file" name="cover_file[]" accept="image/jpeg,image/png,image/webp"><label>PDF или внешняя ссылка<input name="resource_url[]" value="<?=h($item['resource']??'')?>"></label><input type="file" name="resource_file[]" accept="application/pdf"><button type="button" class="remove-row">Убрать карточку</button></div><?php endforeach; ?></div><button type="button" class="button button--quiet" data-add-row>Добавить материал</button><template><div class="card-editor"><input type="hidden" name="lib_id[]"><input name="lib_title[]" placeholder="Название"><div class="field"><span>Описание книги</span><textarea name="lib_description[]" class="js-rich" data-label="Описание книги" rows="3"></textarea></div><label>Обложка: ссылка<input name="cover_url[]"></label><input type="file" name="cover_file[]" accept="image/jpeg,image/png,image/webp"><label>PDF или внешняя ссылка<input name="resource_url[]"></label><input type="file" name="resource_file[]" accept="application/pdf"><button type="button" class="remove-row">Убрать карточку</button></div></template></fieldset><button class="button">Сохранить библиотеку</button></form><?php endif; ?>
+<?php if ($section === 'library'): $data=$content['library']??[]; ?>
+<h1>Библиотека</h1>
+<form method="post" enctype="multipart/form-data" class="admin-form">
+  <input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="library"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
+  <?php admin_rich('note',$data['note']??'','Текст над карточками',false,true); admin_input('other_url',$data['other_url']??'','url','Ссылка «Другая литература»'); admin_document_position('other_position',$data['other_position']??'bottom','Где показывать кнопку Google Диска'); ?>
+  <fieldset class="repeatable" data-repeat="library"><legend>Карточки книг и брошюр</legend>
+    <div data-repeat-items><?php foreach(($data['items']??[]) as $item): ?>
+      <div class="card-editor"><input type="hidden" name="lib_id[]" value="<?=h($item['id']??'')?>"><input name="lib_title[]" value="<?=h($item['title']??'')?>" placeholder="Название">
+        <div class="field"><span>Описание книги</span><textarea name="lib_description[]" class="js-rich" data-label="Описание книги" rows="3"><?=h(admin_rich_legacy_text((string)($item['description']??'')))?></textarea></div>
+        <label>Обложка: ссылка<input name="cover_url[]" value="<?=h($item['cover']??'')?>"></label><input type="file" name="cover_file[]" accept="image/jpeg,image/png,image/webp">
+        <label>PDF или внешняя ссылка<input name="resource_url[]" value="<?=h($item['resource']??'')?>"></label><input type="file" name="resource_file[]" accept="application/pdf">
+        <?php admin_library_button_editor($item, $content); ?>
+        <button type="button" class="remove-row">Убрать карточку</button>
+      </div>
+    <?php endforeach; ?></div>
+    <button type="button" class="button button--quiet" data-add-row>Добавить материал</button>
+    <template><div class="card-editor"><input type="hidden" name="lib_id[]"><input name="lib_title[]" placeholder="Название">
+      <div class="field"><span>Описание книги</span><textarea name="lib_description[]" class="js-rich" data-label="Описание книги" rows="3"></textarea></div>
+      <label>Обложка: ссылка<input name="cover_url[]"></label><input type="file" name="cover_file[]" accept="image/jpeg,image/png,image/webp">
+      <label>PDF или внешняя ссылка<input name="resource_url[]"></label><input type="file" name="resource_file[]" accept="application/pdf">
+      <?php admin_library_button_editor([], $content); ?>
+      <button type="button" class="remove-row">Убрать карточку</button>
+    </div></template>
+  </fieldset>
+  <button class="button">Сохранить библиотеку</button>
+</form>
+<?php endif; ?>
 <?php if ($section === 'speakers'):
     $data=$content['speakers']??[]; $items=$data['items']??[]; $editId=(string)($_GET['edit']??''); $edit=[];
     foreach($items as $item) if(($item['id']??'')===$editId)$edit=$item;

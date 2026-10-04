@@ -37,8 +37,10 @@ const document = {
   const group = html.match(/<summary[^>]*>Новичкам<\/summary>\s*<div class="site-nav__links">(.*?)<\/div>/s);
   assert.ok(group, 'Раздел «Новичкам» должен присутствовать.');
   const urls = [...group[1].matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
-  assert.equal(urls[0], '/p/test-na-alkogolizm', 'Тест должен быть первым после «Новичкам».');
-  assert.equal(urls.at(-1), '/newcomers.html', 'Ссылка на страницу раздела должна остаться доступной.');
+  assert.equal(urls[0], '/newcomers.html', 'Обращение к новичку должно быть первым в разделе.');
+  assert.equal(urls[1], '/p/test-na-alkogolizm', 'Тест должен идти сразу после обращения.');
+  assert.ok(group[1].includes('Обращение к новичку'), 'Название обращения должно быть видно в меню.');
+  assert.ok(!group[1].includes('Открыть раздел «Новичкам»'), 'Старая подпись не должна оставаться в меню.');
   assert.ok(html.includes('Спикерские'));
   console.log('Site navigation rendering checks passed.');
 })().catch((error) => { console.error(error); process.exitCode = 1; });

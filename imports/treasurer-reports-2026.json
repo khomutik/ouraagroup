@@ -1,0 +1,40 @@
+{
+  "source": "https://docs.google.com/spreadsheets/d/1uFKVQ6Orlz2GMTyIWsB4ux7eDRKejFTQ120p6JowZSE/edit?usp=sharing",
+  "reports": {
+    "2026-06-27": {
+      "month": "июнь 2026",
+      "treasurer": "Владимир Э.",
+      "sber": {"opening": "0,00", "income": "3 700,00", "expense": "0,00", "closing": "3 700,00"},
+      "paypal": {"opening": "0,00", "income": "10,00", "expense": "0,00", "closing": "10,00"},
+      "reserve_rub": "0,00",
+      "reserve_eur": "0,00"
+    },
+    "2026-07-25": {
+      "month": "июль 2026",
+      "treasurer": "Владимир Э.",
+      "sber": {"opening": "3 700,00", "income": "6 980,00", "expense": "0,00", "closing": "10 680,00"},
+      "paypal": {"opening": "10,00", "income": "20,00", "expense": "9,72", "closing": "20,28"},
+      "reserve_rub": "0,00",
+      "reserve_eur": "0,00",
+      "note": "Расход PayPal: Zoom — 9,72 €."
+    },
+    "2026-08-29": {
+      "month": "август 2026",
+      "treasurer": "Владимир Э.",
+      "sber": {"opening": "10 680,00", "income": "5 100,00", "expense": "0,00", "closing": "15 780,00"},
+      "paypal": {"opening": "20,28", "income": "20,00", "expense": "19,27", "closing": "21,01"},
+      "reserve_rub": "0,00",
+      "reserve_eur": "0,00",
+      "note": "Расход PayPal: Zoom — 19,27 €."
+    },
+    "2026-10-03": {
+      "month": "сентябрь 2026",
+      "treasurer": "Владимир Э.",
+      "sber": {"opening": "15 780,00", "income": "3 050,00", "expense": "4 000,00", "closing": "14 830,00"},
+      "paypal": {"opening": "21,01", "income": "20,00", "expense": "19,17", "closing": "21,84"},
+      "reserve_rub": "4 000,00",
+      "reserve_eur": "0,00",
+      "note": "Расход Сбер 4 000,00 ₽ — перевод в резерв группы. Расход PayPal: Zoom — 19,17 €."
+    }
+  }
+}

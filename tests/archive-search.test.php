@@ -41,6 +41,10 @@ $decision = array_values(array_filter($docs, static fn($doc): bool => $doc['url'
 archive_expect(count($point) === 1 && $point[0]['category'] === 'Повестка РС', 'Пункт повестки должен искаться отдельно.');
 archive_expect(count($decision) === 1 && $decision[0]['category'] === 'Протокол РС', 'Пункт протокола должен искаться отдельно.');
 archive_expect(str_contains($decision[0]['text'], 'за 7, против 0'), 'Итог голосования потерян при индексации.');
+$content['archive']['items'][0]['treasurer_report'] = '<p>За август 2026. Расход PayPal 19,27 €.</p>';
+$treasurerDocs = site_search_documents($content, '2026-10-04');
+$treasurer = array_values(array_filter($treasurerDocs, static fn($doc): bool => $doc['url'] === '/archive.html#' . archive_treasurer_id('record-1')));
+archive_expect(count($treasurer) === 1 && str_contains($treasurer[0]['text'], '19,27'), 'Отчёт казначея должен искаться по цифрам.');
 $content['archive']['items'][0]['protocol_text'] = $protocolWithVotes;
 $voteDocs = site_search_documents($content, '2026-10-04');
 $vote = array_values(array_filter($voteDocs, static fn($doc): bool => $doc['url'] === '/archive.html#vote-record-1-point-0'));

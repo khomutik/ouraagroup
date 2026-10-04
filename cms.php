@@ -249,7 +249,7 @@ function cms_action_classes(array $action): string {
     // Берём значения по умолчанию явно: иначе PHP пытался прочесть отсутствующий
     // ключ и выводил предупреждение прямо на публичной странице.
     $type = (string)($action['type'] ?? 'primary');
-    if (!in_array($type, ['primary','soft','outline','link','tab'], true)) $type = 'primary';
+    if (!in_array($type, ['classic','primary','soft','outline','link','tab'], true)) $type = 'primary';
     $color = (string)($action['color'] ?? 'orange');
     if (!in_array($color, ['orange','blue','beige'], true)) $color = 'orange';
     $shape = (string)($action['shape'] ?? 'rounded');

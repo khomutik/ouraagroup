@@ -27,7 +27,7 @@ function page_head(string $title, string $description, string $canonical): void 
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=114" />
+  <link rel="stylesheet" href="styles.css?v=115" />
   <script defer src="/site-analytics.js?v=1"></script>
 </head>
 <body>
@@ -38,7 +38,7 @@ function page_foot(): void { global $content; ?>
     <a class="back-to-top" href="#top"><?=h(cms_site_text($content, 'back_to_top'))?></a>
   </main>
   <script type="application/json" id="site-navigation-data"><?=json_encode(cms_navigation_payload($content), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)?></script>
-  <script src="site-nav.js?v=21"></script>
+  <script src="site-nav.js?v=22"></script>
   <script src="pwa-install.js?v=11"></script>
   <script src="site-chat.js?v=7" data-api="/support-chat-api"></script>
   <script src="site-search.js?v=5"></script>
@@ -80,13 +80,13 @@ if ($section === 'archive') { $data=$content['archive']??[]; $items=$data['items
     <div class="announcement-copy">
       <div class="announcement-meta"><time><?=h(cms_date_ru($item['event_date']??''))?></time><?php if (!empty($item['event_time'])): ?><time><?=h($item['event_time'])?> по МСК</time><?php endif; ?></div>
       <h2 class="announcement-title"><?=cms_display_text($item['title']??'')?></h2>
-      <div class="announcement-text"><?=archive_document_html($agendaText, 'agenda', $archiveId)?><?=archive_document_html($protocolText, 'protocol', $archiveId)?></div>
+      <div class="announcement-text"><?=archive_document_html($agendaText, 'agenda', $archiveId)?><?=archive_document_html($protocolText, 'protocol', $archiveId)?><?php if (!empty($item['treasurer_report'])): ?><details class="archive-document archive-treasurer" id="<?=h(archive_treasurer_id($archiveId))?>"><summary>Отчёт казначея</summary><div class="archive-treasurer__body"><?=cms_rich((string)$item['treasurer_report'])?></div></details><?php endif; ?></div>
       <?=cms_actions_html(archive_public_links($item), 'announcement-links')?>
     </div>
   </section><?php endforeach; ?>
   <?php if ($driveUrl && !$driveTop): ?><div class="page-actions"><a class="flow-button flow-button--soft flow-button--align-center" href="<?=h($driveUrl)?>" target="_blank" rel="noopener"><?=h(cms_site_text($content, 'archive_drive_button'))?></a></div><?php endif; ?>
   <?=cms_actions_html(cms_page_actions($content,'archive'))?>
-  <script>(()=>{const reveal=()=>{const id=decodeURIComponent(location.hash.slice(1));const target=document.getElementById(id);if(!target)return;for(let node=target.parentElement;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;if(id.includes('-point-'))requestAnimationFrame(()=>target.scrollIntoView({block:'start'}))};addEventListener('hashchange',reveal);reveal()})();</script>
+  <script>(()=>{const reveal=()=>{const id=decodeURIComponent(location.hash.slice(1));const target=document.getElementById(id);if(!target)return;if(target.tagName==='DETAILS')target.open=true;for(let node=target.parentElement;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;if(id.includes('-point-')||id.startsWith('treasurer-'))requestAnimationFrame(()=>target.scrollIntoView({block:'start'}))};addEventListener('hashchange',reveal);reveal()})();</script>
 <?php }
 
 if ($section === 'schedule') { $data = $content['schedule'] ?? []; ?>
@@ -101,10 +101,10 @@ if ($section === 'library') { $data = $content['library'] ?? []; $other=cms_safe
   <?php if ($other && $otherTop): ?><nav class="menu" aria-label="Разделы библиотеки"><a class="menu-button" href="<?= h($other) ?>" target="_blank" rel="noopener"><img src="assets/emoji/aa_book_blue.png" alt="" /><span><strong><?=h(cms_site_text($content, 'library_other_button'))?></strong></span></a></nav><?php endif; ?>
   <section class="library-list" aria-label="Книги АА">
     <?php if (!empty($data['note'])): ?><div class="library-note"><?= cms_rich((string)$data['note']) ?></div><?php endif; ?>
-    <?php foreach (($data['items'] ?? []) as $i => $item): $resource = cms_safe_url($item['resource'] ?? ''); ?>
+    <?php foreach (($data['items'] ?? []) as $i => $item): $resource = cms_safe_url($item['resource'] ?? ''); $readButton = is_array($item['read_button'] ?? null) ? $item['read_button'] : []; $readLabel = cms_text((string)($readButton['label'] ?? cms_site_text($content, 'library_read_button')), 160); ?>
       <article class="library-card" id="<?=h(site_search_anchor('book', $item['id'] ?? '', (int)$i))?>">
         <?php if (!empty($item['cover'])): ?><a class="library-card__cover-link" href="<?= h($resource) ?>" target="_blank" rel="noopener"><img class="library-card__cover" src="<?= h(cms_safe_url($item['cover'])) ?>" alt="Обложка: <?= h($item['title'] ?? '') ?>" /></a><?php endif; ?>
-        <div class="library-card__body"><h2><?= cms_display_text($item['title'] ?? '') ?></h2><div class="library-card__description"><?= cms_rich((string)($item['description'] ?? '')) ?></div><?php if ($resource): ?><a class="flow-button" href="<?= h($resource) ?>" target="_blank" rel="noopener"><?=h(cms_site_text($content, 'library_read_button'))?></a><?php endif; ?></div>
+        <div class="library-card__body"><h2><?= cms_display_text($item['title'] ?? '') ?></h2><div class="library-card__description"><?= cms_rich((string)($item['description'] ?? '')) ?></div><?php if ($resource && $readLabel !== ''): ?><a class="<?=h($readButton ? cms_action_classes($readButton) : 'flow-button')?>" href="<?= h($resource) ?>" target="_blank" rel="noopener"><?=cms_display_text($readLabel)?></a><?php endif; ?></div>
       </article>
     <?php endforeach; ?>
   </section>
