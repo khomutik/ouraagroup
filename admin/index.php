@@ -33,7 +33,7 @@ function admin_site_texts_form(array $content, string $group, string $returnTo):
       <input type="hidden" name="return_to" value="<?=h($returnTo)?>">
       <input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
       <h2>Заголовок и подписи страницы</h2>
-      <p class="admin-tip">Здесь меняются заголовок, вводный текст и постоянные подписи этой страницы. Основное содержимое и обычные кнопки редактируются ниже.</p>
+      <p class="admin-tip">Заголовок и подписи сохраняются отдельно от основного текста и кнопок страницы.</p>
       <?php foreach ($fields as $key => $definition): $value = cms_site_text($content, $key); ?>
         <label class="field"><span><?=h($definition[1])?></span>
           <?php if ($key === 'home_heading' || str_contains($key, 'description') || str_ends_with($key, '_lead')): ?>
@@ -41,8 +41,9 @@ function admin_site_texts_form(array $content, string $group, string $returnTo):
           <?php else: ?>
             <input name="site_text[<?=h($key)?>]" value="<?=h($value)?>">
           <?php endif; ?>
-          <?php if ($key === 'home_heading'): ?><small>Нажмите Enter там, где нужна новая строка в заголовке на главной.</small><?php endif; ?>
+          <?php if ($key === 'home_heading'): ?><small>Нажмите Enter там, где нужна новая строка, затем сохраните заголовок кнопкой сразу под этим полем.</small><?php endif; ?>
         </label>
+        <?php if ($key === 'home_heading'): ?><button class="button" type="submit">Сохранить заголовок и подписи</button><?php endif; ?>
       <?php endforeach; ?>
       <button class="button" type="submit">Сохранить заголовок и подписи</button>
     </form>
