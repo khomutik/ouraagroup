@@ -9,6 +9,7 @@ RewriteEngine On
 
 # Keep the public addresses that are already indexed and shared in messages.
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
+RewriteRule ^site-search\.json$ site-search.php [L]
 RewriteRule ^announcements\.html$ public.php?section=announcements [L,QSA]
 RewriteRule ^schedule\.html$ public.php?section=schedule [L,QSA]
 RewriteRule ^library\.html$ public.php?section=library [L,QSA]

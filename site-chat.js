@@ -452,6 +452,7 @@
   }
 
   function openPanel() {
+    window.dispatchEvent(new Event("pn:chat-open"));
     panel.hidden = false;
     launcher.setAttribute("aria-expanded", "true");
     launcher.setAttribute("aria-label", "Свернуть чат");
@@ -470,6 +471,7 @@
   }
 
   launcher.addEventListener("click", () => (panel.hidden ? openPanel() : hidePanel()));
+  window.addEventListener("pn:search-open", () => { if (!panel.hidden) hidePanel(); });
   hideButton.addEventListener("click", hidePanel);
   form.addEventListener("submit", (event) => {
     event.preventDefault();

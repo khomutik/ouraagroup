@@ -36,9 +36,14 @@ pochtinormalnye.ru {
         }
     }
 
-    @private path /.git* /.agents* /.codex* /.gitignore /.htaccess /README.md /admin/.htaccess /cms.php /site-page.php /sitemap.php /cms-config.php /cms-config.example.php /cms-data* /cms-backups* /support-chat-worker*
+    @private path /.git* /.agents* /.codex* /.gitignore /.htaccess /README.md /admin/.htaccess /cms.php /site-page.php /sitemap.php /site-search.php /site-search-lib.php /cms-config.php /cms-config.example.php /cms-data* /cms-backups* /support-chat-worker*
     handle @private {
         respond 404
+    }
+
+    handle /site-search.json {
+        header Cache-Control "public, max-age=60"
+        reverse_proxy 127.0.0.1:8091
     }
 
     @cms path / /index.html /newcomers.html /tradition.html /cms-navigation.json /sitemap.xml /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html
@@ -90,9 +95,14 @@ site.194-60-132-53.nip.io {
         }
     }
 
-    @private path /.git* /.agents* /.codex* /.gitignore /.htaccess /README.md /admin/.htaccess /cms.php /site-page.php /sitemap.php /cms-config.php /cms-config.example.php /cms-data* /cms-backups* /support-chat-worker*
+    @private path /.git* /.agents* /.codex* /.gitignore /.htaccess /README.md /admin/.htaccess /cms.php /site-page.php /sitemap.php /site-search.php /site-search-lib.php /cms-config.php /cms-config.example.php /cms-data* /cms-backups* /support-chat-worker*
     handle @private {
         respond 404
+    }
+
+    handle /site-search.json {
+        header Cache-Control "public, max-age=60"
+        reverse_proxy 127.0.0.1:8091
     }
 
     @cms path / /index.html /newcomers.html /tradition.html /cms-navigation.json /sitemap.xml /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html
