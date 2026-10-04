@@ -2,78 +2,29 @@
   const shell = document.querySelector(".page-shell");
   if (!shell) return;
 
-  const speakersUrl = "https://drive.google.com/drive/folders/1x-bKBZzLpj1uTAnJpWqVFq3JBjXw-su-?usp=sharing";
-  const archiveUrl = "archive.html";
-  const zoomUrl = "https://us06web.zoom.us/j/5487249245?pwd=UE3buqca6pTDt8kGPJDW9pRoaC7gkt.1";
-  const telegramUrl = "https://telegram.me/+mta_CKQY2c05ODRi";
-  const maxUrl = "https://max.ru/join/GV-P-08zFtVs6pX-xR5Z8x80MMNPzhjJ1w6JVEYGn9M";
   const escapeHtml = (value) => String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
   const siteUrl = (value) => /^(?:https?:|tel:|mailto:|#|\/)/i.test(String(value || '')) ? String(value || '') : `/${value}`;
 
+  // The live CMS payload is embedded in each page, so the menu does not depend
+  // on a second network request. Keep only basic links as an emergency fallback.
   let navItems = [
-    { title: "Главная страница", href: "index.html" },
-    {
-      title: "Новичкам",
-      href: "newcomers.html",
-      openOn: "newcomers.html",
-      links: [
-        { href: "newcomers.html", label: "Новичкам - главное меню раздела" },
-        { href: "/p/test-na-alkogolizm", label: "Тест на алкоголизм: подходит ли тебе АА?" },
-        { href: "newcomers.html#aa", label: "Кто такие Анонимные Алкоголики?" },
-        { href: "newcomers.html#twelve-steps", label: "Программа «Двенадцать Шагов» АА" },
-        { href: "newcomers.html#program-help", label: "Всем ли помогает Программа АА?" },
-        { href: "newcomers.html#aa-community", label: "Зачем мне общение с анонимными алкоголиками?" },
-        { href: "newcomers.html#sponsor", label: "Кто такой спонсор в АА?" },
-        { href: "newcomers.html#sponsor-steps", label: "12 шагов спонсора" },
-        { href: "newcomers.html#alcoholism", label: "Немного об алкоголизме" },
-        { href: "newcomers.html#alcoholism-learned", label: "Что мы узнали об алкоголизме?" },
-        { href: "newcomers.html#alcoholism-disease", label: "Алкоголизм - это болезнь" },
-        { href: "newcomers.html#meetings", label: "Собрания АА" },
-        { href: "newcomers.html#meeting-process", label: "Что происходит на собраниях Анонимных Алкоголиков?" },
-        { href: "newcomers.html#pn-meetings", label: "Как проходят собрания в группе «Почти нормальные»?" },
-        { href: "newcomers.html#recommendations", label: "Практические рекомендации" },
-        { href: "newcomers.html#today-only", label: "Принцип «Только сегодня»" }
-      ]
-    },
-    { title: "Расписание собраний", href: "schedule.html" },
-    { title: "Объявления", href: "announcements.html" },
-    {
-      title: "Библиотека",
-      href: "library.html",
-      openOn: "library.html",
-      links: [
-        { href: "library.html", label: "Библиотека - книги и брошюры АА" }
-      ]
-    },
-    { title: "Спикерские", href: "speakers.html" },
-    {
-      title: "Служения",
-      href: "service.html",
-      openOn: "service.html",
-      links: [
-        { href: "service.html", label: "Служения - список служений группы" }
-      ]
-    },
-    {
-      title: "7-я традиция",
-      href: "tradition.html",
-      openOn: "tradition.html",
-      links: [
-        { href: "tradition.html", label: "7-я традиция - реквизиты" }
-      ]
-    },
-    { title: "Архив", href: archiveUrl }
+    {title:'Главная страница',href:'index.html'},
+    {title:'Новичкам',href:'newcomers.html'},
+    {title:'Расписание собраний',href:'schedule.html'},
+    {title:'Объявления',href:'announcements.html'},
+    {title:'Библиотека',href:'library.html'},
+    {title:'Спикерские',href:'speakers.html'},
+    {title:'Служения',href:'service.html'},
+    {title:'7-я традиция',href:'tradition.html'},
+    {title:'Архив решений',href:'archive.html'}
   ];
-
-  let socialLinks = [
-    {title:'Zoom', url:zoomUrl, icon:'/assets/social-zoom-v2.png'},
-    {title:'Telegram', url:telegramUrl, icon:'/assets/social-telegram-v2.png'},
-    {title:'MAX', url:maxUrl, icon:'/assets/social-max-v2.png'}
-  ];
+  let socialLinks = [];
   try {
-    const response = await fetch('/cms-navigation.json', {cache:'no-store'});
-    if (response.ok) {
-      const config = await response.json();
+    const embedded = document.getElementById('site-navigation-data');
+    const config = embedded
+      ? JSON.parse(embedded.textContent)
+      : await fetch('/cms-navigation.json', {cache:'no-store'}).then((response) => response.ok ? response.json() : null);
+    if (config) {
       const hiddenMenuLabels = new Set(["Другая литература", "График служений", "Отчет казначея", "Отчёт казначея"]);
       const rows = (Array.isArray(config.items) ? config.items : [])
         .filter((row) => !hiddenMenuLabels.has(String(row.title || "")))
@@ -82,7 +33,7 @@
       navItems = roots.map((row) => {
         const children = rows.filter((child) => child.parent === row.id || child.parent === row.title).map((child) => ({href:child.url,label:child.title,external:!!child.external}));
         const base = {title:row.title,href:row.url,external:!!row.external};
-        if (children.length) return {...base,openOn:String(row.url).split('/').pop().split('#')[0],links:[{href:row.url,label:row.title,external:!!row.external},...children]};
+        if (children.length) return {...base,openOn:String(row.url).split('/').pop().split('#')[0],links:[...children,{href:row.url,label:`Открыть раздел «${row.title}»`,external:!!row.external}]};
         return base;
       });
       if (Array.isArray(config.socials) && config.socials.length) socialLinks = config.socials.map((row) => ({...row,url:siteUrl(row.url),icon:row.icon ? siteUrl(row.icon) : ''}));

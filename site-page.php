@@ -6,43 +6,8 @@ $content = cms_content();
 $path = trim((string)parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH), '/');
 
 if ($path === 'cms-navigation.json' || isset($_GET['navigation'])) {
-    $nav = $content['navigation'] ?? cms_default_navigation();
-    $hiddenMenuTitles = ['Другая литература', 'График служений', 'Отчет казначея', 'Отчёт казначея'];
-    $items = array_values(array_filter(
-        $nav['items'] ?? [],
-        static fn(array $item): bool => !in_array((string)($item['title'] ?? ''), $hiddenMenuTitles, true)
-    ));
-    $testPage = null;
-    foreach (($content['newcomers']['pages'] ?? []) as $page) {
-        if (($page['slug'] ?? '') === 'aa-test' && !empty($page['published'])) $testPage = $page;
-    }
-    if ($testPage !== null) {
-        $testNav = null;
-        $items = array_values(array_filter($items, static function (array $item) use (&$testNav): bool {
-            if (!in_array((string)($item['url'] ?? ''), ['newcomers.html#aa-test', '#aa-test', 'p/test-na-alkogolizm', '/p/test-na-alkogolizm'], true)) return true;
-            $testNav ??= $item;
-            return false;
-        }));
-        $testNav = array_merge(['id'=>'newcomer-aa-test','title'=>'Тест на алкоголизм: подходит ли тебе АА?','icon'=>'','external'=>false], $testNav ?? []);
-        $testNav['url'] = '/p/test-na-alkogolizm';
-        $testNav['parent'] = 'Новичкам';
-        $rootIndex = null;
-        foreach ($items as $index => $item) if (($item['id'] ?? '') === 'newcomers' || ($item['title'] ?? '') === 'Новичкам') { $rootIndex = $index; break; }
-        array_splice($items, $rootIndex === null ? count($items) : $rootIndex + 1, 0, [$testNav]);
-    }
-    $knownUrls = array_column($items, 'url');
-    foreach (($content['newcomers']['pages'] ?? []) as $page) {
-        if (empty($page['published']) || in_array(($page['slug'] ?? ''), ['menu', 'aa-test'], true)) continue;
-        $url = 'newcomers.html#' . ($page['slug'] ?? '');
-        if (!in_array($url, $knownUrls, true)) $items[] = ['id'=>'newcomer-' . ($page['slug'] ?? ''),'title'=>$page['title'] ?? 'Страница','url'=>$url,'parent'=>'Новичкам','icon'=>'','external'=>false];
-    }
-    foreach (($content['pages']['custom'] ?? []) as $page) {
-        if (empty($page['published'])) continue;
-        $url = '/p/' . ($page['slug'] ?? '');
-        if (!in_array($url, $knownUrls, true)) $items[] = ['id'=>'page-' . ($page['slug'] ?? ''),'title'=>$page['title'] ?? 'Страница','url'=>$url,'parent'=>'','icon'=>'','external'=>false];
-    }
     header('Content-Type: application/json; charset=UTF-8'); header('Cache-Control: no-store');
-    echo json_encode(['items'=>$items,'socials'=>$nav['socials']??[]], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES); exit;
+    echo json_encode(cms_navigation_payload($content), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES); exit;
 }
 
 $kind = (string)($_GET['kind'] ?? '');
@@ -52,10 +17,10 @@ if ($kind === '') {
 }
 
 function site_head(string $title, string $description, string $canonical, string $shell = 'page-shell'): void { ?>
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=h($title)?></title><meta name="description" content="<?=h($description)?>"><?php if ($canonical === ''): ?><meta name="google-site-verification" content="5IWS7A0Fugk8U_UVSELaH5BBzBC2tqNW9qVOiSQtt2E"><meta name="msvalidate.01" content="0CB2AF7FFE0AAB04D4E791C26CB5FA3D"><?php endif; ?><link rel="canonical" href="https://pochtinormalnye.ru/<?=h($canonical)?>"><meta name="theme-color" content="#f7efdf"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png"><link rel="apple-touch-icon" href="/icons/apple-touch-icon-v3.png"><link rel="stylesheet" href="/styles.css?v=107"><script defer src="/site-analytics.js?v=1"></script></head><body><main class="<?=h($shell)?>" id="top">
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=h($title)?></title><meta name="description" content="<?=h($description)?>"><?php if ($canonical === ''): ?><meta name="google-site-verification" content="5IWS7A0Fugk8U_UVSELaH5BBzBC2tqNW9qVOiSQtt2E"><meta name="msvalidate.01" content="0CB2AF7FFE0AAB04D4E791C26CB5FA3D"><?php endif; ?><link rel="canonical" href="https://pochtinormalnye.ru/<?=h($canonical)?>"><meta name="theme-color" content="#f7efdf"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png"><link rel="apple-touch-icon" href="/icons/apple-touch-icon-v3.png"><link rel="stylesheet" href="/styles.css?v=110"><script defer src="/site-analytics.js?v=1"></script></head><body><main class="<?=h($shell)?>" id="top">
 <?php }
 function site_foot(bool $siteNav = true): void { global $content; ?>
-<a class="back-to-top" href="#top"><?=h(cms_site_text($content, 'back_to_top'))?></a></main><?php if($siteNav):?><script src="/site-nav.js?v=19"></script><?php endif;?><script src="/pwa-install.js?v=11"></script><script src="/site-chat.js?v=6" data-api="/support-chat-api"></script><script src="/aa-test.js?v=3"></script></body></html>
+<a class="back-to-top" href="#top"><?=h(cms_site_text($content, 'back_to_top'))?></a></main><?php if($siteNav):?><script type="application/json" id="site-navigation-data"><?=json_encode(cms_navigation_payload($content), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)?></script><script src="/site-nav.js?v=21"></script><?php endif;?><script src="/pwa-install.js?v=11"></script><script src="/site-chat.js?v=6" data-api="/support-chat-api"></script><script src="/aa-test.js?v=3"></script></body></html>
 <?php }
 
 if ($kind === 'home') {

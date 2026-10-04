@@ -26,7 +26,7 @@ function page_head(string $title, string $description, string $canonical): void 
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=107" />
+  <link rel="stylesheet" href="styles.css?v=110" />
   <script defer src="/site-analytics.js?v=1"></script>
 </head>
 <body>
@@ -36,7 +36,8 @@ function page_head(string $title, string $description, string $canonical): void 
 function page_foot(): void { global $content; ?>
     <a class="back-to-top" href="#top"><?=h(cms_site_text($content, 'back_to_top'))?></a>
   </main>
-  <script src="site-nav.js?v=18"></script>
+  <script type="application/json" id="site-navigation-data"><?=json_encode(cms_navigation_payload($content), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)?></script>
+  <script src="site-nav.js?v=21"></script>
   <script src="pwa-install.js?v=11"></script>
   <script src="site-chat.js?v=6" data-api="/support-chat-api"></script>
 </body>
@@ -96,14 +97,27 @@ if ($section === 'library') { $data = $content['library'] ?? []; $other=cms_safe
   <?=cms_actions_html(cms_page_actions($content,'library'))?>
 <?php }
 
-if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms_safe_url($data['drive_url']??''); $driveTop=($data['drive_position']??'top')!=='bottom'; ?>
-  <?php if ($driveUrl && $driveTop): ?><a class="document-link speakers-drive-link" href="<?= h($driveUrl) ?>" target="_blank" rel="noopener"><img src="assets/emoji/aa_microphone.png" alt="" /><span><?=h(cms_site_text($content, 'speakers_drive_button'))?></span></a><?php endif; ?>
+if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms_safe_url($data['drive_url']??''); $speakerItems=cms_speakers_newest_first($data['items']??[]); ?>
   <?php if (!empty($data['intro'])): ?><section class="content-card speakers-intro"><?= cms_rich((string)$data['intro']) ?></section><?php endif; ?>
   <?php if (!empty($data['privacy'])): ?><section class="speakers-privacy"><?= cms_rich((string)$data['privacy']) ?></section><?php endif; ?>
-  <?php if (!empty($data['closing'])): ?><section class="content-card speakers-intro"><?= cms_rich((string)$data['closing']) ?></section><?php endif; ?>
   <section class="content-card speakers-materials" aria-label="Материалы об анонимности"><h2><?=h(cms_site_text($content, 'speakers_materials_heading'))?></h2><?php foreach (($data['materials'] ?? []) as $item): if ($url = cms_safe_url($item['resource'] ?? '')): ?><a class="speakers-file" href="<?= h($url) ?>" target="_blank" rel="noopener"><span>📄</span><span><?= cms_display_text($item['title'] ?? '') ?></span></a><?php endif; endforeach; ?></section>
-  <?php if ($driveUrl && !$driveTop): ?><a class="document-link speakers-drive-link" href="<?= h($driveUrl) ?>" target="_blank" rel="noopener"><img src="assets/emoji/aa_microphone.png" alt="" /><span><?=h(cms_site_text($content, 'speakers_drive_button'))?></span></a><?php endif; ?>
+  <?php if ($driveUrl): ?><a class="document-link speakers-drive-link" href="<?= h($driveUrl) ?>" target="_blank" rel="noopener"><img src="assets/emoji/aa_microphone.png" alt="" /><span><?=h(cms_site_text($content, 'speakers_drive_button'))?></span></a><?php endif; ?>
+  <?php foreach($speakerItems as $item): $audioUrl=cms_safe_url($item['audio_url']??''); $previewUrl=cms_drive_audio_preview_url($audioUrl); ?>
+    <article class="announcement-card speaker-card">
+      <div class="announcement-copy">
+        <div class="announcement-meta"><time datetime="<?=h($item['event_date']??'')?>"><?=h(cms_date_ru((string)($item['event_date']??'')))?></time></div>
+        <h2 class="announcement-title"><?=cms_display_text($item['title']??'')?></h2>
+        <dl class="speaker-card__facts">
+          <div><dt>Спикер</dt><dd><?=h($item['speaker']??'')?></dd></div>
+          <?php foreach(['city'=>'Город','home_group'=>'Домашняя группа','sobriety'=>'Трезвость'] as $key=>$label): if (!empty($item[$key])): ?><div><dt><?=h($label)?></dt><dd><?=h($item[$key])?></dd></div><?php endif; endforeach; ?>
+        </dl>
+        <?php if($previewUrl): ?><div class="speaker-audio"><a class="speaker-audio__listen" href="<?=h($audioUrl)?>" target="_blank" rel="noopener noreferrer">▶ Слушать на Google Диске</a><button class="speaker-audio__load" type="button" data-speaker-preview="<?=h($previewUrl)?>" aria-expanded="false">Плеер на странице</button><div class="speaker-audio__frame" hidden></div></div><?php endif; ?>
+        <?=cms_actions_html($item['links']??[],'announcement-links')?>
+      </div>
+    </article>
+  <?php endforeach; ?>
   <?=cms_actions_html(cms_page_actions($content,'speakers'))?>
+  <script defer src="/speakers-audio.js?v=3"></script>
 <?php }
 
 if ($section === 'services') { $data = $content['services'] ?? []; $chartUrl=cms_safe_url($data['chart_url']??''); $chartTop=($data['chart_position']??'top')!=='bottom'; ?>

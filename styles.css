@@ -1177,12 +1177,19 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 
 .site-side-nav,
 .mobile-menu-panel__sheet {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--orange) rgba(247, 239, 223, 0.2);
 }
 
 .site-side-nav::-webkit-scrollbar,
 .mobile-menu-panel__sheet::-webkit-scrollbar {
-  display: none;
+  width: 9px;
+}
+
+.site-side-nav::-webkit-scrollbar-thumb,
+.mobile-menu-panel__sheet::-webkit-scrollbar-thumb {
+  border-radius: 9px;
+  background: var(--orange);
 }
 
 .site-side-nav__title {
@@ -2188,6 +2195,94 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 
 .speakers-drive-link {
   margin-top: 12px;
+}
+
+.speaker-card .announcement-meta time::before {
+  content: "📅";
+}
+
+.speaker-card__facts {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  color: var(--blue);
+  font-size: 17px;
+}
+
+.speaker-card__facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.speaker-card__facts dt {
+  font-weight: 900;
+}
+
+.speaker-card__facts dt::after {
+  content: ":";
+}
+
+.speaker-card__facts dd {
+  margin: 0;
+}
+
+.speaker-audio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.speaker-audio__listen,
+.speaker-audio__load {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 9px 17px;
+  border: 1px solid var(--orange);
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.speaker-audio__listen {
+  color: #fff;
+  background: var(--orange);
+}
+
+.speaker-audio__load {
+  color: var(--orange-dark);
+  background: transparent;
+}
+
+.speaker-audio__listen:hover,
+.speaker-audio__listen:focus-visible,
+.speaker-audio__load:hover,
+.speaker-audio__load:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.speaker-audio__listen:hover,
+.speaker-audio__listen:focus-visible {
+  background: var(--orange-dark);
+}
+
+.speaker-audio__frame {
+  flex-basis: 100%;
+  width: 100%;
+}
+
+.speaker-audio__frame iframe {
+  display: block;
+  width: 100%;
+  height: 220px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
 }
 
 .back-to-top {

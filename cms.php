@@ -86,12 +86,37 @@ function cms_date_ru(string $value): string {
     $month = (int)$parts[2];
     return (int)$parts[3] . ' ' . ($months[$month] ?? $parts[2]) . ' ' . $parts[1];
 }
+function cms_speakers_newest_first(array $items): array {
+    usort($items, static function ($a, $b): int {
+        $date = strcmp((string)($b['event_date'] ?? ''), (string)($a['event_date'] ?? ''));
+        if ($date !== 0) return $date;
+        return (int)($a['order'] ?? PHP_INT_MAX) <=> (int)($b['order'] ?? PHP_INT_MAX);
+    });
+    return $items;
+}
 function cms_safe_url($value, bool $empty = true): string {
     $url = trim((string) $value);
     if ($url === '' && $empty) return '';
     if (preg_match('~^(?:https?://|tel:|mailto:|/|\#|assets/|uploads/)~iu', $url)) return $url;
     if (preg_match('~^[a-z0-9][a-z0-9._/-]*(?:\#[a-z0-9-]+)?$~iu', $url)) return $url;
     return '';
+}
+function cms_drive_audio_preview_url(string $url): string {
+    $parts = parse_url($url);
+    if (!is_array($parts) || ($parts['scheme'] ?? '') !== 'https' || ($parts['host'] ?? '') !== 'drive.google.com') return '';
+    $path = (string)($parts['path'] ?? '');
+    $id = '';
+    if (preg_match('~^/file/d/([A-Za-z0-9_-]+)(?:/.*)?$~', $path, $match)) $id = $match[1];
+    if ($path === '/open') {
+        parse_str((string)($parts['query'] ?? ''), $query);
+        if (is_string($query['id'] ?? null) && preg_match('/^[A-Za-z0-9_-]+$/', $query['id'])) $id = $query['id'];
+    }
+    if ($id === '') return '';
+    parse_str((string)($parts['query'] ?? ''), $query);
+    $resourceKey = $query['resourcekey'] ?? '';
+    $suffix = is_string($resourceKey) && preg_match('/^[A-Za-z0-9_-]+$/', $resourceKey)
+        ? '?resourcekey=' . rawurlencode($resourceKey) : '';
+    return 'https://drive.google.com/file/d/' . $id . '/preview' . $suffix;
 }
 function cms_html_attribute(string $attributes, string $name): string {
     if (!preg_match('/\b' . preg_quote($name, '/') . '\s*=\s*(["\'])(.*?)\1/iu', $attributes, $match)) return '';
@@ -322,6 +347,65 @@ function cms_default_navigation(): array {
     ];
 }
 
+function cms_navigation_payload(array $content): array {
+    $nav = $content['navigation'] ?? cms_default_navigation();
+    $hiddenTitles = ['Другая литература', 'График служений', 'Отчет казначея', 'Отчёт казначея'];
+    $pages = [];
+    foreach (($content['newcomers']['pages'] ?? []) as $page) {
+        if (!empty($page['published']) && !empty($page['slug'])) $pages[(string)$page['slug']] = $page;
+    }
+    $items = [];
+    foreach (($nav['items'] ?? []) as $item) {
+        if (in_array((string)($item['title'] ?? ''), $hiddenTitles, true)) continue;
+        $url = (string)($item['url'] ?? '');
+        if (preg_match('~^/?newcomers\.html#([a-z0-9-]+)$~', $url, $match) && !isset($pages[$match[1]])) continue;
+        $items[] = $item;
+    }
+    $testNav = null;
+    $items = array_values(array_filter($items, static function (array $item) use (&$testNav): bool {
+        if (!in_array((string)($item['url'] ?? ''), ['newcomers.html#aa-test', '#aa-test', 'p/test-na-alkogolizm', '/p/test-na-alkogolizm'], true)) return true;
+        $testNav ??= $item;
+        return false;
+    }));
+    if (isset($pages['aa-test'])) {
+        $testNav = array_merge(['id'=>'newcomer-aa-test','title'=>'Тест на алкоголизм: подходит ли тебе АА?','icon'=>'','external'=>false], $testNav ?? []);
+        $testNav['url'] = '/p/test-na-alkogolizm';
+        $testNav['parent'] = 'Новичкам';
+        $rootIndex = null;
+        foreach ($items as $index => $item) {
+            if (($item['id'] ?? '') === 'newcomers' || ($item['title'] ?? '') === 'Новичкам') { $rootIndex = $index; break; }
+        }
+        array_splice($items, $rootIndex === null ? count($items) : $rootIndex + 1, 0, [$testNav]);
+    }
+    $knownUrls = array_column($items, 'url');
+    foreach ($pages as $slug => $page) {
+        if (in_array($slug, ['menu', 'aa-test'], true)) continue;
+        $url = 'newcomers.html#' . $slug;
+        if (in_array($url, $knownUrls, true)) continue;
+        $items[] = ['id'=>'newcomer-' . $slug,'title'=>$page['title'] ?? 'Страница','url'=>$url,'parent'=>'Новичкам','icon'=>'','external'=>false];
+        $knownUrls[] = $url;
+    }
+    $socialUrls = array_column($nav['socials'] ?? [], 'url');
+    foreach ($pages as $slug => $page) {
+        foreach (($page['actions'] ?? []) as $index => $action) {
+            $url = cms_safe_url($action['url'] ?? '');
+            if (str_starts_with($url, '#')) $url = 'newcomers.html' . $url;
+            $label = cms_text(strip_tags((string)($action['label'] ?? '')), 160);
+            if ($url === '' || $label === '' || in_array($url, $knownUrls, true) || in_array($url, $socialUrls, true)) continue;
+            $items[] = ['id'=>'newcomer-action-' . $slug . '-' . $index,'title'=>$label,'url'=>$url,'parent'=>'Новичкам','icon'=>'','external'=>str_starts_with($url, 'http')];
+            $knownUrls[] = $url;
+        }
+    }
+    foreach (($content['pages']['custom'] ?? []) as $page) {
+        if (empty($page['published']) || empty($page['slug'])) continue;
+        $url = '/p/' . $page['slug'];
+        if (in_array($url, $knownUrls, true)) continue;
+        $items[] = ['id'=>'page-' . $page['slug'],'title'=>$page['title'] ?? 'Страница','url'=>$url,'parent'=>'','icon'=>'','external'=>false];
+        $knownUrls[] = $url;
+    }
+    return ['items'=>$items,'socials'=>$nav['socials'] ?? []];
+}
+
 function cms_default_content(): array {
     $content = [
         'announcements' => [
@@ -338,7 +422,7 @@ function cms_default_content(): array {
             ['day'=>'Понедельник','topic'=>'Чтение и обсуждение БК «Анонимные Алкоголики», дополнительные темы'],['day'=>'Вторник','topic'=>'Ёжик, Билл, шаг программы, игра «500 почти нормальных вопросов», дополнительные темы'],['day'=>'Четверг','topic'=>'Собрание для новичков: «Как воздержаться от первой рюмки?», дополнительные темы'],['day'=>'Пятница','topic'=>'Чтение и обсуждение книги «12 шагов и 12 традиций».<br>2-я и 4-я пятница месяца: большое спикерское собрание.'],['day'=>'Воскресенье','topic'=>'День свободных тем, игра «500 почти нормальных вопросов»']]],
         'library' => ['note'=>'<p>Купить печатную литературу АА на русском языке в России можно на <a href="https://aarussia.ru/litra#!/tab/744553584-1">официальном сайте АА России</a>. За помощью с покупкой литературы за рубежом можно обратиться к членам нашей группы.</p>','other_url'=>'https://drive.google.com/drive/folders/1vKX6abhQRFOKIhHaqXmYcUWgjVcCpmHu?usp=sharing','items'=>[
             ['id'=>'big-book','title'=>'Большая Книга «Анонимные Алкоголики»','description'=>'Большая книга с историями. В ней описан опыт первых членов Содружества и принципы, которые помогают алкоголикам оставаться трезвыми.','cover'=>'assets/book-big-book.webp','resource'=>'assets/big-book-with-stories.pdf'],['id'=>'12x12','title'=>'Двенадцать шагов и Двенадцать традиций','description'=>'Книга подробно раскрывает Двенадцать Шагов как путь личного выздоровления и Двенадцать Традиций как основу единства и работы групп АА.','cover'=>'assets/book-12x12.webp','resource'=>'assets/twelve-steps-twelve-traditions.pdf'],['id'=>'living-sober','title'=>'Жить трезвыми','description'=>'Практическая книга с методами сохранения трезвости, которые используют члены АА.','cover'=>'assets/book-living-sober.jpg','resource'=>'assets/living-sober.pdf'],['id'=>'44','title'=>'Брошюра «44 вопроса и ответа»','description'=>'Короткая брошюра с простыми ответами на частые вопросы об Анонимных Алкоголиках.','cover'=>'assets/brochure-44-questions.jpg','resource'=>'assets/forty-four-questions-answers.pdf'],['id'=>'sponsorship','title'=>'Брошюра «Вопросы и ответы о наставничестве»','description'=>'Краткое руководство о наставничестве в АА.','cover'=>'assets/brochure-sponsorship-qa.jpg','resource'=>'assets/sponsorship-questions-answers.pdf']]],
-        'speakers' => ['drive_url'=>'https://drive.google.com/drive/folders/1x-bKBZzLpj1uTAnJpWqVFq3JBjXw-su-?usp=sharing','intro'=>'<h2>📌 Немного информации об анонимности и соблюдении Традиций на онлайн-собраниях группы АА «Почти нормальные»</h2><p>Друзья, хотим напомнить, что для нашей группы соблюдение Традиций АА и принципа анонимности является важной частью нашей общей групповой совести.</p><p>Включение камеры остаётся исключительно <strong>личным выбором</strong> каждого участника и не должно быть причиной давления или дискомфорта.</p>','privacy'=>'<h2>Важно об анонимности</h2><p>Просим уважать анонимность и личное пространство друг друга: не делать скриншоты, фотографии или записи участников и не распространять их без согласия. 🙏🏻</p><p><em>Во время спикерских выступлений мы не ведём видеозапись встреч.</em></p>','closing'=>'<p>Давайте будем бережны к анонимности друг друга и продолжать нести наше общее послание с любовью и уважением ❤️</p>','materials'=>[['id'=>'mg18','title'=>'A.A. Guidelines - Internet (MG-18)','resource'=>'assets/MG-18_1025.pdf'],['id'=>'mg25','title'=>'Safety and A.A. Groups Online (MG-25)','resource'=>'assets/MG-25_Safety_and_AA_Groups_ONLINE.pdf'],['id'=>'p47','title'=>'Anonymity: Our Spiritual Foundation (P-47)','resource'=>'assets/P-47_Anonymity_Our_Spiritual_Foundation_ONLINE.pdf']]],
+        'speakers' => ['drive_url'=>'https://drive.google.com/drive/folders/1x-bKBZzLpj1uTAnJpWqVFq3JBjXw-su-?usp=sharing','intro'=>'<h2>📌 Немного информации об анонимности и соблюдении Традиций на онлайн-собраниях группы АА «Почти нормальные»</h2><p>Друзья, хотим напомнить, что для нашей группы соблюдение Традиций АА и принципа анонимности является важной частью нашей общей групповой совести.</p><p>Включение камеры остаётся исключительно <strong>личным выбором</strong> каждого участника и не должно быть причиной давления или дискомфорта.</p>','privacy'=>'<h2>Важно об анонимности</h2><p>Просим уважать анонимность и личное пространство друг друга: не делать скриншоты, фотографии или записи участников и не распространять их без согласия. 🙏🏻</p><p><em>Во время спикерских выступлений мы не ведём видеозапись встреч.</em></p>','items'=>[],'materials'=>[['id'=>'mg18','title'=>'A.A. Guidelines - Internet (MG-18)','resource'=>'assets/MG-18_1025.pdf'],['id'=>'mg25','title'=>'Safety and A.A. Groups Online (MG-25)','resource'=>'assets/MG-25_Safety_and_AA_Groups_ONLINE.pdf'],['id'=>'p47','title'=>'Anonymity: Our Spiritual Foundation (P-47)','resource'=>'assets/P-47_Anonymity_Our_Spiritual_Foundation_ONLINE.pdf']]],
         'services' => ['chart_url'=>'https://docs.google.com/spreadsheets/d/1VAWzdnevTgTmfyx83wfSig9BW6PfdKK1wZorpW0bIvU/edit?usp=sharing','lead'=>'Если вы хотите взять служение в нашей группе, вы можете написать любому из служащих или сообщить об этом после собрания в чайной.','items'=>[
             ['id'=>'coordinator','title'=>'Координатор','sobriety'=>'1 год','term'=>'1 год','open'=>false,'holders'=>[['name'=>'Маня Х.','rotation'=>'2027-06-30']]],['id'=>'deputy-coordinator','title'=>'Дублёр координатора','sobriety'=>'6 месяцев','term'=>'6 месяцев','open'=>true,'holders'=>[]],['id'=>'secretary','title'=>'Секретарь','sobriety'=>'6 месяцев','term'=>'6 месяцев','open'=>false,'holders'=>[['name'=>'Валя С.','rotation'=>'2026-12-31']]],['id'=>'deputy-secretary','title'=>'Дублёр секретаря','sobriety'=>'3 месяца','term'=>'6 месяцев','open'=>true,'holders'=>[]],['id'=>'treasurer','title'=>'Казначей','sobriety'=>'1 год','term'=>'1 год','open'=>false,'holders'=>[['name'=>'Владимир Э.','rotation'=>'2027-05-26']]],['id'=>'deputy-treasurer','title'=>'Дублёр казначея','sobriety'=>'6 месяцев','term'=>'6 месяцев','open'=>true,'holders'=>[]],['id'=>'speaker-hunter','title'=>'Спикерхантер','sobriety'=>'1 год','term'=>'1 год','open'=>true,'holders'=>[['name'=>'врио спикерхантера — Катя Ши','rotation'=>'']]],['id'=>'training','title'=>'Куратор по обучению','sobriety'=>'6 месяцев','term'=>'6 месяцев','open'=>false,'holders'=>[['name'=>'Анна Лион','rotation'=>'2026-11-26']]],['id'=>'sysadmin','title'=>'Сисадмин','sobriety'=>'6 месяцев','term'=>'6 месяцев','open'=>false,'holders'=>[['name'=>'Максим Г.','rotation'=>'2026-11-26']]],['id'=>'chairs','title'=>'Ведущие собраний','sobriety'=>'3 месяца','term'=>'3 месяца','open'=>true,'holders'=>[['name'=>'Катя Ши','rotation'=>'2026-12-01'],['name'=>'Анна Лион','rotation'=>'2026-12-01'],['name'=>'Валя С.','rotation'=>'2026-12-01'],['name'=>'Юлия Г.','rotation'=>'2026-12-01']]],['id'=>'tech','title'=>'Технические ведущие','sobriety'=>'2 недели','term'=>'3 месяца','open'=>true,'holders'=>[['name'=>'Катя Ши','rotation'=>'2026-12-01'],['name'=>'Анна Лион','rotation'=>'2026-12-01'],['name'=>'Маня Х.','rotation'=>'2026-12-01'],['name'=>'Валя С.','rotation'=>'2026-12-01'],['name'=>'Денис','rotation'=>'2026-12-01'],['name'=>'Юлия Н.','rotation'=>'2026-12-01']]],['id'=>'announcements','title'=>'Рассыльные анонсов собраний группы','sobriety'=>'2 недели','term'=>'3 месяца','open'=>true,'holders'=>[['name'=>'В Telegram — Анна Лион','rotation'=>'2026-12-01'],['name'=>'В MAX — Юлия Г.','rotation'=>'2026-12-01']]]]],
         'newcomers' => ['pages'=>cms_default_newcomers_pages()],
@@ -352,7 +436,6 @@ function cms_default_content(): array {
     // The initial values reproduce the existing site. Once an editor saves a
     // section, its data is written to cms-data/content.json instead.
     $content['speakers']['intro'] = '<h2>📌 Немного информации об анонимности и соблюдении Традиций на онлайн-собраниях группы АА «Почти нормальные»</h2><p>Друзья, хотим напомнить, что для нашей группы соблюдение Традиций АА и принципа анонимности является важной частью нашей общей групповой совести.</p><p>Согласно рекомендациям GSO АА, на онлайн-собрании каждый участник самостоятельно выбирает тот уровень анонимности, который считает для себя необходимым. Кто-то чувствует себя комфортно с включённой камерой, а для кого-то, в соответствии с его пониманием Одиннадцатой Традиции, предпочтительнее выключенная камера.</p><p>Поэтому включение камеры остаётся исключительно <strong>личным выбором</strong> каждого участника и не должно быть причиной давления или дискомфорта.</p><p>Если вам комфортно и это не затрагивает вашу анонимность, мы будем рады видеть вас с включёнными камерами — это помогает сохранить ощущение живой группы и непосредственного общения.</p>';
-    $content['speakers']['closing'] = '<p>Мы делимся этой информацией не для установления дополнительных правил, а для того, чтобы вместе лучше понимать, чтить и бережно соблюдать принципы АА. 🙏❤️</p><p><em>Для удобства собрали источники информации об анонимности в интернет-пространстве.</em></p><p>📚 <strong>Официальные материалы Alcoholics Anonymous / GSO:</strong></p><ul><li><em>A.A. Guidelines — Safety and A.A. Groups Online</em></li><li><em>Understanding Anonymity</em> — официальный материал GSO</li><li><em>A.A. and Anonymity</em></li><li><em>A.A. Guidelines — Internet</em></li></ul><p>Давайте будем бережны к анонимности друг друга и продолжать нести наше общее послание с любовью и уважением ❤️</p>';
     array_splice($content['services']['items'], 7, 0, [[
         'id'=>'deputy-speaker-hunter','title'=>'Дублёр спикерхантера','sobriety'=>'6 месяцев','term'=>'6 месяцев','open'=>true,'holders'=>[['name'=>'врио дублера спикерхантера — Анна Лион','rotation'=>'']]
     ]]);
