@@ -26,7 +26,7 @@ function page_head(string $title, string $description, string $canonical): void 
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=106" />
+  <link rel="stylesheet" href="styles.css?v=107" />
   <script defer src="/site-analytics.js?v=1"></script>
 </head>
 <body>

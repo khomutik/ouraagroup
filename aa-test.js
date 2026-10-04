@@ -2,7 +2,7 @@
   const card = document.querySelector('.newcomers-card[data-page="aa-test"]');
   if (!card) return;
 
-  const questions = [
+  const defaultQuestions = [
     'Бывало ли так, что вы решали не пить неделю или более, но вас хватало только на пару дней?',
     'Хотелось ли вам, чтобы окружающие перестали говорить вам о вашем пьянстве и о том, что вам следует делать?',
     'Пытались ли вы переключаться с одного вида выпивки на другой в надежде, что это поможет вам не напиться?',
@@ -17,11 +17,18 @@
     'Появлялось ли у вас когда-либо ощущение, что если бы вы не пили, то ваша жизнь была бы лучше?'
   ];
 
+  let config = {};
+  try { config = JSON.parse(document.getElementById('aa-test-config')?.textContent || '{}'); }
+  catch (_) { /* Use the built-in questions if configuration is unavailable. */ }
+  const questions = Array.isArray(config.questions) && config.questions.length === 12 && config.questions.every((item) => typeof item === 'string' && item.trim())
+    ? config.questions : defaultQuestions;
+  const escapeHtml = (value) => String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
   card.classList.add('newcomers-card--test');
-  card.innerHTML = `
-    <h2>Тест «Подходит ли тебе АА?»</h2>
+  if (!card.querySelector('[data-aa-test-intro]')) {
+    card.insertAdjacentHTML('beforeend', '<div class="aa-test__intro" data-aa-test-intro><p>Ответьте на двенадцать вопросов честно — только для себя. Это не диагноз, а повод внимательно посмотреть на то, как алкоголь влияет на жизнь.</p></div>');
+  }
+  card.insertAdjacentHTML('beforeend', `
     <section class="aa-test" data-aa-test aria-labelledby="aa-test-title">
-      <div class="aa-test__intro"><p>Ответьте на двенадцать вопросов честно — только для себя. Это не диагноз, а повод внимательно посмотреть на то, как алкоголь влияет на жизнь.</p></div>
       <div class="aa-test__progress" aria-live="polite"><div><strong data-aa-test-count></strong><span data-aa-test-caption></span></div><div class="aa-test__progress-track" role="progressbar" aria-label="Ход теста" aria-valuemin="1" aria-valuemax="12"><span data-aa-test-progress></span></div></div>
       <form class="aa-test__form" data-aa-test-form novalidate>
         <section class="aa-test__question" role="group" aria-labelledby="aa-test-title"><h3 class="aa-test__question-title" id="aa-test-title" data-aa-test-question></h3><div class="aa-test__answers"><button type="button" class="aa-test__answer" data-aa-test-answer="yes">Да</button><button type="button" class="aa-test__answer" data-aa-test-answer="no">Нет</button></div></section>
@@ -29,7 +36,7 @@
         <div class="aa-test__controls"><button type="button" class="aa-test__control aa-test__control--quiet" data-aa-test-prev>← Назад</button><button type="button" class="aa-test__control" data-aa-test-next disabled>Далее →</button></div>
       </form>
       <section class="aa-test__result" data-aa-test-result hidden aria-live="polite"></section>
-    </section>`;
+    </section>`);
 
   const root = card.querySelector('[data-aa-test]');
   const form = root.querySelector('[data-aa-test-form]');
@@ -72,8 +79,8 @@
     result.classList.toggle('aa-test__result--attention', yes >= 4);
     result.innerHTML = `
       <p class="aa-test__result-count">Ваш результат: <strong>${yes} ${yes === 1 ? 'ответ' : yes >= 2 && yes <= 4 ? 'ответа' : 'ответов'} «Да» из ${questions.length}</strong></p>
-      <h3>${yes >= 4 ? 'Стоит отнестись к этому внимательно' : 'Тест завершён'}</h3>
-      <p>${yes >= 4 ? 'Четыре или более ответов «Да» могут быть поводом обсудить, как алкоголь влияет на вашу жизнь. Только вы сами можете решить, относите ли себя к алкоголикам.' : 'Этот результат не ставит диагноз. Если употребление алкоголя вызывает тревогу или вопросы, можно прийти на собрание АА, послушать опыт других и задать вопросы.'}</p>
+      <h3>${escapeHtml(yes >= 4 ? config.test_attention_heading || 'Стоит отнестись к этому внимательно' : config.test_other_heading || 'Тест завершён')}</h3>
+      <p>${escapeHtml(yes >= 4 ? config.test_attention_text || 'Четыре или более ответов «Да» могут быть поводом обсудить, как алкоголь влияет на вашу жизнь. Только вы сами можете решить, относите ли себя к алкоголикам.' : config.test_other_text || 'Этот результат не ставит диагноз. Если употребление алкоголя вызывает тревогу или вопросы, можно прийти на собрание АА, послушать опыт других и задать вопросы.')}</p>
       <div class="aa-test__result-actions"><a class="aa-test__control" href="/schedule.html">Посмотреть расписание</a><button type="button" class="aa-test__control aa-test__control--quiet" data-aa-test-restart>Пройти ещё раз</button></div>`;
     result.querySelector('[data-aa-test-restart]').addEventListener('click', () => {
       values.fill(null);

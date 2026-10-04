@@ -14,6 +14,13 @@ $paths = [
     'archive.html',
 ];
 
+foreach (cms_content()['newcomers']['pages'] ?? [] as $page) {
+    if (($page['slug'] ?? '') === 'aa-test' && !empty($page['published'])) {
+        $paths[] = 'p/test-na-alkogolizm';
+        break;
+    }
+}
+
 foreach (cms_content()['pages']['custom'] ?? [] as $page) {
     $slug = (string) ($page['slug'] ?? '');
     if (!empty($page['published']) && preg_match('/^[a-z0-9-]+$/', $slug)) {

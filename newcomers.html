@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=106" />
+  <link rel="stylesheet" href="styles.css?v=107" />
   <script defer src="site-analytics.js?v=1"></script>
 </head>
 <body>
@@ -51,9 +51,7 @@
           <button class="flow-button" type="button" data-target="recommendations">
             <span>Практические рекомендации</span>
           </button>
-          <button class="flow-button" type="button" data-target="aa-test">
-            <span>Тест «Подходит ли тебе АА?»</span>
-          </button>
+          <a class="flow-button" href="/p/test-na-alkogolizm">Тест «Подходит ли тебе АА?»</a>
         </div>
       </article>
 
@@ -255,7 +253,7 @@
 
       <article class="newcomers-card" data-page="aa-test" hidden>
         <h2>Тест "Подходит ли тебе АА?"</h2>
-        <p>Текст скоро появится.</p>
+        <div class="aa-test__intro" data-aa-test-intro><p>Ответьте на двенадцать вопросов честно — только для себя. Это не диагноз, а повод внимательно посмотреть на то, как алкоголь влияет на жизнь.</p></div>
       </article>
 
       <article class="newcomers-card" data-page="meetings" hidden>
@@ -432,6 +430,7 @@
       };
 
       const showHashPage = () => {
+        if (location.hash === '#aa-test') { location.replace('/p/test-na-alkogolizm'); return; }
         const pageName = decodeURIComponent(location.hash.replace(/^#/, ""));
         if (pageName && hasPage(pageName)) {
           showPage(pageName, false, false);
@@ -451,7 +450,8 @@
       });
     })();
   </script>
-  <script src="site-nav.js?v=18"></script>
+  <script src="site-nav.js?v=19"></script>
+  <script src="aa-test.js?v=3"></script>
   <script src="pwa-install.js?v=11"></script>
 </body>
 </html>

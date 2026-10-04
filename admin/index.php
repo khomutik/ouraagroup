@@ -426,12 +426,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif ($section === 'newcomers') {
                 $items = $content['newcomers']['pages'] ?? []; $id = cms_text($_POST['id'] ?? '', 40); $index = null;
                 foreach ($items as $i=>$item) if (($item['id']??'')===$id) $index=$i;
-                $slug = strtolower(cms_text($_POST['slug'] ?? '', 80));
+                $slug = $id === 'newcomer-aa-test' ? 'aa-test' : strtolower(cms_text($_POST['slug'] ?? '', 80));
                 if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug)) throw new RuntimeException('Адрес страницы: только латинские буквы, цифры и дефисы.');
                 foreach ($items as $i=>$item) if ($i !== $index && ($item['slug']??'') === $slug) throw new RuntimeException('Такой адрес страницы уже используется.');
                 $title = cms_text($_POST['title'] ?? '', 180); if ($title === '') throw new RuntimeException('Введите заголовок страницы.');
                 $body = cms_sanitize_html(cms_replace_inline_uploads($_POST['body'] ?? '', 'body_inline_images'));
                 $record = ['id'=>$id ?: cms_id(),'slug'=>$slug,'title'=>$title,'body'=>$body,'actions'=>admin_collect_actions('action'),'order'=>(int)($_POST['order']??0),'published'=>isset($_POST['published'])];
+                if ($slug === 'aa-test') {
+                    $defaults = cms_default_aa_test();
+                    $questions = array_map(static fn($question): string => cms_text($question, 500), (array)($_POST['test_question'] ?? []));
+                    if (count($questions) !== 12 || in_array('', $questions, true)) throw new RuntimeException('Заполните все 12 вопросов теста.');
+                    $record['test_questions'] = $questions;
+                    foreach (['seo_title','seo_description','test_attention_heading','test_attention_text','test_other_heading','test_other_text'] as $key) {
+                        $record[$key] = cms_text($_POST[$key] ?? '', 600) ?: $defaults[$key];
+                    }
+                }
                 if ($index===null) $items[]=$record; else $items[$index]=$record; usort($items,static fn($a,$b)=>(int)($a['order']??0)<=>(int)($b['order']??0));
                 $content['newcomers']=['pages'=>$items]; $target='/admin/?section=newcomers';
             } elseif ($section === 'tradition') {
@@ -583,9 +592,42 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
 
 <?php if ($section === 'newcomers'): $items=$content['newcomers']['pages']??[]; $editId=(string)($_GET['edit']??''); $edit=[]; foreach($items as $item)if(($item['id']??'')===$editId)$edit=$item; ?>
   <div class="section-heading"><h1>Новичкам</h1><a class="button button--quiet" href="?section=newcomers&edit=new">Добавить страницу</a></div>
-  <p class="admin-tip">Каждая карточка — отдельная страница внутри раздела. Ссылки вида <code>#aa</code> ведут на карточку с адресом <code>aa</code>.</p>
-  <?php if($editId): ?><form method="post" enctype="multipart/form-data" class="admin-form"><input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="newcomers"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($edit['id']??'')?>"><h2><?= $edit?'Редактирование страницы':'Новая страница' ?></h2><div class="form-grid"><?php admin_input('title',$edit['title']??'','text','Заголовок',true); admin_input('slug',$edit['slug']??'','text','Адрес латиницей, например sponsor',true); admin_input('order',(string)($edit['order']??count($items)),'number','Порядок'); ?></div><label class="check"><input type="checkbox" name="published" <?=(!$edit||!empty($edit['published']))?'checked':''?>> Показывать на сайте</label><?php admin_rich('body',$edit['body']??'','Текст и блоки страницы',false,true); ?><?php admin_page_actions_fieldset($edit['actions']??[],'action'); ?><div class="form-actions"><button class="button">Опубликовать</button><a class="button button--quiet" href="?section=newcomers">Отмена</a></div></form><?php endif; ?>
-  <div class="item-list"><?php foreach($items as $item): ?><article><strong><?=h($item['title']??'')?></strong><span>#<?=h($item['slug']??'')?><?=empty($item['published'])?' · скрыта':''?></span><a href="?section=newcomers&edit=<?=h($item['id']??'')?>">Изменить</a><?php if(($item['slug']??'')!=='menu'): ?><form method="post" onsubmit="return confirm('Удалить страницу?')"><input type="hidden" name="action" value="delete_newcomer"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($item['id']??'')?>"><button class="link-danger">Удалить</button></form><?php endif; ?></article><?php endforeach; ?></div>
+  <p class="admin-tip">Большинство карточек открываются внутри раздела «Новичкам». Тест — отдельная страница с адресом <code>/p/test-na-alkogolizm</code>, чтобы её могли находить поисковики. Ссылки вида <code>#aa</code> ведут на остальные карточки раздела.</p>
+  <?php if($editId): $isTest = ($edit['slug'] ?? '') === 'aa-test'; $testDefaults = cms_default_aa_test(); ?>
+  <form method="post" enctype="multipart/form-data" class="admin-form">
+    <input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="newcomers">
+    <input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($edit['id']??'')?>">
+    <h2><?= $edit?'Редактирование страницы':'Новая страница' ?></h2>
+    <?php if($isTest): ?><p class="admin-tip">Это отдельная страница теста: <a href="/p/test-na-alkogolizm" target="_blank" rel="noopener">посмотреть на сайте</a>. Здесь меняются её заголовок, описание для поиска, вступление, вопросы и оба варианта результата. Ответы посетителей на сервер не отправляются.</p><?php endif; ?>
+    <div class="form-grid">
+      <?php admin_input('title',$edit['title']??'','text','Заголовок',true); ?>
+      <?php if($isTest): ?><label class="field"><span>Адрес теста</span><input value="/p/test-na-alkogolizm" readonly></label><input type="hidden" name="slug" value="aa-test"><?php else: ?><?php admin_input('slug',$edit['slug']??'','text','Адрес латиницей, например sponsor',true); ?><?php endif; ?>
+      <?php admin_input('order',(string)($edit['order']??count($items)),'number','Порядок'); ?>
+    </div>
+    <label class="check"><input type="checkbox" name="published" <?=(!$edit||!empty($edit['published']))?'checked':''?>> Показывать на сайте</label>
+    <?php if($isTest): ?>
+      <?php admin_input('seo_title',$edit['seo_title']??$testDefaults['seo_title'],'text','Заголовок для поиска'); ?>
+      <label class="field"><span>Описание для поисковиков</span><textarea name="seo_description" rows="3"><?=h($edit['seo_description']??$testDefaults['seo_description'])?></textarea></label>
+    <?php endif; ?>
+    <?php admin_rich('body',$edit['body']??($isTest?$testDefaults['body']:''),$isTest?'Текст над тестом':'Текст и блоки страницы',false,true); ?>
+    <?php if($isTest): ?>
+      <fieldset><legend>12 вопросов теста</legend>
+      <?php foreach(($edit['test_questions']??$testDefaults['test_questions']) as $questionIndex=>$question): ?>
+        <label class="field"><span>Вопрос <?=($questionIndex+1)?></span><textarea name="test_question[]" rows="2" required><?=h((string)$question)?></textarea></label>
+      <?php endforeach; ?>
+      </fieldset>
+      <fieldset><legend>Результат теста</legend>
+        <?php admin_input('test_attention_heading',$edit['test_attention_heading']??$testDefaults['test_attention_heading'],'text','Заголовок при 4 и более ответах «Да»'); ?>
+        <label class="field"><span>Текст при 4 и более ответах «Да»</span><textarea name="test_attention_text" rows="3"><?=h($edit['test_attention_text']??$testDefaults['test_attention_text'])?></textarea></label>
+        <?php admin_input('test_other_heading',$edit['test_other_heading']??$testDefaults['test_other_heading'],'text','Заголовок при 0–3 ответах «Да»'); ?>
+        <label class="field"><span>Текст при 0–3 ответах «Да»</span><textarea name="test_other_text" rows="3"><?=h($edit['test_other_text']??$testDefaults['test_other_text'])?></textarea></label>
+      </fieldset>
+    <?php endif; ?>
+    <?php admin_page_actions_fieldset($edit['actions']??[], 'action'); ?>
+    <div class="form-actions"><button class="button">Опубликовать</button><a class="button button--quiet" href="?section=newcomers">Отмена</a></div>
+  </form>
+  <?php endif; ?>
+  <div class="item-list"><?php foreach($items as $item): ?><article><strong><?=h($item['title']??'')?></strong><span><?=($item['slug']??'')==='aa-test'?'/p/test-na-alkogolizm':'#'.h($item['slug']??'')?><?=empty($item['published'])?' · скрыта':''?></span><a href="?section=newcomers&edit=<?=h($item['id']??'')?>">Изменить</a><?php if(!in_array(($item['slug']??''),['menu','aa-test'],true)): ?><form method="post" onsubmit="return confirm('Удалить страницу?')"><input type="hidden" name="action" value="delete_newcomer"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($item['id']??'')?>"><button class="link-danger">Удалить</button></form><?php endif; ?></article><?php endforeach; ?></div>
 <?php endif; ?>
 
 <?php if ($section === 'tradition'): $data=$content['tradition']??[]; ?><h1>7-я традиция</h1><form method="post" class="admin-form"><input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="tradition"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><div class="form-grid"><?php admin_input('treasurer',$data['treasurer']??'','text','Казначей'); admin_input('report_url',$data['report_url']??'','url','Ссылка на отчёт казначея'); admin_document_position('report_position',$data['report_position']??'top','Где показывать кнопку отчёта'); ?></div><?php admin_rich('lead',$data['lead']??'','Основной текст',false,true); ?><fieldset class="repeatable" data-repeat="payments"><legend>Реквизиты и способы перевода</legend><div data-repeat-items><?php foreach(($data['payments']??[]) as $payment): ?><div class="card-editor"><input type="hidden" name="payment_id[]" value="<?=h($payment['id']??'')?>"><div class="form-grid"><input name="payment_title[]" value="<?=h($payment['title']??'')?>" placeholder="Название"><input name="payment_icon[]" value="<?=h($payment['icon']??'')?>" placeholder="Буква или эмодзи"><input name="payment_value[]" value="<?=h($payment['value']??'')?>" placeholder="Реквизиты"><input name="payment_url[]" value="<?=h($payment['url']??'')?>" placeholder="Ссылка или tel:"></div><div class="field"><span>Комментарий</span><textarea name="payment_comment[]" class="js-rich" data-label="Комментарий к способу перевода" rows="2"><?=h(admin_rich_legacy_text((string)($payment['comment']??'')))?></textarea></div><button type="button" class="remove-row">Удалить способ</button></div><?php endforeach; ?></div><button type="button" class="button button--quiet" data-add-row>Добавить способ перевода</button><template><div class="card-editor"><input type="hidden" name="payment_id[]"><div class="form-grid"><input name="payment_title[]" placeholder="Название"><input name="payment_icon[]" placeholder="Буква или эмодзи"><input name="payment_value[]" placeholder="Реквизиты"><input name="payment_url[]" placeholder="Ссылка или tel:"></div><div class="field"><span>Комментарий</span><textarea name="payment_comment[]" class="js-rich" data-label="Комментарий к способу перевода" rows="2"></textarea></div><button type="button" class="remove-row">Удалить способ</button></div></template></fieldset><button class="button">Опубликовать 7-ю традицию</button></form><?php endif; ?>

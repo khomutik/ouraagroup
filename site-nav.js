@@ -18,6 +18,7 @@
       openOn: "newcomers.html",
       links: [
         { href: "newcomers.html", label: "Новичкам - главное меню раздела" },
+        { href: "/p/test-na-alkogolizm", label: "Тест на алкоголизм: подходит ли тебе АА?" },
         { href: "newcomers.html#aa", label: "Кто такие Анонимные Алкоголики?" },
         { href: "newcomers.html#twelve-steps", label: "Программа «Двенадцать Шагов» АА" },
         { href: "newcomers.html#program-help", label: "Всем ли помогает Программа АА?" },
@@ -113,7 +114,7 @@
       return divider + linkHtml(item, "site-nav__main-link");
     }
 
-    const isOpen = item.openOn === currentPage;
+    const isOpen = item.openOn === currentPage || item.links.some((link) => isActive(link.href));
     const open = isOpen ? " open" : "";
     const active = !item.external && isActive(item.href) ? " is-active" : "";
 

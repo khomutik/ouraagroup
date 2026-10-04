@@ -946,6 +946,8 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 }
 
 .aa-test__intro {
+  max-width: 820px;
+  margin: 0 auto 18px;
   padding: 14px 16px;
   border-left: 6px solid var(--orange);
   border-radius: 13px;
