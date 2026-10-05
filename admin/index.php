@@ -571,8 +571,18 @@ if ($section === 'pages') {
     $edit = (string)($_GET['edit'] ?? '');
     admin_redirect('/admin/' . ($edit !== '' ? '?edit=' . rawurlencode($edit) : ''));
 }
-if ($section === 'navigation') admin_redirect('/admin/');
 if ($section !== '' && !cms_can($section)) { http_response_code(403); exit('Нет доступа к этому разделу.'); }
+if ($section === '' && $tab === 'home' && !cms_can('pages')) {
+    foreach (CMS_SECTIONS as $allowedSection) {
+        if ($allowedSection !== 'pages' && cms_can($allowedSection)) {
+            admin_redirect('/admin/?section=' . rawurlencode($allowedSection));
+        }
+    }
+    http_response_code(403); exit('Нет доступа к редактору страниц.');
+}
+if ($section === '' && $tab === 'structure' && !cms_can('pages')) {
+    http_response_code(403); exit('Нет доступа к структуре страниц.');
+}
 $structureGraph = null; $structureGroups = []; $structureSelectedPage = '';
 if ($tab === 'structure' && !$section) {
     $structureGraph = admin_page_graph($content);
