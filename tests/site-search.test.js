@@ -38,6 +38,8 @@ const naturalCases = prepare([
   {category:'Повестка РС',title:'Повестка РС 29.08.2026',keywords:'повестка рс',text:'',date:'2026-08-29',url:'/archive.html#agenda'},
   {category:'Повестка РС',title:'Оплатить хостинг сайта',keywords:'повестка рс',text:'Обсудить и проголосовать',date:'2026-08-29',url:'/archive.html#agenda-point'},
   {category:'Протокол РС',title:'Оплатить хостинг сайта',keywords:'протокол рс голосование',text:'Голосование: за 7, против 0. Решение принято.',date:'2026-08-29',url:'/archive.html#protocol-point'},
+  {category:'Отчёт казначея',title:'Отчёт казначея · 29.08.2026',keywords:'отчёт казначей приход расход остаток',text:'За август 2026. Расход PayPal: Zoom — 19,27 €.',date:'2026-08-29',url:'/archive.html#treasurer-august'},
+  {category:'Отчёт казначея',title:'Отчёт казначея · 03.10.2026',keywords:'отчёт казначей приход расход остаток',text:'За сентябрь 2026. Поступления и расходы.',date:'2026-10-03',url:'/archive.html#treasurer-september'},
 ]);
 for (const [query, url] of [
   ['войти в зум', '/'], ['во сколько собрание', '/schedule.html'],
@@ -48,6 +50,9 @@ for (const [query, url] of [
   ['спикерская 4 шаг', '/speakers.html#four'],
   ['повестка РС 29 августа', '/archive.html#agenda'],
   ['протокол РС оплата хостинга', '/archive.html#protocol-point'],
+  ['Zoom расход август', '/archive.html#treasurer-august'],
+  ['расход зум август', '/archive.html#treasurer-august'],
+  ['отчёт казначея октябрь', '/archive.html#treasurer-september'],
 ]) {
   assert.equal(search(naturalCases, query)[0]?.document.url, url, query);
 }

@@ -80,6 +80,9 @@
         && tokens.some((token) => row.titleWords.some((word) => matchesWord(word, token)))) score = 25;
       else if (textSpan <= limit) score = 14 - textSpan;
       else if (combinedSpan <= limit) score = 8 - combinedSpan;
+      else if (row.document.category === "Отчёт казначея"
+        && tokens.every((token) => [...row.titleWords, ...row.dateWords, ...row.textWords]
+          .some((word) => matchesWord(word, token)))) score = 16;
       else continue;
       if (intent && row.document.category === intent.category) score += 20;
       if (phrase.length > 2 && row.title === phrase) score += 80;
