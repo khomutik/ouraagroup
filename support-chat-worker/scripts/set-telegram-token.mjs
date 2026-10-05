@@ -48,6 +48,7 @@ async function configure(token) {
   await run(process.execPath, [wranglerEntry, "deploy"]);
   const registerResponse = await fetch("https://pn-support-chat.pochtinormalnye.workers.dev/telegram/register", {
     method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!registerResponse.ok) throw new Error("Telegram не принял регистрацию webhook.");
   const healthResponse = await fetch("https://pn-support-chat.pochtinormalnye.workers.dev/health", {

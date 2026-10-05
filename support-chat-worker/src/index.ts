@@ -1469,6 +1469,10 @@ async function registerMaxWebhook(request: Request, env: RuntimeEnv): Promise<Re
 
 async function registerTelegramWebhook(request: Request, env: RuntimeEnv): Promise<Response> {
   requireTelegramConfiguration(env);
+  const supplied = request.headers.get("Authorization") || "";
+  if (!constantTimeEqual(supplied, "Bearer " + env.TELEGRAM_BOT_TOKEN)) {
+    throw new ApiError(401, "invalid_telegram_registration_token", "Unauthorized");
+  }
   const origin = new URL(request.url).origin;
   const registeredAt = Number.parseInt((await getSetting(env, "webhook_registered_at")) || "0", 10);
   if (registeredAt > nowSeconds() - 600 && (await getSetting(env, "webhook_origin")) === origin) {
@@ -1514,17 +1518,30 @@ async function cleanupExpired(env: RuntimeEnv): Promise<void> {
     .bind(cutoff)
     .all<{ id: string; telegram_thread_id: number | null }>();
   const chatId = await getSetting(env, "operator_chat_id");
+  let topicsClosed = 0;
   if (chatId) {
     for (const session of expired.results) {
-      if (session.telegram_thread_id) await closeTelegramTopic(env, chatId, session.telegram_thread_id);
+      if (session.telegram_thread_id) {
+        try {
+          await closeTelegramTopic(env, chatId, session.telegram_thread_id);
+          topicsClosed++;
+        } catch {
+          // A Telegram outage must not keep expired private messages in D1.
+        }
+      }
     }
   }
-  const statements = expired.results.map((session) =>
-    env.DB.prepare("DELETE FROM sessions WHERE id = ?").bind(session.id),
-  );
-  statements.push(env.DB.prepare("DELETE FROM rate_limits WHERE expires_at < ?").bind(now));
-  if (statements.length) await env.DB.batch(statements);
-  console.log(JSON.stringify({ event: "support_chat_cleanup", sessionsDeleted: expired.results.length }));
+  // Close at most 40 Telegram topics per run, but remove every expired D1
+  // session (and its messages through ON DELETE CASCADE) regardless of backlog.
+  const deleted = await env.DB.prepare("DELETE FROM sessions WHERE last_activity_at < ?")
+    .bind(cutoff)
+    .run();
+  await env.DB.prepare("DELETE FROM rate_limits WHERE expires_at < ?").bind(now).run();
+  console.log(JSON.stringify({
+    event: "support_chat_cleanup",
+    sessionsDeleted: deleted.meta.changes,
+    topicsClosed,
+  }));
 }
 
 async function route(request: Request, env: RuntimeEnv, ctx: ExecutionContext): Promise<Response> {
