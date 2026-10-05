@@ -20,6 +20,8 @@ check(!in_array('newcomers.html#deleted', array_column($items, 'url'), true), '�
 check(in_array(cms_newcomer_path('aa'), array_column($items, 'url'), true), 'У статьи новичков должен быть собственный адрес.');
 check(cms_newcomer_path('menu') === '/newcomers.html', 'Главный раздел должен сохранить адрес.');
 check(cms_newcomer_path('aa-test') === '/p/test-na-alkogolizm', 'Тест должен сохранить адрес.');
+check(str_contains(cms_newcomer_seo_defaults('pn-meetings')['description'], 'Zoom'), 'Описание собраний группы должно объяснять способ входа.');
+check(cms_newcomer_seo_defaults('unknown')['title'] === '', 'Неизвестным страницам нельзя подставлять чужой SEO-заголовок.');
 check(cms_newcomer_actions([['url'=>'#aa','label'=>'АА']], ['aa'=>true])[0]['url'] === '/newcomers/aa/', 'Кнопка должна вести на отдельную статью.');
 check(cms_newcomer_actions([['url'=>'newcomers.html#aa','label'=>'АА']], ['aa'=>true])[0]['url'] === '/newcomers/aa/', 'Старая кнопка с хешем должна вести на отдельную статью.');
 check(in_array('https://example.org/groups', array_column($items, 'url'), true), 'Кнопки страниц для новичков должны попадать в меню.');
@@ -30,6 +32,10 @@ check(cms_drive_audio_preview_url('https://example.com/file/d/ABC_123/view') ===
 check(cms_drive_audio_preview_url('https://drive.google.com/drive/folders/ABC_123') === '', 'Нужна ссылка на файл, а не на папку.');
 check(cms_speaker_preview_url(['audio_url'=>'https://drive.google.com/file/d/ORIGINAL/view','audio_stream_url'=>'https://drive.google.com/file/d/OPTIMIZED/view']) === 'https://drive.google.com/file/d/OPTIMIZED/preview', 'Плеер должен использовать облегчённую запись.');
 check(cms_speaker_preview_url(['audio_url'=>'https://drive.google.com/file/d/ORIGINAL/view','audio_stream_url'=>'https://example.org/invalid']) === 'https://drive.google.com/file/d/ORIGINAL/preview', 'При недоступной ссылке на копию плеер должен использовать оригинал.');
+check(cms_speaker_download_url(['audio_url'=>'https://drive.google.com/file/d/ORIGINAL/view?resourcekey=0-KEY']) === 'https://drive.google.com/uc?export=download&id=ORIGINAL&resourcekey=0-KEY', 'Кнопка скачивания должна вести к оригиналу.');
+check(cms_speaker_download_url(['audio_url'=>'https://example.org/file']) === '', 'Скачивание не должно принимать посторонний адрес.');
+check(cms_speaker_button([], 'player')['color'] === 'blue', 'Кнопка плеера должна быть синей.');
+check(cms_speaker_button([], 'download')['type'] === 'outline', 'Кнопка скачивания должна быть прозрачной.');
 
 $speakers = cms_speakers_newest_first([
     ['id'=>'older','event_date'=>'2025-01-01','order'=>0],

@@ -7,7 +7,7 @@ document.addEventListener('click', (event) => {
     frame.replaceChildren();
     frame.hidden = true;
     button.setAttribute('aria-expanded', 'false');
-    button.textContent = 'Плеер на странице';
+    button.textContent = button.dataset.openLabel || 'Открыть плеер';
     return;
   }
   const preview = button.dataset.speakerPreview;

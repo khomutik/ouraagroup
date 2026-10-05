@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/cms.php';
+header('X-Robots-Tag: noindex, nofollow');
 cms_start_session();
 
 $config = cms_config();

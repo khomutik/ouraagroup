@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require dirname(__DIR__) . '/cms.php';
 require dirname(__DIR__) . '/archive-lib.php';
+header('X-Robots-Tag: noindex, nofollow');
 cms_start_session();
 
 function admin_flash(string $message, string $type = 'ok'): void { $_SESSION['admin_flash'] = [$type, $message]; }
@@ -289,6 +290,26 @@ function admin_page_actions_fieldset(array $actions, string $prefix = 'page_acti
 function admin_card_actions_fieldset(array $actions, string $prefix = 'card_action'): void { ?>
 <fieldset class="repeatable page-actions-editor" data-repeat="card-actions"><legend>Кнопки внизу карточки</legend><p class="admin-tip">Кнопки показываются под содержимым карточки. Для каждой укажите название и ссылку; внешний вид можно проверить по образцу.</p><div data-repeat-items><?php foreach ($actions as $action) admin_action_row($action, $prefix, false); ?></div><button type="button" class="button button--quiet" data-add-row>Добавить кнопку</button><template><?php admin_action_row(['type'=>'tab','color'=>'orange','shape'=>'pill','align'=>'left'], $prefix, false); ?></template></fieldset>
 <?php }
+function admin_speaker_button_from_post(string $kind, array $current): array {
+    $prefix = 'speaker_' . $kind;
+    $button = cms_speaker_button($current, $kind);
+    $button['label'] = cms_text($_POST[$prefix . '_label'] ?? $button['label'], 80) ?: $button['label'];
+    foreach (['type'=>['primary','soft','outline','tab','link'], 'color'=>['orange','blue','beige'], 'shape'=>['rounded','pill','square'], 'align'=>['left','center','right','full']] as $key=>$allowed) {
+        $value = $_POST[$prefix . '_' . $key][0] ?? $button[$key];
+        if (is_string($value) && in_array($value, $allowed, true)) $button[$key] = $value;
+    }
+    return $button;
+}
+function admin_speaker_button_editor(array $speaker, string $kind): void {
+    $button = cms_speaker_button($speaker, $kind);
+    $prefix = 'speaker_' . $kind;
+    $purpose = $kind === 'player' ? 'Основная кнопка плеера' : 'Кнопка скачивания';
+    $types = ['primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст'];
+    $colors = ['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый'];
+    $shapes = ['rounded'=>'Скруглённая','pill'=>'Пилюля','square'=>'Прямоугольная'];
+    $aligns = ['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину']; ?>
+<article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($purpose)?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><label class="field"><span><?=h($purpose)?> — надпись</span><input name="<?=h($prefix)?>_label" value="<?=h($button['label'])?>" data-action-label></label><div class="button-editor__settings"><?php admin_action_select($prefix . '_type','Вид',$types,$button['type']); admin_action_select($prefix . '_color','Цвет',$colors,$button['color']); admin_action_select($prefix . '_shape','Форма',$shapes,$button['shape']); admin_action_select($prefix . '_align','Выравнивание',$aligns,$button['align']); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div></div></article>
+<?php }
 function admin_library_button_editor(array $item, array $content): void {
     $button = is_array($item['read_button'] ?? null) ? $item['read_button'] : [];
     $label = (string)($button['label'] ?? cms_site_text($content, 'library_read_button'));
@@ -471,7 +492,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($audioUrl!=='' && cms_drive_audio_preview_url($audioUrl)==='') throw new RuntimeException('Для аудио нужна ссылка на отдельный файл в Google Диске, а не на папку.');
                     $streamUrl=cms_safe_url($_POST['audio_stream_url']??'');
                     if ($streamUrl!=='' && cms_drive_audio_preview_url($streamUrl)==='') throw new RuntimeException('Для облегчённой записи нужна ссылка на отдельный файл в Google Диске.');
-                    $record=['id'=>$id?:cms_id(),'event_date'=>$date,'title'=>$title,'speaker'=>$speaker,'city'=>cms_text($_POST['city']??'',180),'home_group'=>cms_text($_POST['home_group']??'',180),'sobriety'=>cms_text($_POST['sobriety']??'',120),'audio_url'=>$audioUrl,'audio_stream_url'=>$streamUrl,'links'=>admin_collect_actions('card_action'),'order'=>$index===null?0:(int)($items[$index]['order']??$index)];
+                    $current = $index === null ? [] : $items[$index];
+                    $record=['id'=>$id?:cms_id(),'event_date'=>$date,'title'=>$title,'speaker'=>$speaker,'city'=>cms_text($_POST['city']??'',180),'home_group'=>cms_text($_POST['home_group']??'',180),'sobriety'=>cms_text($_POST['sobriety']??'',120),'audio_url'=>$audioUrl,'audio_stream_url'=>$streamUrl,'player_button'=>admin_speaker_button_from_post('player',$current),'download_button'=>admin_speaker_button_from_post('download',$current),'links'=>$current['links']??[],'order'=>$index===null?0:(int)($items[$index]['order']??$index)];
                     if($index===null)array_unshift($items,$record);else$items[$index]=$record;
                     foreach($items as $i=>$item)$items[$i]['order']=$i;
                     $data['items']=$items;
@@ -488,7 +510,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 foreach ($items as $i=>$item) if ($i !== $index && ($item['slug']??'') === $slug) throw new RuntimeException('Такой адрес страницы уже используется.');
                 $title = cms_text($_POST['title'] ?? '', 180); if ($title === '') throw new RuntimeException('Введите заголовок страницы.');
                 $body = cms_sanitize_html(cms_replace_inline_uploads($_POST['body'] ?? '', 'body_inline_images'));
-                $record = ['id'=>$id ?: cms_id(),'slug'=>$slug,'title'=>$title,'body'=>$body,'actions'=>admin_collect_actions('action'),'order'=>(int)($_POST['order']??0),'published'=>isset($_POST['published'])];
+                $record = ['id'=>$id ?: cms_id(),'slug'=>$slug,'title'=>$title,'body'=>$body,'seo_title'=>cms_text($_POST['seo_title']??'',180),'seo_description'=>cms_text($_POST['seo_description']??'',300),'actions'=>admin_collect_actions('action'),'order'=>(int)($_POST['order']??0),'published'=>isset($_POST['published'])];
                 if ($slug === 'aa-test') {
                     $defaults = cms_default_aa_test();
                     $questions = array_map(static fn($question): string => cms_text($question, 500), (array)($_POST['test_question'] ?? []));
@@ -687,8 +709,8 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
       <div class="form-grid"><?php admin_input('event_date',$edit['event_date']??'','date','Дата *',true); admin_input('title',$edit['title']??'','text','Тема спикерской *',true); admin_input('speaker',$edit['speaker']??'','text','Спикер *',true); admin_input('city',$edit['city']??'','text','Город'); admin_input('home_group',$edit['home_group']??'','text','Домашняя группа'); admin_input('sobriety',$edit['sobriety']??'','text','Трезвость'); ?></div>
       <?php admin_input('audio_url',$edit['audio_url']??'','url','Ссылка на MP3-файл в Google Диске (необязательно)'); ?>
       <?php admin_input('audio_stream_url',$edit['audio_stream_url']??'','url','Облегчённая запись для плеера (необязательно)'); ?>
-      <p class="admin-tip">Вставляйте ссылки на отдельные открытые файлы Google Диска. Основная кнопка ведёт к оригиналу; встроенный плеер использует облегчённую копию. Если копия не указана, плеер использует оригинал.</p>
-      <?php admin_card_actions_fieldset($edit['links']??[], 'card_action'); ?>
+      <p class="admin-tip">«Открыть плеер» воспроизводит облегчённую копию; «Скачать» ведёт к исходному файлу на Google Диске. Если копии нет, плеер использует исходный файл.</p>
+      <fieldset class="page-actions-editor"><legend>Две кнопки записи</legend><p class="admin-tip">Адреса берутся из полей записи выше. Ниже можно менять подписи и оформление каждой кнопки.</p><?php admin_speaker_button_editor($edit??[],'player'); admin_speaker_button_editor($edit??[],'download'); ?></fieldset>
       <div class="form-actions"><button class="button">Опубликовать спикерскую</button><a class="button button--quiet" href="?section=speakers">Отмена</a></div>
     </form>
   <?php endif; ?>
@@ -720,10 +742,8 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
       <?php admin_input('order',(string)($edit['order']??count($items)),'number','Порядок'); ?>
     </div>
     <label class="check"><input type="checkbox" name="published" <?=(!$edit||!empty($edit['published']))?'checked':''?>> Показывать на сайте</label>
-    <?php if($isTest): ?>
-      <?php admin_input('seo_title',$edit['seo_title']??$testDefaults['seo_title'],'text','Заголовок для поиска'); ?>
-      <label class="field"><span>Описание для поисковиков</span><textarea name="seo_description" rows="3"><?=h($edit['seo_description']??$testDefaults['seo_description'])?></textarea></label>
-    <?php endif; ?>
+    <?php $seoDefaults = $isTest ? ['title'=>$testDefaults['seo_title'],'description'=>$testDefaults['seo_description']] : cms_newcomer_seo_defaults((string)($edit['slug']??'')); admin_input('seo_title',($edit['seo_title']??'')?:$seoDefaults['title'],'text','Заголовок для поиска (не показывается на странице)'); ?>
+    <label class="field"><span>Описание для поисковиков (не показывается на странице)</span><textarea name="seo_description" rows="3"><?=h(($edit['seo_description']??'')?:$seoDefaults['description'])?></textarea></label>
     <?php admin_rich('body',$edit['body']??($isTest?$testDefaults['body']:''),$isTest?'Текст над тестом':'Текст и блоки страницы',false,true); ?>
     <?php if($isTest): ?>
       <fieldset><legend>12 вопросов теста</legend>

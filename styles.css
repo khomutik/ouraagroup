@@ -2235,47 +2235,18 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
   gap: 10px;
 }
 
-.speaker-audio__listen,
-.speaker-audio__load {
-  display: inline-flex;
-  align-items: center;
+.speaker-audio .flow-button {
+  width: auto;
+  max-width: 100%;
   min-height: 46px;
   padding: 9px 17px;
-  border: 1px solid var(--orange);
-  border-radius: 12px;
-  font: inherit;
-  font-weight: 900;
-  text-decoration: none;
-  cursor: pointer;
+  font-size: clamp(16px, 3vw, 20px);
 }
 
-.speaker-audio__listen {
-  color: #fff;
-  background: var(--orange);
-}
-
-.speaker-audio__load {
-  color: var(--orange-dark);
-  background: transparent;
-}
-
-.speaker-audio__listen:hover,
-.speaker-audio__listen:focus-visible,
-.speaker-audio__load:hover,
-.speaker-audio__load:focus-visible {
+.speaker-audio .flow-button:hover,
+.speaker-audio .flow-button:focus-visible {
   outline: 2px solid var(--blue);
   outline-offset: 2px;
-}
-
-.speaker-audio__listen:hover,
-.speaker-audio__listen:focus-visible {
-  background: var(--orange-dark);
-}
-
-.speaker-audio__original {
-  color: var(--orange-dark);
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 .speaker-audio__frame {

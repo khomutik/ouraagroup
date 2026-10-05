@@ -12,22 +12,27 @@ header('Pragma: no-cache');
 
 $content = cms_content();
 $textKey = ['announcements'=>'announcements','schedule'=>'schedule','library'=>'library','speakers'=>'speakers','services'=>'services','archive'=>'archive'];
-function page_head(string $title, string $description, string $canonical): void { ?>
+function page_head(string $title, string $description, string $canonical, string $seoTitle): void { ?>
 <!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><?= h($title) ?> - Почти нормальные</title>
+  <title><?= h($seoTitle) ?></title>
   <meta name="description" content="<?= h($description) ?>" />
   <link rel="canonical" href="https://pochtinormalnye.ru/<?= h($canonical) ?>.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Почти нормальные" />
+  <meta property="og:title" content="<?= h($seoTitle) ?>" />
+  <meta property="og:description" content="<?= h($description) ?>" />
+  <meta property="og:url" content="https://pochtinormalnye.ru/<?= h($canonical) ?>.html" />
   <meta name="theme-color" content="#f7efdf" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=116" />
+  <link rel="stylesheet" href="styles.css?v=117" />
   <script defer src="/site-analytics.js?v=1"></script>
 </head>
 <body>
@@ -47,7 +52,7 @@ function page_foot(): void { global $content; ?>
 <?php }
 
 $canonical = ['announcements'=>'announcements','schedule'=>'schedule','library'=>'library','speakers'=>'speakers','services'=>'service','archive'=>'archive'][$section];
-page_head(cms_site_text($content, $textKey[$section] . '_heading'), cms_site_text($content, $textKey[$section] . '_description'), $canonical);
+page_head(cms_site_text($content, $textKey[$section] . '_heading'), cms_site_text($content, $textKey[$section] . '_description'), $canonical, cms_site_text($content, $textKey[$section] . '_seo_title'));
 
 if ($section === 'announcements') {
     $items = $content['announcements'] ?? [];
@@ -117,7 +122,7 @@ if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms
   <?php if (!empty($data['privacy'])): ?><section class="speakers-privacy"><?= cms_rich((string)$data['privacy']) ?></section><?php endif; ?>
   <section class="content-card speakers-materials" aria-label="Материалы об анонимности"><h2><?=h(cms_site_text($content, 'speakers_materials_heading'))?></h2><?php foreach (($data['materials'] ?? []) as $item): if ($url = cms_safe_url($item['resource'] ?? '')): ?><a class="speakers-file" href="<?= h($url) ?>" target="_blank" rel="noopener"><span>📄</span><span><?= cms_display_text($item['title'] ?? '') ?></span></a><?php endif; endforeach; ?></section>
   <?php if ($driveUrl): ?><a class="document-link speakers-drive-link" href="<?= h($driveUrl) ?>" target="_blank" rel="noopener"><img src="assets/emoji/aa_microphone.png" alt="" /><span><?=h(cms_site_text($content, 'speakers_drive_button'))?></span></a><?php endif; ?>
-  <?php foreach($speakerItems as $i => $item): $audioUrl=cms_safe_url($item['audio_url']??''); $streamUrl=cms_safe_url($item['audio_stream_url']??''); if (cms_drive_audio_preview_url($streamUrl)==='') $streamUrl=''; $listenUrl=$streamUrl ?: $audioUrl; $previewUrl=cms_speaker_preview_url($item); ?>
+  <?php foreach($speakerItems as $i => $item): $previewUrl=cms_speaker_preview_url($item); $downloadUrl=cms_speaker_download_url($item); $playerButton=cms_speaker_button($item,'player'); $downloadButton=cms_speaker_button($item,'download'); ?>
     <article class="announcement-card speaker-card" id="<?=h(site_search_anchor('speaker', $item['id'] ?? '', (int)$i))?>">
       <div class="announcement-copy">
         <div class="announcement-meta"><time datetime="<?=h($item['event_date']??'')?>"><?=h(cms_date_ru((string)($item['event_date']??'')))?></time></div>
@@ -126,13 +131,12 @@ if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms
           <div><dt>Спикер</dt><dd><?=h($item['speaker']??'')?></dd></div>
           <?php foreach(['city'=>'Город','home_group'=>'Домашняя группа','sobriety'=>'Трезвость'] as $key=>$label): if (!empty($item[$key])): ?><div><dt><?=h($label)?></dt><dd><?=h($item[$key])?></dd></div><?php endif; endforeach; ?>
         </dl>
-        <?php if($previewUrl): ?><div class="speaker-audio"><a class="speaker-audio__listen" href="<?=h($listenUrl)?>" target="_blank" rel="noopener noreferrer">▶ Слушать на Google Диске</a><button class="speaker-audio__load" type="button" data-speaker-preview="<?=h($previewUrl)?>" aria-expanded="false">Плеер на странице</button><?php if($streamUrl && $audioUrl): ?><a class="speaker-audio__original" href="<?=h($audioUrl)?>" target="_blank" rel="noopener noreferrer">Оригинал записи</a><?php endif; ?><div class="speaker-audio__frame" hidden></div></div><?php endif; ?>
-        <?=cms_actions_html($item['links']??[],'announcement-links')?>
+        <?php if($previewUrl || $downloadUrl): ?><div class="speaker-audio"><?php if($previewUrl): ?><button class="speaker-audio__load <?=h(cms_action_classes($playerButton))?>" type="button" data-speaker-preview="<?=h($previewUrl)?>" data-open-label="<?=h($playerButton['label'])?>" aria-expanded="false"><?=h($playerButton['label'])?></button><?php endif; ?><?php if($downloadUrl): ?><a class="speaker-audio__download <?=h(cms_action_classes($downloadButton))?>" href="<?=h($downloadUrl)?>" target="_blank" rel="noopener noreferrer"><?=h($downloadButton['label'])?></a><?php endif; ?><div class="speaker-audio__frame" hidden></div></div><?php endif; ?>
       </div>
     </article>
   <?php endforeach; ?>
   <?=cms_actions_html(cms_page_actions($content,'speakers'))?>
-  <script defer src="/speakers-audio.js?v=3"></script>
+  <script defer src="/speakers-audio.js?v=4"></script>
 <?php }
 
 if ($section === 'services') { $data = $content['services'] ?? []; $chartUrl=cms_safe_url($data['chart_url']??''); $chartTop=($data['chart_position']??'top')!=='bottom'; ?>

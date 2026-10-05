@@ -11,12 +11,12 @@ const frame = {
   replaceChildren() { this.children = []; }
 };
 const button = {
-  dataset: {speakerPreview: 'https://drive.google.com/file/d/ABC_123/preview'},
+  dataset: {speakerPreview: 'https://drive.google.com/file/d/ABC_123/preview', openLabel: 'Моя кнопка плеера'},
   parentElement: {querySelector: () => frame},
   attributes: {'aria-expanded': 'false'},
   getAttribute(name) { return this.attributes[name]; },
   setAttribute(name, value) { this.attributes[name] = value; },
-  textContent: 'Плеер на странице'
+  textContent: 'Моя кнопка плеера'
 };
 const document = {
   addEventListener(name, handler) { if (name === 'click') clickHandler = handler; },
@@ -33,6 +33,6 @@ clickHandler({target: {closest: () => button}});
 assert.equal(frame.children.length, 0);
 assert.equal(frame.hidden, true);
 assert.equal(button.getAttribute('aria-expanded'), 'false');
-assert.equal(button.textContent, 'Плеер на странице');
+assert.equal(button.textContent, 'Моя кнопка плеера');
 
 console.log('Speaker audio click-to-load checks passed.');
