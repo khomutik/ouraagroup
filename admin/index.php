@@ -170,6 +170,7 @@ function admin_page_graph(array $content): array {
             $slug = substr($page['key'], 9);
             $urlToKey['newcomers.html#' . $slug] = $page['key'];
             $urlToKey['#' . $slug] = $page['key'];
+            $urlToKey[ltrim(cms_newcomer_path($slug), '/')] = $page['key'];
         }
         if (str_starts_with($page['key'], 'custom:')) {
             $slug = substr($page['key'], 7);
@@ -265,7 +266,7 @@ function admin_action_link_options(): array {
     ];
     foreach (($content['newcomers']['pages'] ?? []) as $page) {
         if (empty($page['published']) || ($page['slug'] ?? '') === 'menu') continue;
-        $options['newcomers.html#' . $page['slug']] = 'Новичкам → ' . ($page['title'] ?? 'Страница');
+        $options[cms_newcomer_path((string)$page['slug'])] = 'Новичкам → ' . ($page['title'] ?? 'Страница');
     }
     foreach (($content['pages']['custom'] ?? []) as $page) {
         if (empty($page['published']) || empty($page['slug'])) continue;
@@ -273,7 +274,9 @@ function admin_action_link_options(): array {
     }
     return $options;
 }
-function admin_action_destination(array $options, string $selected): void { ?>
+function admin_action_destination(array $options, string $selected): void {
+    if (preg_match('~^/?newcomers\.html#([a-z0-9-]+)$~', $selected, $match)) $selected = cms_newcomer_path($match[1]);
+    ?>
 <label class="field"><span>Куда ведёт кнопка</span><select data-action-destination><option value="">Внешняя ссылка или адрес вручную</option><?php foreach ($options as $url=>$title): ?><option value="<?=h($url)?>" <?=$selected===$url?'selected':''?>><?=h($title)?></option><?php endforeach; ?></select></label>
 <?php }
 function admin_action_select(string $name, string $label, array $options, string $selected): void { $kind = substr($name, strrpos($name, '_') + 1); ?><fieldset class="button-option" data-button-kind="<?=h($kind)?>"><legend><?=h($label)?></legend><input type="hidden" name="<?=h($name)?>[]" value="<?=h($selected)?>" data-button-option="<?=h($kind)?>"><div class="button-option__choices"><?php foreach($options as $value=>$caption): ?><button type="button" class="button-choice button-choice--<?=h($kind)?>-<?=h($value)?> <?=$selected===$value?'is-selected':''?>" data-button-value="<?=h($value)?>" aria-pressed="<?=$selected===$value?'true':'false'?>"><span><?=h($caption)?></span></button><?php endforeach; ?></div></fieldset><?php }

@@ -23,6 +23,22 @@ function site_foot(bool $siteNav = true): void { global $content; ?>
 <a class="back-to-top" href="#top"><?=h(cms_site_text($content, 'back_to_top'))?></a></main><?php if($siteNav):?><script type="application/json" id="site-navigation-data"><?=json_encode(cms_navigation_payload($content), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)?></script><script src="/site-nav.js?v=22"></script><?php endif;?><script src="/pwa-install.js?v=11"></script><script src="/site-chat.js?v=7" data-api="/support-chat-api"></script><script src="/site-search.js?v=5"></script><script src="/aa-test.js?v=3"></script></body></html>
 <?php }
 
+function site_newcomer_description(string $html, string $fallback): string {
+    $text = html_entity_decode(strip_tags(preg_replace('~</?(?:p|div|li|br|h[1-6])[^>]*>~iu', ' ', $html) ?? $html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = trim(preg_replace('/\s+/u', ' ', $text) ?? $text);
+    if ($text === '') return $fallback . ' — материалы группы АА «Почти нормальные».';
+    if (preg_match('/^.{0,160}[.!?](?=\s|$)/us', $text, $sentence) && $sentence[0] !== '') return $sentence[0];
+    if (preg_match('/^.{0,155}(?=\s|$)/us', $text, $words) && $words[0] !== '') return $words[0] . '…';
+    preg_match('/^.{1,155}/us', $text, $characters);
+    return ($characters[0] ?? $fallback) . '…';
+}
+
+function site_newcomer_body(string $html, array $publishedPages): string {
+    return preg_replace_callback('~href="(?:/?newcomers\.html#|#)([a-z0-9-]+)"~i', static function (array $match) use ($publishedPages): string {
+        return isset($publishedPages[$match[1]]) ? 'href="' . h(cms_newcomer_path($match[1])) . '"' : $match[0];
+    }, cms_rich($html)) ?? cms_rich($html);
+}
+
 if ($kind === 'home') {
     $pages=$content['pages']??[]; $nav=$content['navigation']??cms_default_navigation();
     $homeHeading = cms_site_text($content, 'home_heading');
@@ -45,7 +61,30 @@ if ($kind === 'home') {
     <?=cms_actions_html(cms_page_actions($content,'home'))?>
 <?php site_foot(false); exit; }
 
-if ($kind === 'newcomers') { $pages=array_values(array_filter($content['newcomers']['pages']??[],static fn($p)=>!empty($p['published']) && ($p['slug'] ?? '') !== 'aa-test')); usort($pages,static fn($a,$b)=>(int)($a['order']??0)<=>(int)($b['order']??0)); site_head(cms_site_text($content, 'newcomers_heading') . ': как прийти на собрание АА - Почти нормальные', cms_site_text($content, 'newcomers_description'),'newcomers.html'); ?><header class="page-header"><h1 class="page-title"><?=h(cms_site_text($content, 'newcomers_heading'))?></h1></header><section class="newcomers-flow" aria-live="polite"><?php foreach($pages as $i=>$page):?><article class="newcomers-card" data-page="<?=h($page['slug']??'')?>"<?=$i?' hidden':''?>><?php if(($page['slug']??'')!=='menu'):?><h2><?=cms_display_text($page['title']??'')?></h2><?php endif;?><?=cms_actions_html($page['actions']??[],'newcomers-actions','under-title')?><?=cms_rich((string)($page['body']??''))?><?=cms_actions_html($page['actions']??[],'newcomers-actions','bottom')?></article><?php endforeach;?></section><script>(()=>{if(location.hash==='#aa-test'){location.replace('/p/test-na-alkogolizm');return}const p=[...document.querySelectorAll('[data-page]')],h=[];let c='menu';const show=(n,keep=true,hash=true)=>{const x=p.find(e=>e.dataset.page===n);if(!x||n===c)return;if(keep)h.push(c);p.forEach(e=>e.hidden=e!==x);c=n;if(hash)history.replaceState(null,'',location.pathname+(n==='menu'?'':'#'+n));scrollTo({top:0,behavior:'smooth'})};window.handleNewcomersBack=()=>{if(c==='menu')return false;show(h.pop()||'menu',false);return true};const fromHash=()=>{const n=decodeURIComponent(location.hash.slice(1));if(n&&p.some(e=>e.dataset.page===n))show(n,false,false)};fromHash();addEventListener('hashchange',fromHash);document.addEventListener('click',e=>{const b=e.target.closest('[data-target]');if(b)show(b.dataset.target)})})();</script><?php site_foot(); exit; }
+if ($kind === 'newcomers' || $kind === 'newcomer') {
+    $pages = [];
+    foreach (($content['newcomers']['pages'] ?? []) as $candidate) {
+        $candidateSlug = (string)($candidate['slug'] ?? '');
+        if (!empty($candidate['published']) && preg_match('/^[a-z0-9-]+$/', $candidateSlug)) $pages[$candidateSlug] = $candidate;
+    }
+    $currentSlug = $kind === 'newcomers' ? 'menu' : $slug;
+    if ($currentSlug === 'aa-test' || !isset($pages[$currentSlug])) { http_response_code(404); exit('Страница не найдена.'); }
+    $page = $pages[$currentSlug];
+    $isMenu = $currentSlug === 'menu';
+    $heading = $isMenu ? cms_site_text($content, 'newcomers_heading') : cms_text((string)($page['title'] ?? ''), 180);
+    $description = $isMenu ? cms_site_text($content, 'newcomers_description') : site_newcomer_description((string)($page['body'] ?? ''), $heading);
+    $canonical = ltrim(cms_newcomer_path($currentSlug), '/');
+    $actions = cms_newcomer_actions((array)($page['actions'] ?? []), $pages);
+    site_head($heading . ' — Почти нормальные', $description, $canonical);
+    ?><header class="page-header"><h1 class="page-title"><?=h($heading)?></h1></header>
+    <section class="newcomers-flow"><article class="newcomers-card" data-page="<?=h($currentSlug)?>">
+        <?=cms_actions_html($actions, 'newcomers-actions', 'under-title')?>
+        <?=site_newcomer_body((string)($page['body'] ?? ''), $pages)?>
+        <?=cms_actions_html($actions, 'newcomers-actions', 'bottom')?>
+    </article></section>
+    <?php if ($isMenu): ?><script>(()=>{const slug=decodeURIComponent(location.hash.slice(1));if(/^[a-z0-9-]+$/.test(slug)){const pages=<?=json_encode(array_keys($pages), JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)?>;if(pages.includes(slug)&&slug!=='menu')location.replace(slug==='aa-test'?'/p/test-na-alkogolizm':'/newcomers/'+slug+'/')}})();</script><?php else: ?><script>window.handleNewcomersBack=()=>{location.href='/newcomers.html';return true};</script><?php endif; ?>
+    <?php site_foot(); exit;
+}
 
 if ($kind === 'custom' && $slug === 'test-na-alkogolizm') {
     $testPage = null;

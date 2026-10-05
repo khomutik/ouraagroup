@@ -46,7 +46,7 @@ function site_search_documents(array $content, ?string $today = null): array {
         $actions = implode(' ', array_map(static fn($action): string => (string)($action['label'] ?? ''), (array)($page['actions'] ?? [])));
         $keywords = $slug === 'menu' ? 'бросить пить перестать пить помощь алкоголику найти группу аа онлайн собрание первый раз впервые' : '';
         if ($slug === 'aa') $keywords = 'что такое аа';
-        $add('Новичкам', $title, '/newcomers.html' . ($slug === 'menu' ? '' : '#' . $slug), (string)($page['body'] ?? '') . ' ' . $actions, $keywords);
+        $add('Новичкам', $title, cms_newcomer_path($slug), (string)($page['body'] ?? '') . ' ' . $actions, $keywords);
     }
 
     $schedule = $content['schedule'] ?? [];

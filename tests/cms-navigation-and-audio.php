@@ -17,6 +17,11 @@ $root = array_search('newcomers', array_column($items, 'id'), true);
 check($root !== false, 'Нет раздела «Новичкам».');
 check(($items[$root + 1]['url'] ?? '') === '/p/test-na-alkogolizm', 'Тест должен идти сразу после раздела «Новичкам».');
 check(!in_array('newcomers.html#deleted', array_column($items, 'url'), true), 'Старая ссылка не удалена из меню.');
+check(in_array(cms_newcomer_path('aa'), array_column($items, 'url'), true), 'У статьи новичков должен быть собственный адрес.');
+check(cms_newcomer_path('menu') === '/newcomers.html', 'Главный раздел должен сохранить адрес.');
+check(cms_newcomer_path('aa-test') === '/p/test-na-alkogolizm', 'Тест должен сохранить адрес.');
+check(cms_newcomer_actions([['url'=>'#aa','label'=>'АА']], ['aa'=>true])[0]['url'] === '/newcomers/aa/', 'Кнопка должна вести на отдельную статью.');
+check(cms_newcomer_actions([['url'=>'newcomers.html#aa','label'=>'АА']], ['aa'=>true])[0]['url'] === '/newcomers/aa/', 'Старая кнопка с хешем должна вести на отдельную статью.');
 check(in_array('https://example.org/groups', array_column($items, 'url'), true), 'Кнопки страниц для новичков должны попадать в меню.');
 
 $preview = cms_drive_audio_preview_url('https://drive.google.com/file/d/ABC_123/view?resourcekey=0-KEY');

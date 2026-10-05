@@ -272,6 +272,21 @@ function cms_actions_html(array $actions, string $class = 'page-actions', string
     return $html === '' ? '' : '<div class="' . h($class) . '">' . $html . '</div>';
 }
 
+function cms_newcomer_path(string $slug): string {
+    return $slug === 'menu' ? '/newcomers.html' : ($slug === 'aa-test' ? '/p/test-na-alkogolizm' : '/newcomers/' . rawurlencode($slug) . '/');
+}
+
+function cms_newcomer_actions(array $actions, array $publishedSlugs): array {
+    foreach ($actions as &$action) {
+        $url = (string)($action['url'] ?? '');
+        if (preg_match('~^(?:/?newcomers\.html)?#([a-z0-9-]+)$~', $url, $match) && isset($publishedSlugs[$match[1]])) {
+            $action['url'] = cms_newcomer_path($match[1]);
+        }
+    }
+    unset($action);
+    return $actions;
+}
+
 function cms_default_aa_test(): array {
     return [
         'seo_title' => 'Тест на алкоголизм — 12 вопросов АА | Почти нормальные',
@@ -358,7 +373,10 @@ function cms_navigation_payload(array $content): array {
     foreach (($nav['items'] ?? []) as $item) {
         if (in_array((string)($item['title'] ?? ''), $hiddenTitles, true)) continue;
         $url = (string)($item['url'] ?? '');
-        if (preg_match('~^/?newcomers\.html#([a-z0-9-]+)$~', $url, $match) && !isset($pages[$match[1]])) continue;
+        if (preg_match('~^/?newcomers\.html#([a-z0-9-]+)$~', $url, $match)) {
+            if (!isset($pages[$match[1]])) continue;
+            $item['url'] = cms_newcomer_path($match[1]);
+        }
         $items[] = $item;
     }
     $testNav = null;
@@ -380,7 +398,7 @@ function cms_navigation_payload(array $content): array {
     $knownUrls = array_column($items, 'url');
     foreach ($pages as $slug => $page) {
         if (in_array($slug, ['menu', 'aa-test'], true)) continue;
-        $url = 'newcomers.html#' . $slug;
+        $url = cms_newcomer_path($slug);
         if (in_array($url, $knownUrls, true)) continue;
         $items[] = ['id'=>'newcomer-' . $slug,'title'=>$page['title'] ?? 'Страница','url'=>$url,'parent'=>'Новичкам','icon'=>'','external'=>false];
         $knownUrls[] = $url;
@@ -389,7 +407,7 @@ function cms_navigation_payload(array $content): array {
     foreach ($pages as $slug => $page) {
         foreach (($page['actions'] ?? []) as $index => $action) {
             $url = cms_safe_url($action['url'] ?? '');
-            if (str_starts_with($url, '#')) $url = 'newcomers.html' . $url;
+            if (preg_match('~^(?:/?newcomers\.html)?#([a-z0-9-]+)$~', $url, $match) && isset($pages[$match[1]])) $url = cms_newcomer_path($match[1]);
             $label = cms_text(strip_tags((string)($action['label'] ?? '')), 160);
             if ($url === '' || $label === '' || in_array($url, $knownUrls, true) || in_array($url, $socialUrls, true)) continue;
             $items[] = ['id'=>'newcomer-action-' . $slug . '-' . $index,'title'=>$label,'url'=>$url,'parent'=>'Новичкам','icon'=>'','external'=>str_starts_with($url, 'http')];

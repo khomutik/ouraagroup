@@ -22,6 +22,7 @@ $urls = array_column($documents, 'url');
 $dump = json_encode($documents, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
 expect_search(in_array('/newcomers.html', $urls, true), 'Главная страница новичков пропала из поиска.');
+expect_search(in_array('/newcomers/aa/', $urls, true), 'Отдельная статья новичков должна быть в поиске.');
 expect_search(in_array('/p/public-page', $urls, true), 'Опубликованная страница пропала из поиска.');
 expect_search(in_array('/speakers.html#speaker-record-1', $urls, true), 'Поиск должен вести к конкретной записи.');
 expect_search(in_array('/p/test-na-alkogolizm', $urls, true) === in_array('aa-test', array_column($content['newcomers']['pages'], 'slug'), true), 'Тест включается только при публикации.');

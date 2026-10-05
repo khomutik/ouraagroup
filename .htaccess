@@ -19,6 +19,7 @@ RewriteRule ^archive\.html$ public.php?section=archive [L,QSA]
 RewriteRule ^$ site-page.php?kind=home [L,QSA]
 RewriteRule ^index\.html$ site-page.php?kind=home [L,QSA]
 RewriteRule ^newcomers\.html$ site-page.php?kind=newcomers [L,QSA]
+RewriteRule ^newcomers/([a-z0-9-]+)/?$ site-page.php?kind=newcomer&slug=$1 [L,QSA]
 RewriteRule ^tradition\.html$ site-page.php?kind=tradition [L,QSA]
 RewriteRule ^cms-navigation\.json$ site-page.php?navigation=1 [L,QSA]
 # This retired page is kept as a draft in the CMS; send old search links to the relevant page.

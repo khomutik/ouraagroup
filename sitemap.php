@@ -15,10 +15,9 @@ $paths = [
 ];
 
 foreach (cms_content()['newcomers']['pages'] ?? [] as $page) {
-    if (($page['slug'] ?? '') === 'aa-test' && !empty($page['published'])) {
-        $paths[] = 'p/test-na-alkogolizm';
-        break;
-    }
+    $slug = (string)($page['slug'] ?? '');
+    if (empty($page['published']) || !preg_match('/^[a-z0-9-]+$/', $slug) || $slug === 'menu') continue;
+    $paths[] = ltrim(cms_newcomer_path($slug), '/');
 }
 
 foreach (cms_content()['pages']['custom'] ?? [] as $page) {
