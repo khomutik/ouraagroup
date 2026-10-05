@@ -1,0 +1,42 @@
+name: Проверки сайта
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+      - name: Проверить синтаксис PHP
+        run: find . -name '*.php' -not -path './support-chat-worker/node_modules/*' -print0 | xargs -0 -n1 php -l
+      - name: Проверить функции сайта
+        run: |
+          for test in tests/*.js; do node "$test"; done
+          for test in tests/*.php; do php "$test"; done
+
+  chat:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: support-chat-worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: support-chat-worker/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
