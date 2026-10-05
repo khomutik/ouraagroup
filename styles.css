@@ -1542,9 +1542,9 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 }
 
 .pwa-install-banner__button--primary {
-  border-color: var(--orange);
+  border-color: var(--orange-dark);
   color: #fff;
-  background: var(--orange);
+  background: var(--orange-dark);
 }
 
 .pwa-install-banner__button:focus-visible {
@@ -1700,13 +1700,13 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
   gap: 7px;
   min-height: 44px;
   padding: 9px 14px;
-  border: 1px solid var(--orange);
+  border: 1px solid var(--orange-dark);
   border-radius: 12px;
   color: #fff;
   font-size: clamp(16px, 2.4vw, 18px);
   font-weight: 900;
   line-height: 1.2;
-  background: var(--orange);
+  background: var(--orange-dark);
 }
 
 .announcement-meta time:first-child::before {
@@ -2268,7 +2268,7 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
   width: max-content;
   margin: 24px auto 0;
   padding: 4px;
-  color: var(--orange-dark);
+  color: #ffad69;
   font-size: 15px;
   font-weight: 700;
   text-decoration: underline;
@@ -2277,7 +2277,7 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 
 .back-to-top:hover,
 .back-to-top:focus-visible {
-  color: var(--blue);
+  color: var(--cream-2);
   text-decoration-thickness: 2px;
 }
 
