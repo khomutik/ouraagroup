@@ -118,6 +118,11 @@ function cms_drive_audio_preview_url(string $url): string {
         ? '?resourcekey=' . rawurlencode($resourceKey) : '';
     return 'https://drive.google.com/file/d/' . $id . '/preview' . $suffix;
 }
+function cms_speaker_preview_url(array $speaker): string {
+    $optimized = cms_drive_audio_preview_url(cms_safe_url($speaker['audio_stream_url'] ?? ''));
+    if ($optimized !== '') return $optimized;
+    return cms_drive_audio_preview_url(cms_safe_url($speaker['audio_url'] ?? ''));
+}
 function cms_html_attribute(string $attributes, string $name): string {
     if (!preg_match('/\b' . preg_quote($name, '/') . '\s*=\s*(["\'])(.*?)\1/iu', $attributes, $match)) return '';
     return html_entity_decode($match[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');

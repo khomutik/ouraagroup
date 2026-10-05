@@ -28,6 +28,8 @@ $preview = cms_drive_audio_preview_url('https://drive.google.com/file/d/ABC_123/
 check($preview === 'https://drive.google.com/file/d/ABC_123/preview?resourcekey=0-KEY', 'Ссылка на плеер Google Диска составлена неверно.');
 check(cms_drive_audio_preview_url('https://example.com/file/d/ABC_123/view') === '', 'Посторонний сайт не должен попадать в плеер.');
 check(cms_drive_audio_preview_url('https://drive.google.com/drive/folders/ABC_123') === '', 'Нужна ссылка на файл, а не на папку.');
+check(cms_speaker_preview_url(['audio_url'=>'https://drive.google.com/file/d/ORIGINAL/view','audio_stream_url'=>'https://drive.google.com/file/d/OPTIMIZED/view']) === 'https://drive.google.com/file/d/OPTIMIZED/preview', 'Плеер должен использовать облегчённую запись.');
+check(cms_speaker_preview_url(['audio_url'=>'https://drive.google.com/file/d/ORIGINAL/view','audio_stream_url'=>'https://example.org/invalid']) === 'https://drive.google.com/file/d/ORIGINAL/preview', 'При недоступной ссылке на копию плеер должен использовать оригинал.');
 
 $speakers = cms_speakers_newest_first([
     ['id'=>'older','event_date'=>'2025-01-01','order'=>0],

@@ -469,7 +469,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($title==='' || $speaker==='') throw new RuntimeException('Заполните тему и имя спикера.');
                     $audioUrl=cms_safe_url($_POST['audio_url']??'');
                     if ($audioUrl!=='' && cms_drive_audio_preview_url($audioUrl)==='') throw new RuntimeException('Для аудио нужна ссылка на отдельный файл в Google Диске, а не на папку.');
-                    $record=['id'=>$id?:cms_id(),'event_date'=>$date,'title'=>$title,'speaker'=>$speaker,'city'=>cms_text($_POST['city']??'',180),'home_group'=>cms_text($_POST['home_group']??'',180),'sobriety'=>cms_text($_POST['sobriety']??'',120),'audio_url'=>$audioUrl,'links'=>admin_collect_actions('card_action'),'order'=>$index===null?0:(int)($items[$index]['order']??$index)];
+                    $streamUrl=cms_safe_url($_POST['audio_stream_url']??'');
+                    if ($streamUrl!=='' && cms_drive_audio_preview_url($streamUrl)==='') throw new RuntimeException('Для облегчённой записи нужна ссылка на отдельный файл в Google Диске.');
+                    $record=['id'=>$id?:cms_id(),'event_date'=>$date,'title'=>$title,'speaker'=>$speaker,'city'=>cms_text($_POST['city']??'',180),'home_group'=>cms_text($_POST['home_group']??'',180),'sobriety'=>cms_text($_POST['sobriety']??'',120),'audio_url'=>$audioUrl,'audio_stream_url'=>$streamUrl,'links'=>admin_collect_actions('card_action'),'order'=>$index===null?0:(int)($items[$index]['order']??$index)];
                     if($index===null)array_unshift($items,$record);else$items[$index]=$record;
                     foreach($items as $i=>$item)$items[$i]['order']=$i;
                     $data['items']=$items;
@@ -677,14 +679,15 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
     <button class="button">Сохранить тексты и материалы</button>
   </form>
   <div class="section-heading"><h2>Записи спикерских — новые сверху</h2><a class="button button--quiet" href="?section=speakers&edit=new">Добавить спикерскую</a></div>
-  <p class="admin-tip">MP3 остаются на Google Диске и не занимают место на сервере. Посетитель может сразу перейти к записи; встроенный плеер загружается только по отдельному нажатию и зависит от скорости Google Диска.</p>
+  <p class="admin-tip">Записи остаются на Google Диске и не занимают место на сервере. Встроенный плеер загружается только по нажатию и использует облегчённую копию, если она указана.</p>
   <?php if($editId): ?>
     <form method="post" class="admin-form">
       <input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="speakers"><input type="hidden" name="speaker_mode" value="card"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($edit['id']??'')?>">
       <h2><?= $edit?'Редактировать спикерскую':'Новая спикерская' ?></h2>
       <div class="form-grid"><?php admin_input('event_date',$edit['event_date']??'','date','Дата *',true); admin_input('title',$edit['title']??'','text','Тема спикерской *',true); admin_input('speaker',$edit['speaker']??'','text','Спикер *',true); admin_input('city',$edit['city']??'','text','Город'); admin_input('home_group',$edit['home_group']??'','text','Домашняя группа'); admin_input('sobriety',$edit['sobriety']??'','text','Трезвость'); ?></div>
       <?php admin_input('audio_url',$edit['audio_url']??'','url','Ссылка на MP3-файл в Google Диске (необязательно)'); ?>
-      <p class="admin-tip">Вставьте ссылку именно на открытый для просмотра файл, например drive.google.com/file/d/…/view. Основная кнопка откроет запись на Google Диске; маленький встроенный плеер — дополнительный вариант.</p>
+      <?php admin_input('audio_stream_url',$edit['audio_stream_url']??'','url','Облегчённая запись для плеера (необязательно)'); ?>
+      <p class="admin-tip">Вставляйте ссылки на отдельные открытые файлы Google Диска. Основная кнопка ведёт к оригиналу; встроенный плеер использует облегчённую копию. Если копия не указана, плеер использует оригинал.</p>
       <?php admin_card_actions_fieldset($edit['links']??[], 'card_action'); ?>
       <div class="form-actions"><button class="button">Опубликовать спикерскую</button><a class="button button--quiet" href="?section=speakers">Отмена</a></div>
     </form>

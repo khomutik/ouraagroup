@@ -2272,6 +2272,12 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
   background: var(--orange-dark);
 }
 
+.speaker-audio__original {
+  color: var(--orange-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .speaker-audio__frame {
   flex-basis: 100%;
   width: 100%;

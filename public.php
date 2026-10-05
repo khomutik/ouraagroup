@@ -27,7 +27,7 @@ function page_head(string $title, string $description, string $canonical): void 
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=115" />
+  <link rel="stylesheet" href="styles.css?v=116" />
   <script defer src="/site-analytics.js?v=1"></script>
 </head>
 <body>
@@ -117,7 +117,7 @@ if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms
   <?php if (!empty($data['privacy'])): ?><section class="speakers-privacy"><?= cms_rich((string)$data['privacy']) ?></section><?php endif; ?>
   <section class="content-card speakers-materials" aria-label="Материалы об анонимности"><h2><?=h(cms_site_text($content, 'speakers_materials_heading'))?></h2><?php foreach (($data['materials'] ?? []) as $item): if ($url = cms_safe_url($item['resource'] ?? '')): ?><a class="speakers-file" href="<?= h($url) ?>" target="_blank" rel="noopener"><span>📄</span><span><?= cms_display_text($item['title'] ?? '') ?></span></a><?php endif; endforeach; ?></section>
   <?php if ($driveUrl): ?><a class="document-link speakers-drive-link" href="<?= h($driveUrl) ?>" target="_blank" rel="noopener"><img src="assets/emoji/aa_microphone.png" alt="" /><span><?=h(cms_site_text($content, 'speakers_drive_button'))?></span></a><?php endif; ?>
-  <?php foreach($speakerItems as $i => $item): $audioUrl=cms_safe_url($item['audio_url']??''); $previewUrl=cms_drive_audio_preview_url($audioUrl); ?>
+  <?php foreach($speakerItems as $i => $item): $audioUrl=cms_safe_url($item['audio_url']??''); $streamUrl=cms_safe_url($item['audio_stream_url']??''); if (cms_drive_audio_preview_url($streamUrl)==='') $streamUrl=''; $listenUrl=$streamUrl ?: $audioUrl; $previewUrl=cms_speaker_preview_url($item); ?>
     <article class="announcement-card speaker-card" id="<?=h(site_search_anchor('speaker', $item['id'] ?? '', (int)$i))?>">
       <div class="announcement-copy">
         <div class="announcement-meta"><time datetime="<?=h($item['event_date']??'')?>"><?=h(cms_date_ru((string)($item['event_date']??'')))?></time></div>
@@ -126,7 +126,7 @@ if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms
           <div><dt>Спикер</dt><dd><?=h($item['speaker']??'')?></dd></div>
           <?php foreach(['city'=>'Город','home_group'=>'Домашняя группа','sobriety'=>'Трезвость'] as $key=>$label): if (!empty($item[$key])): ?><div><dt><?=h($label)?></dt><dd><?=h($item[$key])?></dd></div><?php endif; endforeach; ?>
         </dl>
-        <?php if($previewUrl): ?><div class="speaker-audio"><a class="speaker-audio__listen" href="<?=h($audioUrl)?>" target="_blank" rel="noopener noreferrer">▶ Слушать на Google Диске</a><button class="speaker-audio__load" type="button" data-speaker-preview="<?=h($previewUrl)?>" aria-expanded="false">Плеер на странице</button><div class="speaker-audio__frame" hidden></div></div><?php endif; ?>
+        <?php if($previewUrl): ?><div class="speaker-audio"><a class="speaker-audio__listen" href="<?=h($listenUrl)?>" target="_blank" rel="noopener noreferrer">▶ Слушать на Google Диске</a><button class="speaker-audio__load" type="button" data-speaker-preview="<?=h($previewUrl)?>" aria-expanded="false">Плеер на странице</button><?php if($streamUrl && $audioUrl): ?><a class="speaker-audio__original" href="<?=h($audioUrl)?>" target="_blank" rel="noopener noreferrer">Оригинал записи</a><?php endif; ?><div class="speaker-audio__frame" hidden></div></div><?php endif; ?>
         <?=cms_actions_html($item['links']??[],'announcement-links')?>
       </div>
     </article>
