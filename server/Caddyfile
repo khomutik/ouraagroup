@@ -20,7 +20,7 @@ pochtinormalnye.ru, www.pochtinormalnye.ru {
 	handle_path /support-chat-api/* {
 		reverse_proxy https://pn-support-chat.pochtinormalnye.workers.dev {
 			header_up Host pn-support-chat.pochtinormalnye.workers.dev
-			header_up X-PN-Visitor-IP {http.request.header.CF-Connecting-IP}
+			header_up X-PN-Visitor-IP {http.request.remote.host}
 			transport http {
 				tls_server_name pn-support-chat.pochtinormalnye.workers.dev
 			}
@@ -37,7 +37,7 @@ pochtinormalnye.ru, www.pochtinormalnye.ru {
 		}
 	}
 
-	@private path /.git* /.agents* /.codex* /.gitignore /.htaccess /admin/.htaccess /cms.php /site-page.php /sitemap.php /cms-config.php /cms-config.example.php /cms-data* /cms-backups* /support-chat-worker*
+	@private path /.git* /.agents* /.codex* /.gitignore /.htaccess /admin/.htaccess *.php /cms-data* /cms-backups* /support-chat-worker*
 	handle @private {
 		respond 404
 	}
