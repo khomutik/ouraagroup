@@ -401,6 +401,7 @@ async function customEmojiImage(
   const cache = await caches.open("pn-support-chat-custom-emoji-v1");
   const cached = await cache.match(cacheKey);
   if (cached) return cached;
+  await consumeCustomEmojiRateLimit(request, env);
 
   const stickers = await telegramApi<TelegramSticker[]>(env, "getCustomEmojiStickers", {
     custom_emoji_ids: [customEmojiId],
@@ -465,6 +466,30 @@ async function consumeSessionRateLimit(request: Request, env: RuntimeEnv): Promi
     .first<{ count: number }>();
   if ((row?.count ?? 1) > 5) {
     throw new ApiError(429, "too_many_sessions", "Слишком много новых диалогов. Попробуйте снова не позднее чем через 10 минут.", true);
+  }
+}
+
+async function consumeCustomEmojiRateLimit(request: Request, env: RuntimeEnv): Promise<void> {
+  if (!env.RATE_LIMIT_SECRET) {
+    throw new ApiError(503, "rate_limit_not_configured", "Эмодзи временно недоступен.", true);
+  }
+  const ip = rateLimitAddress(
+    request.headers.get("CF-Connecting-IP"),
+    request.headers.get("X-PN-Visitor-IP"),
+    env.TRUSTED_PROXY_IP,
+  );
+  const now = nowSeconds();
+  const windowSeconds = 10 * 60;
+  const bucket = Math.floor(now / windowSeconds);
+  const digest = await hmacSha256Hex(env.RATE_LIMIT_SECRET, "emoji:" + ip + ":" + bucket);
+  const row = await env.DB.prepare(
+    "INSERT INTO rate_limits(bucket_key, count, expires_at) VALUES (?, 1, ?) " +
+      "ON CONFLICT(bucket_key) DO UPDATE SET count = count + 1 RETURNING count",
+  )
+    .bind("emoji:" + bucket + ":" + digest, now + windowSeconds * 2)
+    .first<{ count: number }>();
+  if ((row?.count ?? 1) > 60) {
+    throw new ApiError(429, "emoji_rate_limited", "Слишком много запросов эмодзи. Попробуйте позже.", true);
   }
 }
 

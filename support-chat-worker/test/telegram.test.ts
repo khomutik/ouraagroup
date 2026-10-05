@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import worker, { telegramTestHelpers } from "../src/index";
 
 describe("Telegram private chat guards", () => {
@@ -35,6 +35,29 @@ describe("Telegram private chat guards", () => {
     await Promise.all(work);
     expect(queries).toContain("DELETE FROM sessions WHERE last_activity_at < ?");
     expect(queries).toContain("DELETE FROM rate_limits WHERE expires_at < ?");
+  });
+
+  it("limits uncached public emoji lookups before calling Telegram", async () => {
+    vi.stubGlobal("caches", { open: async () => ({ match: async () => null }) });
+    const db = {
+      prepare() {
+        return { bind() { return this; }, async first() { return { count: 61 }; } };
+      },
+    };
+    try {
+      const request = new Request("https://pn-support-chat.pochtinormalnye.workers.dev/api/chat/custom-emoji/123456789", {
+        headers: { "CF-Connecting-IP": "198.51.100.2" },
+      });
+      const response = await worker.fetch(request as any, {
+        DB: db,
+        TELEGRAM_BOT_TOKEN: "test-token",
+        TELEGRAM_WEBHOOK_SECRET: "test-webhook-secret",
+        RATE_LIMIT_SECRET: "test-rate-limit-secret",
+      } as any, {} as any);
+      expect(response.status).toBe(429);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it("accepts only a private message sent by that Telegram user", () => {
