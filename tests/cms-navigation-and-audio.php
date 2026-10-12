@@ -25,6 +25,14 @@ check(cms_newcomer_seo_defaults('unknown')['title'] === '', 'Неизвестн�
 check(cms_newcomer_actions([['url'=>'#aa','label'=>'АА']], ['aa'=>true])[0]['url'] === '/newcomers/aa/', 'Кнопка должна вести на отдельную статью.');
 check(cms_newcomer_actions([['url'=>'newcomers.html#aa','label'=>'АА']], ['aa'=>true])[0]['url'] === '/newcomers/aa/', 'Старая кнопка с хешем должна вести на отдельную статью.');
 check(in_array('https://example.org/groups', array_column($items, 'url'), true), 'Кнопки страниц для новичков должны попадать в меню.');
+check(!in_array('nafanya-zoom-control', array_column($items, 'id'), true), 'Служебный пульт Нафани не должен отображаться в публичном меню сайта.');
+$unsafeMenu = $content;
+$unsafeMenu['navigation']['items'] = [
+    ['id'=>'archive','title'=>'Архив','url'=>'archive.html','parent'=>''],
+    ['id'=>'nafanya-zoom-control','title'=>'Старый пункт','url'=>'/nafanya-zoom-control/app?token=do-not-publish','parent'=>''],
+];
+$safeMenu = cms_navigation_payload($unsafeMenu)['items'];
+check(!in_array('/nafanya-zoom-control/app', array_column($safeMenu, 'url'), true), 'Старую кнопку Нафани нужно скрыть и из сохранённого меню.');
 
 $newcomerBody = cms_newcomer_body('<p>Read <a href="library.html">Library</a> <a href="schedule.html#top">Schedule</a> <a href="#aa">AA</a> <a href="#local">Local</a> <a href="/archive.html">Archive</a> <a href="https://example.org/library.html">External</a> <a href="javascript:alert(1)">Unsafe</a></p>', ['aa'=>true]);
 check(str_contains($newcomerBody, 'href="/library.html"'), 'Legacy library links must resolve from the site root on nested newcomer pages.');
@@ -46,6 +54,17 @@ check(cms_speaker_download_url(['audio_url'=>'https://drive.google.com/file/d/OR
 check(cms_speaker_download_url(['audio_url'=>'https://example.org/file']) === '', 'Скачивание не должно принимать посторонний адрес.');
 check(cms_speaker_button([], 'player')['color'] === 'blue', 'Кнопка плеера должна быть синей.');
 check(cms_speaker_button([], 'download')['type'] === 'outline', 'Кнопка скачивания должна быть прозрачной.');
+check(in_array('rs_audio', CMS_SECTIONS, true), 'Аудиозаписи РС должны быть отдельным разделом CMS.');
+check(in_array('scenarios', CMS_SECTIONS, true), 'Сценарии собраний должны быть отдельным разделом CMS.');
+check(count(cms_default_content()['scenarios']['items']) === 5, 'В отдельном разделе должны быть ровно пять исходных сценариев.');
+check(array_column(cms_default_content()['scenarios']['items'], 'label') === ['Сценарий (чтение книги)','Сценарий (обычное собрание)','Сценарий (для новичков)','Сценарий (спикерская)','Сценарий (свободные темы)'], 'Подписи пяти сценариев должны соответствовать расписанию.');
+check(cms_default_content()['admin_portal']['order'] === ['services','scenarios','nafanya','edit_site','edit_admin','rs_audio'], 'Порядок кабинета должен ставить редактирование админки сразу под редактированием сайта.');
+check(array_column(cms_rs_audio_newest_first([
+    ['id'=>'old','event_date'=>'2026-06-27'],
+    ['id'=>'new','event_date'=>'2026-10-03'],
+    ['id'=>'middle','event_date'=>'2026-08-29'],
+]), 'event_date') === ['2026-10-03','2026-08-29','2026-06-27'], 'Аудиозаписи РС должны сортироваться от новых к старым.');
+check(cms_drive_audio_preview_url('https://drive.google.com/file/d/RS_AUDIO_123/view?usp=sharing') === 'https://drive.google.com/file/d/RS_AUDIO_123/preview', 'Для архивной записи нужен встроенный предпросмотр Google Диска.');
 
 $speakers = cms_speakers_newest_first([
     ['id'=>'older','event_date'=>'2025-01-01','order'=>0],

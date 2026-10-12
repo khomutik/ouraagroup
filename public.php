@@ -32,7 +32,7 @@ function page_head(string $title, string $description, string $canonical, string
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=118" />
+  <link rel="stylesheet" href="styles.css?v=120" />
   <script defer src="/site-analytics.js?v=1"></script>
 </head>
 <body>
@@ -43,7 +43,7 @@ function page_foot(): void { global $content; ?>
     <a class="back-to-top" href="#top"><?=h(cms_site_text($content, 'back_to_top'))?></a>
   </main>
   <script type="application/json" id="site-navigation-data"><?=json_encode(cms_navigation_payload($content), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)?></script>
-  <script src="site-nav.js?v=22"></script>
+  <script src="site-nav.js?v=24"></script>
   <script src="pwa-install.js?v=11"></script>
   <script src="site-chat.js?v=7" data-api="/support-chat-api"></script>
   <script src="site-search.js?v=6"></script>

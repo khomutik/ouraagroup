@@ -519,9 +519,10 @@
     const remove = event.target.closest('.remove-row');
     if (remove) {
       markDirty(remove.closest('form'));
-      remove.closest('.repeat-row,.button-editor,.card-editor,.service-editor,.holder-row')?.remove();
+      remove.closest('.repeat-row,.schedule-row,.button-editor,.card-editor,.service-editor,.holder-row')?.remove();
       renumberServices();
       renumberNavigation();
+      renumberScheduleScenarioNames();
       return;
     }
     const add = event.target.closest('[data-add-row]');
@@ -536,6 +537,7 @@
         items.querySelectorAll('.button-editor').forEach(updateButtonPreview);
         renumberServices();
         renumberNavigation();
+        renumberScheduleScenarioNames();
       }
       return;
     }
@@ -567,6 +569,16 @@
     document.querySelectorAll('[data-nav-item]').forEach((item, index) => {
       const checkbox = item.querySelector('input[type=checkbox]');
       if (checkbox) checkbox.name = `nav_external[${index}]`;
+    });
+  }
+
+  function renumberScheduleScenarioNames() {
+    document.querySelectorAll('[data-repeat="days"] > [data-repeat-items] > .schedule-row').forEach((row, dayIndex) => {
+      row.querySelectorAll('.schedule-scenario-button').forEach((editor) => {
+        editor.querySelectorAll('[data-scenario-field]').forEach((input) => {
+          input.name = `schedule_scenario_buttons[${dayIndex}][${input.dataset.scenarioField}][]`;
+        });
+      });
     });
   }
 
@@ -628,6 +640,7 @@
   document.querySelectorAll('.button-editor').forEach(updateButtonPreview);
   renumberServices();
   renumberNavigation();
+  renumberScheduleScenarioNames();
 
   // Проводник структуры: сворачивается только выбранная ветка, как в файловом менеджере.
   document.addEventListener('click', (event) => {

@@ -8,6 +8,11 @@ pochtinormalnye.ru {
     root * /srv/pochtinormalnye-site
     encode zstd gzip
 
+    handle /nafanya-zoom-control/logout {
+        rewrite * /nafanya-logout
+        reverse_proxy 127.0.0.1:8091
+    }
+
     handle /nafanya-zoom-control/* {
         reverse_proxy https://89.124.123.138 {
             header_up Host pochtinormalnye.ru
@@ -46,10 +51,12 @@ pochtinormalnye.ru {
         reverse_proxy 127.0.0.1:8091
     }
 
-    @cms path / /index.html /newcomers.html /newcomers/* /tradition.html /cms-navigation.json /sitemap.xml /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html
+    @cms path / /index.html /newcomers.html /newcomers/* /tradition.html /cms-navigation.json /sitemap.xml /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html /nafanya-login /nafanya-auth-check /nafanya-logout
     handle @cms {
         header Cache-Control "no-store"
-        reverse_proxy 127.0.0.1:8091
+        reverse_proxy 127.0.0.1:8091 {
+            header_up X-PN-Client-IP {http.request.remote.host}
+        }
     }
 
     handle {
@@ -67,6 +74,11 @@ site.194-60-132-53.nip.io {
     root * /srv/pochtinormalnye-site
     encode zstd gzip
 
+    handle /nafanya-zoom-control/logout {
+        rewrite * /nafanya-logout
+        reverse_proxy 127.0.0.1:8091
+    }
+
     handle /nafanya-zoom-control/* {
         reverse_proxy https://89.124.123.138 {
             header_up Host pochtinormalnye.ru
@@ -105,10 +117,12 @@ site.194-60-132-53.nip.io {
         reverse_proxy 127.0.0.1:8091
     }
 
-    @cms path / /index.html /newcomers.html /newcomers/* /tradition.html /cms-navigation.json /sitemap.xml /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html
+    @cms path / /index.html /newcomers.html /newcomers/* /tradition.html /cms-navigation.json /sitemap.xml /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html /nafanya-login /nafanya-auth-check /nafanya-logout
     handle @cms {
         header Cache-Control "no-store"
-        reverse_proxy 127.0.0.1:8091
+        reverse_proxy 127.0.0.1:8091 {
+            header_up X-PN-Client-IP {http.request.remote.host}
+        }
     }
 
     handle {

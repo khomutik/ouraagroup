@@ -6,6 +6,11 @@ pochtinormalnye.ru, www.pochtinormalnye.ru {
 	root * /home/masha/pochtinormalnye-site
 	encode zstd gzip
 
+	handle /nafanya-zoom-control/logout {
+		rewrite * /nafanya-logout
+		reverse_proxy 127.0.0.1:8091
+	}
+
 	handle_path /nafanya-zoom-control/vnc/* {
 		forward_auth 127.0.0.1:3098 {
 			uri /auth/check
@@ -42,10 +47,12 @@ pochtinormalnye.ru, www.pochtinormalnye.ru {
 		respond 404
 	}
 
-	@cms path / /index.html /newcomers.html /tradition.html /cms-navigation.json /sitemap.xml /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html
+	@cms path / /index.html /newcomers.html /tradition.html /cms-navigation.json /sitemap.xml /p/* /admin* /setup.php /public.php /announcements.html /schedule.html /library.html /speakers.html /service.html /archive.html /nafanya-login /nafanya-auth-check /nafanya-logout
 	handle @cms {
 		header Cache-Control "no-store"
-		reverse_proxy 127.0.0.1:8091
+		reverse_proxy 127.0.0.1:8091 {
+			header_up X-PN-Client-IP {http.request.remote.host}
+		}
 	}
 
 	handle {

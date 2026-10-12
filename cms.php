@@ -5,8 +5,8 @@ const CMS_ROOT = __DIR__;
 const CMS_DATA = CMS_ROOT . '/cms-data';
 const CMS_BACKUPS = CMS_ROOT . '/cms-backups';
 const CMS_UPLOADS = CMS_ROOT . '/uploads';
-const CMS_SECTIONS = ['announcements', 'schedule', 'library', 'speakers', 'services', 'newcomers', 'tradition', 'archive', 'pages', 'navigation', 'site_texts'];
-function cms_section_labels(): array { return ['announcements'=>'Объявления','schedule'=>'Расписание собраний','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','newcomers'=>'Новичкам','tradition'=>'7-я традиция','archive'=>'Архив решений','pages'=>'Главная и пользовательские страницы','navigation'=>'Кнопки и меню','site_texts'=>'Заголовки и подписи']; }
+const CMS_SECTIONS = ['announcements', 'schedule', 'library', 'speakers', 'services', 'newcomers', 'tradition', 'archive', 'scenarios', 'rs_audio', 'pages', 'navigation', 'site_texts'];
+function cms_section_labels(): array { return ['announcements'=>'Объявления','schedule'=>'Расписание собраний','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','newcomers'=>'Новичкам','tradition'=>'7-я традиция','archive'=>'Архив решений','scenarios'=>'Сценарии собраний','rs_audio'=>'Аудиозаписи РС','pages'=>'Главная и пользовательские страницы','navigation'=>'Кнопки и меню','site_texts'=>'Заголовки и подписи']; }
 
 function cms_config(): array {
     static $config = null;
@@ -92,6 +92,10 @@ function cms_speakers_newest_first(array $items): array {
         if ($date !== 0) return $date;
         return (int)($a['order'] ?? PHP_INT_MAX) <=> (int)($b['order'] ?? PHP_INT_MAX);
     });
+    return $items;
+}
+function cms_rs_audio_newest_first(array $items): array {
+    usort($items, static fn($a, $b): int => strcmp((string)($b['event_date'] ?? ''), (string)($a['event_date'] ?? '')));
     return $items;
 }
 function cms_safe_url($value, bool $empty = true): string {
@@ -304,6 +308,53 @@ function cms_actions_html(array $actions, string $class = 'page-actions', string
     return $html === '' ? '' : '<div class="' . h($class) . '">' . $html . '</div>';
 }
 
+function cms_schedule_scenario_button(array $action): array {
+    $url = cms_safe_url($action['url'] ?? '');
+    if ($url === '') return [];
+    $button = ['label'=>cms_text($action['label'] ?? '', 160) ?: 'Сценарий собрания', 'url'=>$url];
+    foreach ([
+        'type'=>['primary','soft','outline','tab','link'],
+        'color'=>['orange','blue','beige'],
+        'shape'=>['rounded','pill','square'],
+        'align'=>['left','center','right','full'],
+    ] as $key=>$allowed) {
+        $value = $action[$key] ?? '';
+        $button[$key] = is_string($value) && in_array($value, $allowed, true) ? $value : match ($key) {
+            'type'=>'primary', 'color'=>'orange', 'shape'=>'rounded', default=>'left'
+        };
+    }
+    return $button;
+}
+
+function cms_schedule_scenario_buttons(array $day): array {
+    $actions = is_array($day['scenario_buttons'] ?? null)
+        ? $day['scenario_buttons']
+        : (is_array($day['scenario_button'] ?? null) ? [$day['scenario_button']] : []);
+    $buttons = [];
+    foreach ($actions as $action) {
+        if (!is_array($action)) continue;
+        $button = cms_schedule_scenario_button($action);
+        if ($button) $buttons[] = $button;
+    }
+    return $buttons;
+}
+
+function cms_schedule_scenario_html(array $action): string {
+    return cms_schedule_scenarios_html([$action]);
+}
+
+function cms_schedule_scenarios_html(array $actions): string {
+    $html = '';
+    foreach ($actions as $action) {
+        if (!is_array($action)) continue;
+        $button = cms_schedule_scenario_button($action);
+        if (!$button) continue;
+        $class = cms_action_classes($button);
+        $html .= '<a class="' . h($class) . '" href="' . h($button['url']) . '" target="_blank" rel="noopener">' . cms_display_text($button['label']) . '</a>';
+    }
+    return $html === '' ? '' : '<div class="schedule-scenario">' . $html . '</div>';
+}
+
 function cms_newcomer_path(string $slug): string {
     return $slug === 'menu' ? '/newcomers.html' : ($slug === 'aa-test' ? '/p/test-na-alkogolizm' : '/newcomers/' . rawurlencode($slug) . '/');
 }
@@ -451,6 +502,7 @@ function cms_navigation_payload(array $content): array {
     }
     $items = [];
     foreach (($nav['items'] ?? []) as $item) {
+        if (($item['id'] ?? '') === 'nafanya-zoom-control' || parse_url((string)($item['url'] ?? ''), PHP_URL_PATH) === '/nafanya-zoom-control/app') continue;
         if (in_array((string)($item['title'] ?? ''), $hiddenTitles, true)) continue;
         $url = (string)($item['url'] ?? '');
         if (preg_match('~^/?newcomers\.html#([a-z0-9-]+)$~', $url, $match)) {
@@ -518,6 +570,17 @@ function cms_default_content(): array {
         ],
         'schedule' => ['time'=>'21:30 по Москве','zoom_url'=>'https://us06web.zoom.us/j/5487249245?pwd=UE3buqca6pTDt8kGPJDW9pRoaC7gkt.1','days'=>[
             ['day'=>'Понедельник','topic'=>'Чтение и обсуждение БК «Анонимные Алкоголики», дополнительные темы'],['day'=>'Вторник','topic'=>'Ёжик, Билл, шаг программы, игра «500 почти нормальных вопросов», дополнительные темы'],['day'=>'Четверг','topic'=>'Собрание для новичков: «Как воздержаться от первой рюмки?», дополнительные темы'],['day'=>'Пятница','topic'=>'Чтение и обсуждение книги «12 шагов и 12 традиций».<br>2-я и 4-я пятница месяца: большое спикерское собрание.'],['day'=>'Воскресенье','topic'=>'День свободных тем, игра «500 почти нормальных вопросов»']]],
+        'scenarios' => ['items'=>[
+            ['id'=>'big-book','label'=>'Сценарий (чтение книги)','url'=>'https://drive.google.com/file/d/1Go0cd0e6X17jfSdwXJguaPtlIR7Nxo2E/view?usp=drive_link','type'=>'primary','color'=>'orange','shape'=>'pill','align'=>'left'],
+            ['id'=>'regular','label'=>'Сценарий (обычное собрание)','url'=>'https://drive.google.com/file/d/1IwBLcqmUCfc1FhlhBbGdfL094I9ZDgx7/view?usp=drive_link','type'=>'primary','color'=>'orange','shape'=>'pill','align'=>'left'],
+            ['id'=>'newcomers','label'=>'Сценарий (для новичков)','url'=>'https://drive.google.com/file/d/1rxyXq_Ci60GxFrlEO00xFJ-DxTk2xI81/view?usp=drive_link','type'=>'primary','color'=>'orange','shape'=>'pill','align'=>'left'],
+            ['id'=>'speaker','label'=>'Сценарий (спикерская)','url'=>'https://drive.google.com/file/d/1TwNXAXbapoFEhJdg_03Z63lYIeE7f8t-/view?usp=drive_link','type'=>'primary','color'=>'orange','shape'=>'pill','align'=>'left'],
+            ['id'=>'free-topics','label'=>'Сценарий (свободные темы)','url'=>'https://drive.google.com/file/d/1jZCXdncdxrxObPZTA9BCm6zecDVelAaA/view?usp=drive_link','type'=>'primary','color'=>'orange','shape'=>'pill','align'=>'left'],
+        ]],
+        'admin_portal' => ['order'=>['services','scenarios','nafanya','edit_site','edit_admin','rs_audio'],'labels'=>[
+            'services'=>'График служений','scenarios'=>'Сценарии собраний','nafanya'=>'Нафаня в ZOOM',
+            'edit_site'=>'Редактировать сайт','edit_admin'=>'Редактировать админку','rs_audio'=>'Аудиозаписи РС',
+        ]],
         'library' => ['note'=>'<p>Купить печатную литературу АА на русском языке в России можно на <a href="https://aarussia.ru/litra#!/tab/744553584-1">официальном сайте АА России</a>. За помощью с покупкой литературы за рубежом можно обратиться к членам нашей группы.</p>','other_url'=>'https://drive.google.com/drive/folders/1vKX6abhQRFOKIhHaqXmYcUWgjVcCpmHu?usp=sharing','items'=>[
             ['id'=>'big-book','title'=>'Большая Книга «Анонимные Алкоголики»','description'=>'Большая книга с историями. В ней описан опыт первых членов Содружества и принципы, которые помогают алкоголикам оставаться трезвыми.','cover'=>'assets/book-big-book.webp','resource'=>'assets/big-book-with-stories.pdf'],['id'=>'12x12','title'=>'Двенадцать шагов и Двенадцать традиций','description'=>'Книга подробно раскрывает Двенадцать Шагов как путь личного выздоровления и Двенадцать Традиций как основу единства и работы групп АА.','cover'=>'assets/book-12x12.webp','resource'=>'assets/twelve-steps-twelve-traditions.pdf'],['id'=>'living-sober','title'=>'Жить трезвыми','description'=>'Практическая книга с методами сохранения трезвости, которые используют члены АА.','cover'=>'assets/book-living-sober.jpg','resource'=>'assets/living-sober.pdf'],['id'=>'44','title'=>'Брошюра «44 вопроса и ответа»','description'=>'Короткая брошюра с простыми ответами на частые вопросы об Анонимных Алкоголиках.','cover'=>'assets/brochure-44-questions.jpg','resource'=>'assets/forty-four-questions-answers.pdf'],['id'=>'sponsorship','title'=>'Брошюра «Вопросы и ответы о наставничестве»','description'=>'Краткое руководство о наставничестве в АА.','cover'=>'assets/brochure-sponsorship-qa.jpg','resource'=>'assets/sponsorship-questions-answers.pdf']]],
         'speakers' => ['drive_url'=>'https://drive.google.com/drive/folders/1x-bKBZzLpj1uTAnJpWqVFq3JBjXw-su-?usp=sharing','intro'=>'<h2>📌 Немного информации об анонимности и соблюдении Традиций на онлайн-собраниях группы АА «Почти нормальные»</h2><p>Друзья, хотим напомнить, что для нашей группы соблюдение Традиций АА и принципа анонимности является важной частью нашей общей групповой совести.</p><p>Включение камеры остаётся исключительно <strong>личным выбором</strong> каждого участника и не должно быть причиной давления или дискомфорта.</p>','privacy'=>'<h2>Важно об анонимности</h2><p>Просим уважать анонимность и личное пространство друг друга: не делать скриншоты, фотографии или записи участников и не распространять их без согласия. 🙏🏻</p><p><em>Во время спикерских выступлений мы не ведём видеозапись встреч.</em></p>','items'=>[],'materials'=>[['id'=>'mg18','title'=>'A.A. Guidelines - Internet (MG-18)','resource'=>'assets/MG-18_1025.pdf'],['id'=>'mg25','title'=>'Safety and A.A. Groups Online (MG-25)','resource'=>'assets/MG-25_Safety_and_AA_Groups_ONLINE.pdf'],['id'=>'p47','title'=>'Anonymity: Our Spiritual Foundation (P-47)','resource'=>'assets/P-47_Anonymity_Our_Spiritual_Foundation_ONLINE.pdf']]],
@@ -526,6 +589,7 @@ function cms_default_content(): array {
         'newcomers' => ['pages'=>cms_default_newcomers_pages()],
         'tradition' => ['report_url'=>'https://docs.google.com/spreadsheets/d/1uFKVQ6Orlz2GMTyIWsB4ux7eDRKejFTQ120p6JowZSE/edit?usp=sharing','lead'=>'<p>Пожертвования добровольны и не являются условием членства в нашей группе. Это не касается гостей нашей группы, не являющихся алкоголиками.</p>','thanks'=>'<p>Благодарим за участие и поддержку!</p>','treasurer'=>'Владимир Э.','payments'=>[['id'=>'sber','title'=>'СБП Сбер, Владимир Э.','value'=>'+7 981 188-15-62','url'=>'tel:+79811881562','comment'=>'В комментариях к переводу пишите, пожалуйста, «7 традиция».','icon'=>'С'],['id'=>'paypal','title'=>'PayPal (для переводов из ЕС, США и других стран)','value'=>'paypal.me/Vlad1954','url'=>'https://paypal.me/Vlad1954','comment'=>'','icon'=>'P']]],
         'archive' => ['drive_url'=>'https://docs.google.com/document/d/14c8l7aYBO2R3Gz-PgVV3y0CCMXS4gBflpFp4pQsn9v8/edit?usp=sharing','items'=>[]],
+        'rs_audio' => ['intro'=>'','items'=>[]],
         'pages' => ['home_intro'=>'<p><strong>Группа Анонимных Алкоголиков «Почти нормальные»</strong> - это место для алкоголиков, которым нужна трезвость, опыт других алкоголиков, живое общение, человеческое тепло и поддержка.</p><p>Группа создана для того, чтобы оставаться трезвыми самим и помогать другим алкоголикам обрести трезвость.</p><p>К нам можно прийти новичком, вернуться после срыва или перерыва, прийти с вопросами, сомнениями, тревогой, выключенным микрофоном и ощущением: «Я вообще не знаю, что делать». Всё нормально, мы сами начинали с этого.</p><p>Мы не делим людей на «настоящих» или «не настоящих» алкоголиков, у нас нет «правильно» или «не правильно» выздоравливающих. Не надо заранее знать Шаги, Традиции и быть святым. Не надо уметь красиво говорить и понимать всё с полуслова.</p><p class="intro__lines">Нормальным быть не обязательно.<br>Анонимность уважаем.<br>Атмосферу бережём.<br>Трезвость поддерживаем.</p><p class="intro__invite">Приходите к нам на собрания.<br>🫶 Места хватит всем 🫶</p>','custom'=>[]],
         'site_texts' => [],
         'page_actions' => [],
@@ -612,6 +676,161 @@ function cms_site_text(array $content, string $key): string {
     return is_string($value) && trim($value) !== '' ? $value : $default;
 }
 function cms_users(): array { return cms_read('users', []); }
+/** Stable, opaque keys keep usernames and client IPs out of the rate-limit file. */
+function cms_nafanya_login_bucket_keys(string $username, string $clientIp): array {
+    $config = cms_config();
+    $pepper = (string)($config['setup_token'] ?? '');
+    if ($pepper === '' || str_contains($pepper, 'PUT-A-LONG-RANDOM-SECRET-HERE')) $pepper = CMS_ROOT;
+    $username = cms_lower(cms_text($username, 80));
+    $ip = filter_var($clientIp, FILTER_VALIDATE_IP) ? $clientIp : 'unknown';
+    return [
+        'pair:' . hash_hmac('sha256', $username . "\0" . $ip, $pepper),
+        'ip:' . hash_hmac('sha256', $ip, $pepper),
+    ];
+}
+function cms_nafanya_login_client_ip(): string {
+    // Caddy overwrites this dedicated header at the public ingress; never trust arbitrary X-Forwarded-For values.
+    $candidate = (string)($_SERVER['HTTP_X_PN_CLIENT_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '');
+    return filter_var($candidate, FILTER_VALIDATE_IP) ? $candidate : 'unknown';
+}
+/** Pure transition, separated so the session-independent limit can be regression-tested. */
+function cms_nafanya_login_attempt_transition(array $records, array $keys, int $now, bool $consume): array {
+    $records = array_filter($records, static fn($row): bool => is_array($row) && (int)($row['last_at'] ?? 0) > $now - 600 && (int)($row['count'] ?? 0) > 0);
+    if (!$consume) {
+        foreach ($keys as $key=>$limit) if ((int)($records[$key]['count'] ?? 0) >= $limit) return [false, $records];
+        return [true, $records];
+    }
+    foreach ($keys as $key=>$limit) if ((int)($records[$key]['count'] ?? 0) >= $limit) return [false, $records];
+    foreach ($keys as $key=>$limit) $records[$key] = ['count'=>(int)($records[$key]['count'] ?? 0) + 1, 'last_at'=>$now];
+    if (count($records) > 4096) {
+        uasort($records, static fn($a, $b): int => (int)($b['last_at'] ?? 0) <=> (int)($a['last_at'] ?? 0));
+        $records = array_slice($records, 0, 4096, true);
+    }
+    return [true, $records];
+}
+function cms_nafanya_login_rate_limit(string $username, string $clientIp, bool $consume = false, ?int $now = null, ?string $dataDir = null): bool {
+    $now ??= time();
+    $dataDir ??= CMS_DATA;
+    if (!is_dir($dataDir) && !mkdir($dataDir, 0750, true) && !is_dir($dataDir)) throw new RuntimeException('Не удалось создать хранилище ограничений входа.');
+    $lock = @fopen($dataDir . '/nafanya-login-attempts.lock', 'c');
+    if ($lock === false || !flock($lock, LOCK_EX)) {
+        if (is_resource($lock)) fclose($lock);
+        throw new RuntimeException('Не удалось проверить ограничение попыток входа.');
+    }
+    try {
+        $path = $dataDir . '/nafanya-login-attempts.json';
+        $records = [];
+        if (is_file($path)) {
+            $raw = @file_get_contents($path);
+            $decoded = is_string($raw) ? json_decode($raw, true) : null;
+            if (!is_array($decoded)) throw new RuntimeException('Хранилище ограничений входа повреждено.');
+            $records = $decoded;
+        }
+        $keys = array_fill_keys(cms_nafanya_login_bucket_keys($username, $clientIp), 0);
+        $keys[array_key_first($keys)] = 5; // Five failures for this account from this address per ten minutes.
+        $keys[array_key_last($keys)] = 30; // Also limit broad guessing from one address.
+        [$allowed, $records] = cms_nafanya_login_attempt_transition($records, $keys, $now, $consume);
+        if ($consume || count($records) > 0) {
+            $temporary = $path . '.' . getmypid() . '.' . bin2hex(random_bytes(5)) . '.tmp';
+            $json = json_encode($records, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+            if (@file_put_contents($temporary, $json, LOCK_EX) === false) throw new RuntimeException('Не удалось сохранить ограничение попыток входа.');
+            @chmod($temporary, 0600);
+            if (!@rename($temporary, $path)) { @unlink($temporary); throw new RuntimeException('Не удалось сохранить ограничение попыток входа.'); }
+            @chmod($path, 0600);
+        }
+        return $allowed;
+    } finally {
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
+}
+function cms_nafanya_login_rate_limit_success(string $username, string $clientIp, ?string $dataDir = null): void {
+    $directory = $dataDir ?? CMS_DATA;
+    if (!is_dir($directory)) return;
+    $lock = @fopen($directory . '/nafanya-login-attempts.lock', 'c');
+    if ($lock === false || !flock($lock, LOCK_EX)) { if (is_resource($lock)) fclose($lock); throw new RuntimeException('Не удалось завершить проверку попыток входа.'); }
+    try {
+        $path = $directory . '/nafanya-login-attempts.json';
+        if (!is_file($path)) return;
+        $raw = @file_get_contents($path); $records = is_string($raw) ? json_decode($raw, true) : null;
+        if (!is_array($records)) throw new RuntimeException('Хранилище ограничений входа повреждено.');
+        $keys = cms_nafanya_login_bucket_keys($username, $clientIp);
+        unset($records[$keys[0]]);
+        if (isset($records[$keys[1]])) $records[$keys[1]]['count'] = max(0, (int)($records[$keys[1]]['count'] ?? 0) - 1);
+        if (isset($records[$keys[1]]) && $records[$keys[1]]['count'] === 0) unset($records[$keys[1]]);
+        $temporary = $path . '.' . getmypid() . '.' . bin2hex(random_bytes(5)) . '.tmp';
+        if (@file_put_contents($temporary, json_encode($records, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR), LOCK_EX) === false) throw new RuntimeException('Не удалось сохранить ограничение попыток входа.');
+        @chmod($temporary, 0600);
+        if (!@rename($temporary, $path)) { @unlink($temporary); throw new RuntimeException('Не удалось сохранить ограничение попыток входа.'); }
+        @chmod($path, 0600);
+    } finally { flock($lock, LOCK_UN); fclose($lock); }
+}
+function cms_nafanya_token_hash(string $token): string { return hash('sha256', $token); }
+function cms_nafanya_session_user_from(array $users, array $sessions, string $token): ?array {
+    if (!preg_match('/^[a-f0-9]{64}$/D', $token)) return null;
+    $session = $sessions[cms_nafanya_token_hash($token)] ?? null;
+    if (!is_array($session) || empty($session['user_id'])) return null;
+    foreach ($users as $user) {
+        if (($user['id'] ?? '') === $session['user_id'] && !empty($user['active']) && !empty($user['nafanya_access'])) return $user;
+    }
+    return null;
+}
+function cms_nafanya_session_user(?string $token = null): ?array {
+    $token ??= (string)($_COOKIE['pn_nafanya_staff'] ?? '');
+    return cms_nafanya_session_user_from(cms_users(), cms_read('nafanya_sessions', []), $token);
+}
+/** Serialize all session mutations so a concurrent login cannot restore a revoked token from an old snapshot. */
+function cms_nafanya_update_sessions(callable $update, ?string $dataDir = null) {
+    $directory = $dataDir ?? CMS_DATA;
+    if (!is_dir($directory) && !mkdir($directory, 0750, true) && !is_dir($directory)) throw new RuntimeException('Не удалось создать хранилище сессий пульта.');
+    $lock = @fopen($directory . '/nafanya-sessions.lock', 'c');
+    if ($lock === false || !flock($lock, LOCK_EX)) {
+        if (is_resource($lock)) fclose($lock);
+        throw new RuntimeException('Не удалось заблокировать хранилище сессий пульта.');
+    }
+    try {
+        $path = $directory . '/nafanya_sessions.json';
+        $sessions = [];
+        if (is_file($path)) {
+            $raw = @file_get_contents($path);
+            $decoded = is_string($raw) ? json_decode($raw, true) : null;
+            if (!is_array($decoded)) throw new RuntimeException('Хранилище сессий пульта повреждено.');
+            $sessions = $decoded;
+        }
+        $original = $sessions;
+        $result = $update($sessions);
+        if ($sessions !== $original) {
+            $temporary = $path . '.' . getmypid() . '.' . bin2hex(random_bytes(5)) . '.tmp';
+            $json = json_encode($sessions, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+            if (@file_put_contents($temporary, $json, LOCK_EX) === false) throw new RuntimeException('Не удалось сохранить сессии пульта.');
+            @chmod($temporary, 0600);
+            if (!@rename($temporary, $path)) { @unlink($temporary); throw new RuntimeException('Не удалось сохранить сессии пульта.'); }
+            @chmod($path, 0600);
+        }
+        return $result;
+    } finally {
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
+}
+function cms_nafanya_create_session(string $userId, ?string $dataDir = null): string {
+    $token = bin2hex(random_bytes(32));
+    cms_nafanya_update_sessions(static function (array &$sessions) use ($userId, $token): void {
+        $sessions[cms_nafanya_token_hash($token)] = ['user_id'=>$userId,'created_at'=>time()];
+    }, $dataDir);
+    return $token;
+}
+function cms_nafanya_revoke_session(string $token, ?string $dataDir = null): void {
+    if (!preg_match('/^[a-f0-9]{64}$/D', $token)) return;
+    cms_nafanya_update_sessions(static function (array &$sessions) use ($token): void {
+        unset($sessions[cms_nafanya_token_hash($token)]);
+    }, $dataDir);
+}
+function cms_nafanya_revoke_user_sessions(string $userId, ?string $dataDir = null): void {
+    cms_nafanya_update_sessions(static function (array &$sessions) use ($userId): void {
+        foreach ($sessions as $hash=>$session) if (($session['user_id'] ?? '') === $userId) unset($sessions[$hash]);
+    }, $dataDir);
+}
 function cms_audit(): array { return cms_read('audit', []); }
 function cms_log(string $action, string $details = ''): void {
     $audit = cms_audit();

@@ -82,14 +82,12 @@
     `;
   }).join("");
 
- const socialHtml = `<div class="site-nav-socials" aria-label="Соцсети и быстрые ссылки">${socialLinks.map((item) => `<a class="site-nav-socials__link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${item.icon ? `<img src="${escapeHtml(item.icon)}" alt="" />` : ''}<span>${escapeHtml(item.title)}</span></a>`).join('')}</div>`;
-  const adminLinkHtml = `<a class="site-nav__admin-link" href="/admin/" aria-label="Вход в админку">Вход в админку</a>`;
+ const socialHtml = `<div class="site-nav-socials" aria-label="Соцсети и быстрые ссылки">${socialLinks.map((item) => `<a class="site-nav-socials__link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${item.icon ? `<img src="${escapeHtml(item.icon)}" alt="" />` : ''}<span>${escapeHtml(item.title)}</span></a>`).join('')}<a class="site-nav-socials__link site-nav-socials__link--nafanya" href="/nafanya-login" aria-label="Вход в пульт Нафани"><img src="/assets/nafanya.png" alt=""><span>Нафаня</span></a></div>`;
 
   shell.insertAdjacentHTML("beforeend", `
     <aside class="site-side-nav" aria-label="Меню сайта">
      <p class="site-side-nav__title">Меню</p>
      <nav class="site-nav">${navHtml}</nav>
-      ${adminLinkHtml}
      ${socialHtml}
     </aside>
 
@@ -112,7 +110,6 @@
       <div class="mobile-menu-panel__sheet" role="dialog" aria-modal="true" aria-label="Меню сайта">
        <button class="mobile-menu-panel__close" type="button" data-site-menu-close>Закрыть</button>
        <nav class="site-nav">${navHtml}</nav>
-        ${adminLinkHtml}
        ${socialHtml}
       </div>
     </div>

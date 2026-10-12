@@ -57,10 +57,10 @@ function admin_page_links(array $content): void { ?>
     <div class="admin-page-links__grid">
       <?php foreach ([''=>'Главная страница','schedule'=>'Расписание','newcomers'=>'Новичкам','announcements'=>'Объявления','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','tradition'=>'7-я традиция','archive'=>'Архив'] as $key=>$label):
         if (!cms_can($key === '' ? 'pages' : $key)) continue; ?>
-        <a href="<?= $key === '' ? '/admin/' : '/admin/?section=' . rawurlencode($key) ?>"><?=h($label)?></a>
+        <a href="<?= $key === '' ? '/admin/?tab=home' : '/admin/?section=' . rawurlencode($key) ?>"><?=h($label)?></a>
       <?php endforeach; ?>
       <?php foreach (cms_can('pages') ? ($content['pages']['custom'] ?? []) : [] as $page): ?>
-        <a href="/admin/?edit=<?=rawurlencode((string)($page['id'] ?? ''))?>"><?=h((string)($page['title'] ?? 'Страница'))?></a>
+        <a href="/admin/?tab=home&amp;edit=<?=rawurlencode((string)($page['id'] ?? ''))?>"><?=h((string)($page['title'] ?? 'Страница'))?></a>
       <?php endforeach; ?>
     </div>
     <p>На странице редактора собраны её заголовки, тексты и кнопки. Каждая форма сохраняется отдельно.</p>
@@ -93,7 +93,7 @@ function admin_collect_actions(string $prefix): array {
     $result = []; foreach (($_POST[$prefix . '_label'] ?? []) as $i => $label) { $url = cms_safe_url($_POST[$prefix . '_url'][$i] ?? ''); if (cms_text($label,160) === '' || $url === '') continue; $result[] = ['label'=>cms_text($label,160),'url'=>$url,'type'=>cms_text($_POST[$prefix . '_type'][$i] ?? 'primary',20),'color'=>cms_text($_POST[$prefix . '_color'][$i] ?? 'orange',20),'shape'=>cms_text($_POST[$prefix . '_shape'][$i] ?? 'rounded',20),'placement'=>cms_text($_POST[$prefix . '_placement'][$i] ?? 'bottom',20),'align'=>cms_text($_POST[$prefix . '_align'][$i] ?? 'center',20)]; } return $result;
 }
 function admin_collect_navigation(): array {
-    $items=[]; foreach(($_POST['nav_title']??[]) as $i=>$title){$title=cms_text($title,120);$url=cms_safe_url($_POST['nav_url'][$i]??'');if($title===''||$url==='')continue;$items[]=['id'=>cms_text($_POST['nav_id'][$i]??'',40)?:cms_id(),'title'=>$title,'url'=>$url,'parent'=>cms_text($_POST['nav_parent'][$i]??'',80),'icon'=>admin_upload_value('nav_icon',$i,(string)($_POST['nav_icon_url'][$i]??''),'image'),'external'=>isset($_POST['nav_external'][$i])];}
+    $items=[]; foreach(($_POST['nav_title']??[]) as $i=>$title){$title=cms_text($title,120);$url=cms_safe_url($_POST['nav_url'][$i]??'');$path=parse_url($url,PHP_URL_PATH);if($title===''||$url===''||($path==='/nafanya-zoom-control/app'))continue;$items[]=['id'=>cms_text($_POST['nav_id'][$i]??'',40)?:cms_id(),'title'=>$title,'url'=>$url,'parent'=>cms_text($_POST['nav_parent'][$i]??'',80),'icon'=>admin_upload_value('nav_icon',$i,(string)($_POST['nav_icon_url'][$i]??''),'image'),'external'=>isset($_POST['nav_external'][$i])];}
     $socials=[]; foreach(($_POST['social_title']??[]) as $i=>$title){$title=cms_text($title,80);$url=cms_safe_url($_POST['social_url'][$i]??'');if($title===''||$url==='')continue;$socials[]=['title'=>$title,'url'=>$url,'icon'=>admin_upload_value('social_icon',$i,(string)($_POST['social_icon_url'][$i]??''),'image')];}
     return ['items'=>$items,'socials'=>$socials];
 }
@@ -280,9 +280,27 @@ function admin_action_destination(array $options, string $selected): void {
     ?>
 <label class="field"><span>Куда ведёт кнопка</span><select data-action-destination><option value="">Внешняя ссылка или адрес вручную</option><?php foreach ($options as $url=>$title): ?><option value="<?=h($url)?>" <?=$selected===$url?'selected':''?>><?=h($title)?></option><?php endforeach; ?></select></label>
 <?php }
-function admin_action_select(string $name, string $label, array $options, string $selected): void { $kind = substr($name, strrpos($name, '_') + 1); ?><fieldset class="button-option" data-button-kind="<?=h($kind)?>"><legend><?=h($label)?></legend><input type="hidden" name="<?=h($name)?>[]" value="<?=h($selected)?>" data-button-option="<?=h($kind)?>"><div class="button-option__choices"><?php foreach($options as $value=>$caption): ?><button type="button" class="button-choice button-choice--<?=h($kind)?>-<?=h($value)?> <?=$selected===$value?'is-selected':''?>" data-button-value="<?=h($value)?>" aria-pressed="<?=$selected===$value?'true':'false'?>"><span><?=h($caption)?></span></button><?php endforeach; ?></div></fieldset><?php }
-function admin_action_row(array $action, string $prefix, bool $showPlacement = true): void { $types=['primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст']; $colors=['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый']; $shapes=['rounded'=>'Скруглённая','pill'=>'Пилюля','square'=>'Прямоугольная']; $placements=['under-title'=>'Под заголовком','bottom'=>'Внизу страницы']; $aligns=['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину']; $url=$action['url']??''; ?>
-<article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($action['label']??'Новая кнопка')?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="<?=h($prefix)?>_label[]" value="<?=h($action['label']??'')?>" placeholder="Например: Открыть протокол"></label><?php admin_action_destination(admin_action_link_options(), $url); ?></div><label class="field button-editor__manual-url"><span>Внешняя ссылка или адрес вручную</span><input name="<?=h($prefix)?>_url[]" value="<?=h($url)?>" data-action-url placeholder="https://... (заполнять, только если страницы нет в списке)"></label><div class="button-editor__settings"><?php admin_action_select($prefix . '_type','Вид',$types,$action['type']??'primary'); admin_action_select($prefix . '_color','Цвет',$colors,$action['color']??'orange'); admin_action_select($prefix . '_shape','Форма',$shapes,$action['shape']??'rounded'); if ($showPlacement) admin_action_select($prefix . '_placement','Место',$placements,$action['placement']??'bottom'); admin_action_select($prefix . '_align','Выравнивание',$aligns,$action['align']??'left'); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div><span class="row-actions"><button type="button" class="move-row" data-move="up">↑ Выше</button><button type="button" class="move-row" data-move="down">↓ Ниже</button><button type="button" class="remove-row">Убрать</button></span></div></article>
+function admin_action_select(string $name, string $label, array $options, string $selected, ?string $optionKind = null): void { $kind = $optionKind ?? substr($name, strrpos($name, '_') + 1); ?><fieldset class="button-option" data-button-kind="<?=h($kind)?>"><legend><?=h($label)?></legend><input type="hidden" name="<?=h($name)?>[]" value="<?=h($selected)?>" data-button-option="<?=h($kind)?>"<?=str_starts_with($name, 'schedule_scenario_buttons[')?' data-scenario-field="'.h($kind).'"':''?>><div class="button-option__choices"><?php foreach($options as $value=>$caption): ?><button type="button" class="button-choice button-choice--<?=h($kind)?>-<?=h($value)?> <?=$selected===$value?'is-selected':''?>" data-button-value="<?=h($value)?>" aria-pressed="<?=$selected===$value?'true':'false'?>"><span><?=h($caption)?></span></button><?php endforeach; ?></div></fieldset><?php }
+function admin_action_row(array $action, string $prefix, bool $showPlacement = true, bool $showRowActions = true): void { $types=['primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст']; $colors=['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый']; $shapes=['rounded'=>'Скруглённая','pill'=>'Пилюля','square'=>'Прямоугольная']; $placements=['under-title'=>'Под заголовком','bottom'=>'Внизу страницы']; $aligns=['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину']; $url=$action['url']??''; ?>
+<article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($action['label']??'Новая кнопка')?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="<?=h($prefix)?>_label[]" value="<?=h($action['label']??'')?>" placeholder="Например: Сценарий собрания"></label><?php admin_action_destination(admin_action_link_options(), $url); ?></div><label class="field button-editor__manual-url"><span>Внешняя ссылка или адрес вручную</span><input name="<?=h($prefix)?>_url[]" value="<?=h($url)?>" data-action-url placeholder="https://... (заполнять, только если страницы нет в списке)"></label><div class="button-editor__settings"><?php admin_action_select($prefix . '_type','Вид',$types,$action['type']??'primary'); admin_action_select($prefix . '_color','Цвет',$colors,$action['color']??'orange'); admin_action_select($prefix . '_shape','Форма',$shapes,$action['shape']??'rounded'); if ($showPlacement) admin_action_select($prefix . '_placement','Место',$placements,$action['placement']??'bottom'); admin_action_select($prefix . '_align','Выравнивание',$aligns,$action['align']??'left'); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div><?php if ($showRowActions): ?><span class="row-actions"><button type="button" class="move-row" data-move="up">↑ Выше</button><button type="button" class="move-row" data-move="down">↓ Ниже</button><button type="button" class="remove-row">Убрать</button></span><?php endif; ?></div></article>
+<?php }
+function admin_schedule_scenario_button_editor(array $action, int $dayIndex): void {
+    $defaults = ['label'=>'Сценарий собрания','type'=>'outline','color'=>'orange','shape'=>'rounded','align'=>'left'];
+    $button = array_merge($defaults, cms_schedule_scenario_button($action));
+    $prefix = 'schedule_scenario_buttons[' . $dayIndex . ']';
+    $types=['primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст'];
+    $colors=['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый'];
+    $shapes=['rounded'=>'Скруглённая','pill'=>'Пилюля','square'=>'Прямоугольная'];
+    $aligns=['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину']; ?>
+<article class="button-editor schedule-scenario-button"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($button['label'])?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="<?=h($prefix)?>[label][]" value="<?=h($button['label'])?>" data-scenario-field="label" data-action-label placeholder="Сценарий собрания"></label><?php admin_action_destination(admin_action_link_options(), $button['url']??''); ?></div><label class="field button-editor__manual-url"><span>Ссылка на PDF или файл</span><input name="<?=h($prefix)?>[url][]" value="<?=h($button['url']??'')?>" data-action-url data-scenario-field="url" placeholder="Ссылка Google Диска"></label><div class="button-editor__settings"><?php admin_action_select($prefix . '[type]','Вид',$types,$button['type'],'type'); admin_action_select($prefix . '[color]','Цвет',$colors,$button['color'],'color'); admin_action_select($prefix . '[shape]','Форма',$shapes,$button['shape'],'shape'); admin_action_select($prefix . '[align]','Выравнивание',$aligns,$button['align'],'align'); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div><button type="button" class="remove-row schedule-scenario-remove">Убрать кнопку</button></div></article>
+<?php }
+function admin_schedule_scenario_editor(array $day, int $dayIndex): void {
+    // PDF scenarios are maintained once in the dedicated admin section, not per weekday.
+    return;
+    $buttons = cms_schedule_scenario_buttons($day);
+    while (count($buttons) < 2) $buttons[] = [];
+    ?>
+<fieldset class="repeatable schedule-scenario-editor" data-repeat="schedule-scenarios"><legend>Кнопки сценария (можно добавить ещё)</legend><p class="admin-tip">Ссылка на файл Google Диска и оформление настраиваются отдельно для каждой кнопки. Две пустые настройки уже готовы; добавленные кнопки появятся рядом на сайте.</p><div data-repeat-items><?php foreach ($buttons as $button): admin_schedule_scenario_button_editor($button, $dayIndex); endforeach; ?></div><button type="button" class="button button--quiet" data-add-row>Добавить кнопку</button><template><?php admin_schedule_scenario_button_editor([], $dayIndex); ?></template></fieldset>
 <?php }
 function admin_page_actions_fieldset(array $actions, string $prefix = 'page_action'): void { ?>
 <fieldset class="repeatable page-actions-editor" data-repeat="page-actions"><legend>Кнопки этой страницы</legend><p class="admin-tip">Добавьте название и ссылку кнопки, затем выберите её вид, цвет, форму и место на странице. Образец справа показывает результат до сохранения.</p><div data-repeat-items><?php foreach ($actions as $action) admin_action_row($action, $prefix); ?></div><button type="button" class="button button--quiet" data-add-row>Добавить кнопку</button><template><?php admin_action_row([], $prefix); ?></template></fieldset>
@@ -359,6 +377,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'logout') { cms_verify_csrf(); session_destroy(); admin_redirect('/admin/'); }
         cms_require_login(); cms_verify_csrf();
 
+        if ($action === 'save_admin_portal') {
+            if (!cms_is_admin()) throw new RuntimeException('Вы не являетесь администратором сайта, обратитесь к сисадмину.');
+            $content = cms_content();
+            $labels = $content['admin_portal']['labels'] ?? cms_default_content()['admin_portal']['labels'];
+            foreach (array_keys(cms_default_content()['admin_portal']['labels']) as $key) {
+                $labels[$key] = cms_text($_POST['portal_label'][$key] ?? $labels[$key], 80) ?: $labels[$key];
+            }
+            $validKeys = array_keys(cms_default_content()['admin_portal']['labels']);
+            $order = [];
+            foreach (($_POST['portal_order'] ?? []) as $key) if (in_array($key, $validKeys, true) && !in_array($key, $order, true)) $order[] = $key;
+            foreach ($validKeys as $key) if (!in_array($key, $order, true)) $order[] = $key;
+            $content['admin_portal'] = ['order'=>$order,'labels'=>$labels];
+            cms_write('content', $content);
+            admin_flash('Названия кнопок админки сохранены.');
+            admin_redirect('/admin/?tab=admin_settings');
+        }
+
         if ($action === 'save_user') {
             if (!cms_is_admin()) throw new RuntimeException('Только администратор может управлять пользователями.');
             $users = cms_users(); $id = cms_text($_POST['id'] ?? '', 40); $editing = null; $index = null;
@@ -370,9 +405,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$editing && cms_length($password) < 12) throw new RuntimeException('Для нового пользователя задайте пароль не короче 12 символов.');
             if ($password !== '' && cms_length($password) < 12) throw new RuntimeException('Новый пароль должен быть не короче 12 символов.');
             $permissions = array_values(array_intersect(CMS_SECTIONS, $_POST['permissions'] ?? []));
-            $record = ['id'=>$editing['id'] ?? cms_id(),'username'=>$username,'password_hash'=>$editing['password_hash'] ?? password_hash($password, PASSWORD_DEFAULT),'active'=>isset($_POST['active']),'admin'=>isset($_POST['admin']),'permissions'=>$permissions];
+            $record = ['id'=>$editing['id'] ?? cms_id(),'username'=>$username,'password_hash'=>$editing['password_hash'] ?? password_hash($password, PASSWORD_DEFAULT),'active'=>isset($_POST['active']),'admin'=>isset($_POST['admin']),'nafanya_access'=>isset($_POST['nafanya_access']),'permissions'=>$permissions];
             if ($password !== '') $record['password_hash'] = password_hash($password, PASSWORD_DEFAULT);
             if ($record['admin']) $record['permissions'] = CMS_SECTIONS;
+            if (!$record['active'] || !$record['nafanya_access']) cms_nafanya_revoke_user_sessions((string)$record['id']);
             if ($index === null) $users[] = $record; else $users[$index] = $record;
             if (!array_filter($users, static fn($u) => !empty($u['admin']) && !empty($u['active']))) throw new RuntimeException('Нужно оставить хотя бы одного активного администратора.');
             cms_write('users', $users); cms_log('Пользователь сохранён', $username); admin_flash('Пользователь сохранён.'); admin_redirect('/admin/?tab=users');
@@ -457,8 +493,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if($index===null)array_unshift($items,$record);else $items[$index]=$record; foreach($items as $i=>$item)$items[$i]['order']=$i;
                     $content['archive']=['drive_url'=>$driveUrl,'drive_position'=>$drivePosition,'items'=>$items]; $target='/admin/?section=archive';
                 }
+            } elseif ($section === 'scenarios') {
+                $defaults = cms_default_content()['scenarios']['items'];
+                $items = [];
+                for ($i = 0; $i < count($defaults); $i++) {
+                    $label = cms_text($_POST['scenario_action_label'][$i] ?? '', 160);
+                    $url = cms_safe_url($_POST['scenario_action_url'][$i] ?? '');
+                    $current = $defaults[$i];
+                    $items[] = [
+                        'id'=>$current['id'],
+                        'label'=>$label ?: $current['label'],
+                        'url'=>$url,
+                        'type'=>in_array($_POST['scenario_action_type'][$i] ?? '', ['primary','soft','outline','tab','link'], true) ? $_POST['scenario_action_type'][$i] : 'primary',
+                        'color'=>in_array($_POST['scenario_action_color'][$i] ?? '', ['orange','blue','beige'], true) ? $_POST['scenario_action_color'][$i] : 'orange',
+                        'shape'=>in_array($_POST['scenario_action_shape'][$i] ?? '', ['rounded','pill','square'], true) ? $_POST['scenario_action_shape'][$i] : 'pill',
+                        'align'=>in_array($_POST['scenario_action_align'][$i] ?? '', ['left','center','right','full'], true) ? $_POST['scenario_action_align'][$i] : 'left',
+                    ];
+                }
+                $content['scenarios'] = ['items'=>$items];
+                $target = '/admin/?section=scenarios';
+            } elseif ($section === 'rs_audio') {
+                $items = [];
+                foreach (($_POST['rs_audio_date'] ?? []) as $i => $dateRaw) {
+                    $date = cms_text($dateRaw, 10);
+                    $url = cms_safe_url($_POST['rs_audio_url'][$i] ?? '');
+                    if ($date === '' && $url === '') continue;
+                    if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $date, $dateParts) || !checkdate((int)$dateParts[2], (int)$dateParts[3], (int)$dateParts[1])) throw new RuntimeException('Укажите правильную дату аудиозаписи.');
+                    if ($url === '' || cms_drive_audio_preview_url($url) === '') throw new RuntimeException('Для каждой записи добавьте ссылку на MP3-файл Google Диска.');
+                    $items[] = ['id'=>cms_text($_POST['rs_audio_id'][$i] ?? '', 40) ?: cms_id(), 'event_date'=>$date, 'url'=>$url];
+                }
+                $content['rs_audio'] = ['intro'=>cms_sanitize_html($_POST['intro'] ?? ''), 'items'=>cms_rs_audio_newest_first($items)];
+                $target = '/admin/?section=rs_audio';
             } elseif ($section === 'schedule') {
-                $days=[]; foreach (($_POST['day'] ?? []) as $i=>$day) { if (cms_text($day,60)!=='') $days[]=['day'=>cms_text($day,60),'topic'=>cms_sanitize_html($_POST['topic'][$i] ?? '')]; }
+                $days=[]; foreach (($_POST['day'] ?? []) as $i=>$day) {
+                    if (cms_text($day,60)==='') continue;
+                    $days[]=['day'=>cms_text($day,60),'topic'=>cms_sanitize_html($_POST['topic'][$i] ?? '')];
+                }
                 $content['schedule']=['time'=>cms_text($_POST['time'] ?? '',80),'zoom_url'=>cms_safe_url($_POST['zoom_url'] ?? ''),'days'=>$days]; $target='/admin/?section=schedule';
             } elseif ($section === 'library') {
                 $items=[]; foreach (($_POST['lib_title'] ?? []) as $i=>$title) {
@@ -563,26 +633,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $users = cms_users(); $user = cms_current_user(); $flash = admin_take_flash();
 if (!$user): ?>
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=26"></head><body class="admin-login"><main class="login-card"><h1>Админка сайта</h1><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?><?php if (!$users): ?><p>Админка ещё не настроена. Администратор должен открыть <code>/setup.php</code> по инструкции.</p><?php else: ?><form method="post"><input type="hidden" name="action" value="login"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><?php admin_input('username','','text','Логин'); ?><label class="field"><span>Пароль</span><input type="password" name="password" autocomplete="current-password" required></label><button class="button" type="submit">Войти</button></form><?php endif; ?></main></body></html>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=29"></head><body class="admin-login"><main class="login-card"><h1>Админка сайта</h1><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?><?php if (!$users): ?><p>Админка ещё не настроена. Администратор должен открыть <code>/setup.php</code> по инструкции.</p><?php else: ?><form method="post"><input type="hidden" name="action" value="login"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><?php admin_input('username','','text','Логин'); ?><label class="field"><span>Пароль</span><input type="password" name="password" autocomplete="current-password" required></label><button class="button" type="submit">Войти</button></form><?php endif; ?></main></body></html>
 <?php exit; endif;
 
-$tab = (string)($_GET['tab'] ?? 'home'); $section = (string)($_GET['section'] ?? ''); $content = cms_content();
+$tab = (string)($_GET['tab'] ?? 'portal'); $section = (string)($_GET['section'] ?? ''); $content = cms_content();
+if (isset($content['navigation']['items'])) $content['navigation']['items'] = array_values(array_filter($content['navigation']['items'], static fn($item): bool => is_array($item) && ($item['id'] ?? '') !== 'nafanya-zoom-control' && parse_url((string)($item['url'] ?? ''), PHP_URL_PATH) !== '/nafanya-zoom-control/app'));
+if ($section === '' && isset($_GET['edit']) && !isset($_GET['tab'])) admin_redirect('/admin/?tab=home&edit=' . rawurlencode((string)$_GET['edit']));
 if ($section === 'pages') {
     $edit = (string)($_GET['edit'] ?? '');
-    admin_redirect('/admin/' . ($edit !== '' ? '?edit=' . rawurlencode($edit) : ''));
+    admin_redirect('/admin/?tab=home' . ($edit !== '' ? '&edit=' . rawurlencode($edit) : ''));
 }
 if ($section !== '' && !cms_can($section)) { http_response_code(403); exit('Нет доступа к этому разделу.'); }
-if ($section === '' && $tab === 'home' && !cms_can('pages')) {
-    foreach (CMS_SECTIONS as $allowedSection) {
-        if ($allowedSection !== 'pages' && cms_can($allowedSection)) {
-            admin_redirect('/admin/?section=' . rawurlencode($allowedSection));
-        }
-    }
-    http_response_code(403); exit('Нет доступа к редактору страниц.');
+if ($section === '' && $tab === 'home' && !cms_can('pages')) { http_response_code(403); exit('Нет доступа к редактору страниц.'); }
+if ($section === '' && $tab === 'portal' && !cms_is_admin() && empty($user['nafanya_access']) && !array_filter(CMS_SECTIONS, 'cms_can')) {
+    http_response_code(403); exit('Для кабинета не выдан доступ. Обратитесь к администратору.');
+}
+if ($section === '' && $tab === 'site' && !cms_is_admin() && !array_filter(CMS_SECTIONS, 'cms_can')) {
+    http_response_code(403); exit('Нет доступа к редактору сайта.');
 }
 if ($section === '' && $tab === 'structure' && !cms_can('pages')) {
     http_response_code(403); exit('Нет доступа к структуре страниц.');
 }
+$adminSettingsDenied = $section === '' && $tab === 'admin_settings' && !cms_is_admin();
+$portalDefaults = cms_default_content()['admin_portal'];
+$portalLabels = $content['admin_portal']['labels'] ?? $portalDefaults['labels'];
+$portalOrder = array_values(array_filter($content['admin_portal']['order'] ?? $portalDefaults['order'], static fn($key): bool => isset($portalLabels[$key])));
+foreach (array_keys($portalLabels) as $key) if (!in_array($key, $portalOrder, true)) $portalOrder[] = $key;
 $structureGraph = null; $structureGroups = []; $structureSelectedPage = '';
 if ($tab === 'structure' && !$section) {
     $structureGraph = admin_page_graph($content);
@@ -599,13 +675,57 @@ if ($tab === 'structure' && !$section) {
 }
 $structureMobileLanding = $structureGraph !== null && !isset($_GET['page']);
 ?>
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=25"></head><body class="<?=$structureMobileLanding?'admin-structure--landing':''?>"><header class="admin-header"><button type="button" class="admin-menu-toggle" data-admin-menu-toggle aria-controls="admin-nav" aria-expanded="false">☰ <span>Разделы</span></button><a href="/" class="admin-brand">Почти нормальные <small>админка</small></a><form method="post"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><button class="link-button">Выйти (<?=h($user['username'])?>)</button></form></header><div class="admin-layout"><aside id="admin-nav" class="admin-nav" aria-label="Разделы админки"><div class="admin-nav__mobile-heading"><strong>Разделы</strong><button type="button" class="admin-nav__close" data-admin-menu-close aria-label="Закрыть разделы">×</button></div><a href="/admin/" class="<?=(!$section && $tab==='home')?'is-active':''?>">Главная страница</a><a href="?tab=structure" class="<?=($tab==='structure')?'is-active':''?>">Структура сайта</a><?php if ($structureGraph): ?><section class="admin-nav__explorer" aria-label="Проводник реальных переходов"><p>Переходы страниц</p><?php foreach ($structureGroups as $group=>$keys): if (!$keys) continue; ?><section class="site-explorer__group"><h3><?=h($group)?></h3><ul class="site-explorer__list"><?php foreach ($keys as $key) admin_structure_tree_node($structureGraph, $key, $structureSelectedPage); ?></ul></section><?php endforeach; ?></section><?php endif; ?><?php foreach (cms_section_labels() as $key=>$label): if (cms_can($key) && !in_array($key, ['navigation','pages','site_texts'], true)): ?><a href="?section=<?=$key?>" class="<?=$section===$key?'is-active':''?>"><?=h($label)?></a><?php endif; endforeach; ?><?php if (cms_is_admin()): ?><a href="?tab=users" class="<?=($tab==='users')?'is-active':''?>">Пользователи</a><?php endif; ?></aside><main class="admin-main"><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=29"></head><body class="<?=$structureMobileLanding?'admin-structure--landing':''?>"><header class="admin-header"><button type="button" class="admin-menu-toggle" data-admin-menu-toggle aria-controls="admin-nav" aria-expanded="false">☰ <span>Разделы</span></button><a href="/" class="admin-brand">Почти нормальные <small>админка</small></a><form method="post"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><button class="link-button">Выйти (<?=h($user['username'])?>)</button></form></header><div class="admin-layout"><aside id="admin-nav" class="admin-nav" aria-label="Разделы админки"><div class="admin-nav__mobile-heading"><strong>Разделы</strong><button type="button" class="admin-nav__close" data-admin-menu-close aria-label="Закрыть разделы">×</button></div><a href="/admin/" class="<?=(!$section && $tab==='home')?'is-active':''?>">Главная страница</a><a href="?tab=structure" class="<?=($tab==='structure')?'is-active':''?>">Структура сайта</a><?php if ($structureGraph): ?><section class="admin-nav__explorer" aria-label="Проводник реальных переходов"><p>Переходы страниц</p><?php foreach ($structureGroups as $group=>$keys): if (!$keys) continue; ?><section class="site-explorer__group"><h3><?=h($group)?></h3><ul class="site-explorer__list"><?php foreach ($keys as $key) admin_structure_tree_node($structureGraph, $key, $structureSelectedPage); ?></ul></section><?php endforeach; ?></section><?php endif; ?><?php foreach (cms_section_labels() as $key=>$label): if (cms_can($key) && !in_array($key, ['navigation','pages','site_texts'], true)): ?><a href="?section=<?=$key?>" class="<?=$section===$key?'is-active':''?>"><?=h($label)?></a><?php endif; endforeach; ?><?php if (cms_is_admin()): ?><a href="?tab=users" class="<?=($tab==='users')?'is-active':''?>">Пользователи</a><?php endif; ?></aside><main class="admin-main"><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?>
 <?php
 $pageTextGroup = admin_site_text_group_for_section(
     (!$section && $tab === 'home' && empty($_GET['edit'])) ? 'home' : $section
 );
 if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $section ?: 'home');
 ?>
+<?php if (!$section && $tab === 'portal'): ?>
+  <section class="admin-portal" aria-labelledby="admin-portal-title">
+    <h1 id="admin-portal-title">Кабинет служащего</h1>
+    <p>Нужный раздел — одной кнопкой, без квеста по лабиринту админки.</p>
+    <nav class="admin-portal__grid" aria-label="Служебные разделы">
+      <?php foreach ($portalOrder as $portalKey): ?>
+        <?php if ($portalKey === 'services' && cms_can('services')): ?><a class="admin-portal__button" href="https://docs.google.com/spreadsheets/d/1VAWzdnevTgTmfyx83wfSig9BW6PfdKK1wZorpW0bIvU/edit?usp=sharing" target="_blank" rel="noopener"><strong><?=h($portalLabels['services'])?></strong></a>
+        <?php elseif ($portalKey === 'scenarios' && cms_can('scenarios')): ?><a class="admin-portal__button" href="?section=scenarios"><strong><?=h($portalLabels['scenarios'])?></strong></a>
+        <?php elseif ($portalKey === 'nafanya' && !empty($user['nafanya_access'])): ?><a class="admin-portal__button" href="/nafanya-zoom-control/app"><img src="/assets/nafanya.png" alt=""><strong><?=h($portalLabels['nafanya'])?></strong></a>
+        <?php elseif ($portalKey === 'edit_site' && (cms_is_admin() || array_filter(CMS_SECTIONS, 'cms_can'))): ?><a class="admin-portal__button" href="?tab=site"><strong><?=h($portalLabels['edit_site'])?></strong></a>
+        <?php elseif ($portalKey === 'edit_admin' && cms_is_admin()): ?><a class="admin-portal__button" href="?tab=admin_settings"><strong><?=h($portalLabels['edit_admin'])?></strong></a>
+        <?php elseif ($portalKey === 'rs_audio' && cms_can('rs_audio')): ?><a class="admin-portal__button" href="?section=rs_audio"><strong><?=h($portalLabels['rs_audio'])?></strong></a><?php endif; ?>
+      <?php endforeach; ?>
+    </nav>
+  </section>
+<?php endif; ?>
+<?php if (!$section && $tab === 'site'): ?>
+  <section class="admin-portal" aria-labelledby="admin-site-title">
+    <h1 id="admin-site-title">Редактировать сайт</h1>
+    <p>Показаны только разделы, которые доступны вашей учётной записи.</p>
+    <nav class="admin-portal__grid" aria-label="Разделы сайта">
+      <?php foreach (cms_section_labels() as $key=>$label): if (!cms_can($key)) continue; ?>
+        <a class="admin-portal__button" href="?section=<?=rawurlencode($key)?>"><strong><?=h($label)?></strong></a>
+      <?php endforeach; ?>
+    </nav>
+  </section>
+<?php endif; ?>
+<?php if (!$section && $tab === 'admin_settings' && !$adminSettingsDenied): ?>
+  <section class="admin-portal" aria-labelledby="admin-settings-title">
+    <h1 id="admin-settings-title">Редактировать админку</h1>
+    <p>Здесь отдельно от материалов сайта настраиваются кнопки кабинета и права служащих. Этот раздел доступен только администраторам сайта.</p>
+    <form method="post" class="admin-form">
+      <input type="hidden" name="action" value="save_admin_portal"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
+      <h2>Кнопки кабинета: названия и порядок</h2>
+      <fieldset class="admin-portal-order"><legend>Перетасуйте стрелками; названия можно изменить</legend>
+      <div><?php foreach ($portalOrder as $index=>$key): ?><div class="repeat-row"><input type="hidden" name="portal_order[]" value="<?=h($key)?>"><label class="field"><span><?=h(match($key){'services'=>'График служений','scenarios'=>'Сценарии собраний','nafanya'=>'Нафаня в ZOOM','edit_site'=>'Редактировать сайт','edit_admin'=>'Редактировать админку','rs_audio'=>'Аудиозаписи РС',default=>$key})?></span><input name="portal_label[<?=h($key)?>]" value="<?=h($portalLabels[$key])?>" maxlength="80"></label><button type="button" class="move-row" data-move="up" aria-label="Переместить выше">↑</button><button type="button" class="move-row" data-move="down" aria-label="Переместить ниже">↓</button></div><?php endforeach; ?></div>
+      </fieldset>
+      <button class="button">Сохранить названия</button>
+    </form>
+    <a class="admin-portal__button" href="?tab=users"><strong>Пользователи, роли и доступы</strong></a>
+  </section>
+<?php elseif (!$section && $tab === 'admin_settings' && $adminSettingsDenied): ?>
+  <section class="admin-portal"><h1>Редактировать админку</h1><p>Вы не являетесь администратором сайта, обратитесь к сисадмину.</p></section>
+<?php endif; ?>
 <?php if (!$section && $tab === 'home'): ?>
 <p class="admin-tip">Выберите страницу ниже. В её редакторе меняются заголовки, тексты и кнопки. Каждую форму нужно сохранить отдельно; затем проверьте результат на сайте.</p>
 <?php endif; ?>
@@ -619,8 +739,8 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
 <?php endif; ?>
 <?php if ($tab === 'users' && cms_is_admin()): $editId=(string)($_GET['edit']??''); $edit=[]; foreach ($users as $candidate) if (($candidate['id']??'')===$editId) $edit=$candidate; ?>
   <div class="section-heading"><h1>Пользователи</h1><a class="button button--quiet" href="?tab=users&edit=new">Добавить пользователя</a></div>
-  <?php if ($editId): ?><form method="post" class="admin-form"><input type="hidden" name="action" value="save_user"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($edit['id']??'')?>"><h2><?= $edit ? 'Редактирование: '.h($edit['username']) : 'Новый пользователь' ?></h2><div class="form-grid"><?php admin_input('username',$edit['username']??'','text','Логин'); ?><label class="field"><span><?= $edit?'Новый пароль (оставьте пустым, чтобы не менять)':'Пароль (минимум 12 символов)' ?></span><input type="password" name="password" autocomplete="new-password"></label></div><label class="check"><input type="checkbox" name="active" <?=(!$edit || !empty($edit['active']))?'checked':''?>> Аккаунт активен</label><label class="check"><input type="checkbox" name="admin" <?=!empty($edit['admin'])?'checked':''?>> Администратор: может управлять пользователями и всеми разделами</label><fieldset><legend>Разрешённые разделы</legend><?php foreach (cms_section_labels() as $key=>$label): ?><label class="check"><input type="checkbox" name="permissions[]" value="<?=$key?>" <?=in_array($key,$edit['permissions']??[],true)?'checked':''?>> <?=h($label)?></label><?php endforeach; ?></fieldset><div class="form-actions"><button class="button">Сохранить пользователя</button><a class="button button--quiet" href="?tab=users">Отмена</a></div></form><?php endif; ?>
-  <div class="table-wrap"><table><thead><tr><th>Логин</th><th>Доступ</th><th>Состояние</th><th></th></tr></thead><tbody><?php foreach ($users as $candidate): ?><tr><td><?=h($candidate['username'])?></td><td><?=!empty($candidate['admin'])?'Администратор':h(implode(', ',array_map(static fn($p)=>cms_section_labels()[$p]??$p,$candidate['permissions']??[])))?></td><td><?=!empty($candidate['active'])?'Активен':'Отключён'?></td><td><a href="?tab=users&edit=<?=h($candidate['id'])?>">Изменить</a></td></tr><?php endforeach; ?></tbody></table></div>
+  <?php if ($editId): ?><form method="post" class="admin-form"><input type="hidden" name="action" value="save_user"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($edit['id']??'')?>"><h2><?= $edit ? 'Редактирование: '.h($edit['username']) : 'Новый пользователь' ?></h2><div class="form-grid"><?php admin_input('username',$edit['username']??'','text','Логин'); ?><label class="field"><span><?= $edit?'Новый пароль (оставьте пустым, чтобы не менять)':'Пароль (минимум 12 символов)' ?></span><input type="password" name="password" autocomplete="new-password"></label></div><label class="check"><input type="checkbox" name="active" <?=(!$edit || !empty($edit['active']))?'checked':''?>> Аккаунт активен</label><label class="check"><input type="checkbox" name="admin" <?=!empty($edit['admin'])?'checked':''?>> Администратор: может управлять пользователями и всеми разделами</label><label class="check"><input type="checkbox" name="nafanya_access" <?=!empty($edit['nafanya_access'])?'checked':''?>> Доступ к пульту Нафани (только активным пользователям)</label><fieldset><legend>Разрешённые разделы</legend><?php foreach (cms_section_labels() as $key=>$label): ?><label class="check"><input type="checkbox" name="permissions[]" value="<?=$key?>" <?=in_array($key,$edit['permissions']??[],true)?'checked':''?>> <?=h($label)?></label><?php endforeach; ?></fieldset><div class="form-actions"><button class="button">Сохранить пользователя</button><a class="button button--quiet" href="?tab=users">Отмена</a></div></form><?php endif; ?>
+  <div class="table-wrap"><table><thead><tr><th>Логин</th><th>Доступ</th><th>Пульт Нафани</th><th>Состояние</th><th></th></tr></thead><tbody><?php foreach ($users as $candidate): ?><tr><td><?=h($candidate['username'])?></td><td><?=!empty($candidate['admin'])?'Администратор':h(implode(', ',array_map(static fn($p)=>cms_section_labels()[$p]??$p,$candidate['permissions']??[])))?></td><td><?=!empty($candidate['nafanya_access'])?'Разрешён':'Нет'?></td><td><?=!empty($candidate['active'])?'Активен':'Отключён'?></td><td><a href="?tab=users&edit=<?=h($candidate['id'])?>">Изменить</a></td></tr><?php endforeach; ?></tbody></table></div>
 <?php endif; ?>
 <?php if ($section === 'announcements'): $items=$content['announcements']??[]; $editId=(string)($_GET['edit']??''); $edit=[]; foreach($items as $item)if(($item['id']??'')===$editId)$edit=$item; ?>
   <div class="section-heading"><h1>Объявления</h1><a class="button button--quiet" href="?section=announcements&edit=new">Новое объявление</a></div>
@@ -666,9 +786,67 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
   <?php endif; ?>
   <div class="item-list"><?php foreach($items as $item): ?><article><strong><?=h($item['title']??'')?></strong><span><?=h($item['event_date']??'')?></span><div class="item-list__actions"><form method="post"><input type="hidden" name="action" value="reorder_archive_item"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($item['id']??'')?>"><input type="hidden" name="direction" value="up"><button class="move-row" title="Поднять выше" aria-label="Поднять решение выше">↑</button></form><form method="post"><input type="hidden" name="action" value="reorder_archive_item"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($item['id']??'')?>"><input type="hidden" name="direction" value="down"><button class="move-row" title="Опустить ниже" aria-label="Опустить решение ниже">↓</button></form><a href="?section=archive&edit=<?=h($item['id']??'')?>">Изменить</a><form method="post" onsubmit="return confirm('Удалить решение?')"><input type="hidden" name="action" value="delete_archive_item"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($item['id']??'')?>"><button class="link-danger">Удалить</button></form></div></article><?php endforeach; ?></div>
 <?php endif; ?>
+<?php if ($section === 'scenarios'):
+    $items = $content['scenarios']['items'] ?? cms_default_content()['scenarios']['items'];
+    $defaults = cms_default_content()['scenarios']['items'];
+    $items = array_values(array_slice(array_merge($items, array_slice($defaults, count($items))), 0, 5));
+?>
+  <h1>Сценарии собраний</h1>
+  <p class="admin-tip">Пять кнопок сценариев — отдельно от расписания по дням. Здесь настраиваются подписи, ссылки на PDF и оформление.</p>
+  <form method="post" class="admin-form">
+    <input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="scenarios"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
+    <?php foreach ($items as $index=>$item): ?>
+      <h2><?=h($defaults[$index]['label'])?></h2>
+      <?php admin_action_row($item, 'scenario_action', false, false); ?>
+    <?php endforeach; ?>
+    <button class="button">Сохранить сценарии</button>
+  </form>
+  <section class="content-card scenario-preview" aria-label="Предпросмотр пяти кнопок">
+    <h2>Предпросмотр кнопок</h2>
+    <?=cms_actions_html($items, 'scenario-links')?>
+  </section>
+<?php endif; ?>
+<?php if ($section === 'rs_audio'):
+    $items = cms_rs_audio_newest_first($content['rs_audio']['items'] ?? []);
+?>
+  <h1>Аудиозаписи РС</h1>
+  <p class="admin-tip">Эта страница оформлена как архив спикерских: одно пояснение над карточками и записи рабочих собраний от новых к старым.</p>
+  <form method="post" class="admin-form">
+    <input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="rs_audio"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
+    <?php admin_rich('intro',$content['rs_audio']['intro']??'','Пояснение над карточками',false,true); ?>
+    <p class="admin-tip">Для каждой записи укажите дату и общедоступную ссылку Google Диска на MP3-файл, не ссылку на папку.</p>
+    <fieldset class="repeatable" data-repeat="rs-audio">
+      <legend>Записи — новые сверху</legend>
+      <div data-repeat-items>
+        <?php foreach ($items as $item): ?>
+          <div class="card-editor rs-audio-edit-row">
+            <input type="hidden" name="rs_audio_id[]" value="<?=h($item['id'] ?? '')?>">
+            <label class="field"><span>Дата рабочего собрания</span><input type="date" name="rs_audio_date[]" value="<?=h($item['event_date'] ?? '')?>"></label>
+            <label class="field"><span>Ссылка на MP3-файл Google Диска</span><input type="url" name="rs_audio_url[]" value="<?=h($item['url'] ?? '')?>" placeholder="https://drive.google.com/file/d/…/view"></label>
+            <button type="button" class="remove-row">Убрать запись</button>
+          </div>
+        <?php endforeach; ?>
+      </div>
+      <button type="button" class="button button--quiet" data-add-row>Добавить аудиозапись</button>
+      <template><div class="card-editor rs-audio-edit-row"><input type="hidden" name="rs_audio_id[]"><label class="field"><span>Дата рабочего собрания</span><input type="date" name="rs_audio_date[]"></label><label class="field"><span>Ссылка на MP3-файл Google Диска</span><input type="url" name="rs_audio_url[]" placeholder="https://drive.google.com/file/d/…/view"></label><button type="button" class="remove-row">Убрать запись</button></div></template>
+    </fieldset>
+    <button class="button">Сохранить аудиозаписи</button>
+  </form>
+  <section class="speakers-intro rs-audio-intro" aria-label="Предпросмотр пояснения"><?=cms_rich((string)($content['rs_audio']['intro']??''))?></section>
+  <section class="rs-audio-list" aria-label="Предпросмотр списка аудиозаписей">
+    <?php foreach ($items as $item): $preview = cms_drive_audio_preview_url((string)($item['url'] ?? '')); if ($preview === '') continue; ?>
+      <article class="announcement-card speaker-card rs-audio-card">
+        <div class="announcement-copy"><h2 class="announcement-title"><time datetime="<?=h($item['event_date'] ?? '')?>"><?=h(cms_date_ru((string)($item['event_date'] ?? '')))?></time></h2>
+        <details><summary>Открыть плеер</summary><iframe loading="lazy" src="<?=h($preview)?>" title="Аудиозапись рабочего собрания от <?=h(cms_date_ru((string)($item['event_date'] ?? '')))?>" allow="autoplay" referrerpolicy="strict-origin-when-cross-origin"></iframe></details>
+        <a class="document-link" href="<?=h($item['url'] ?? '')?>" target="_blank" rel="noopener">Открыть аудиофайл на Google Диске</a></div>
+      </article>
+    <?php endforeach; ?>
+  </section>
+<?php endif; ?>
+
 <?php if ($section === 'schedule'): $data=$content['schedule']??[]; ?>
 <h1>Расписание</h1><form method="post" class="admin-form"><input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="schedule"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><div class="form-grid"><?php admin_input('time',$data['time']??'','text','Время собрания'); admin_input('zoom_url',$data['zoom_url']??'','url','Ссылка на Zoom'); ?></div>
-<fieldset class="repeatable" data-repeat="days"><legend>Дни и темы</legend><p class="admin-tip">Слева — день недели, справа — текст темы. В теме можно выбрать «Обычный текст» или заголовок через меню «Стиль текста».</p><div data-repeat-items><?php foreach(($data['days']??[]) as $day): ?><div class="schedule-row"><label class="field schedule-row__day"><span>День недели</span><input name="day[]" value="<?=h($day['day']??'')?>" placeholder="Например: Понедельник"></label><div class="field schedule-row__topic"><span>Тема собрания</span><textarea name="topic[]" class="js-rich" data-label="Тема собрания" rows="4"><?=h($day['topic']??'')?></textarea></div><button type="button" class="remove-row">Убрать</button></div><?php endforeach; ?></div><button type="button" class="button button--quiet" data-add-row>Добавить день</button><template><div class="schedule-row"><label class="field schedule-row__day"><span>День недели</span><input name="day[]" placeholder="Например: Понедельник"></label><div class="field schedule-row__topic"><span>Тема собрания</span><textarea name="topic[]" class="js-rich" data-label="Тема собрания" rows="4"></textarea></div><button type="button" class="remove-row">Убрать</button></div></template></fieldset><button class="button">Сохранить расписание</button></form><?php endif; ?>
+<fieldset class="repeatable" data-repeat="days"><legend>Дни и темы</legend><p class="admin-tip">Здесь настраиваются только день недели и тема. PDF-сценарии находятся в отдельном разделе «Сценарии собраний».</p><div data-repeat-items><?php foreach(($data['days']??[]) as $dayIndex=>$day): ?><div class="schedule-row"><label class="field schedule-row__day"><span>День недели</span><input name="day[]" value="<?=h($day['day']??'')?>" placeholder="Например: Понедельник"></label><div class="field schedule-row__topic"><span>Тема собрания</span><textarea name="topic[]" class="js-rich" data-label="Тема собрания" rows="4"><?=h($day['topic']??'')?></textarea></div><?php admin_schedule_scenario_editor($day,(int)$dayIndex); ?><button type="button" class="remove-row">Убрать день</button></div><?php endforeach; ?></div><button type="button" class="button button--quiet" data-add-row>Добавить день</button><template><div class="schedule-row"><label class="field schedule-row__day"><span>День недели</span><input name="day[]" placeholder="Например: Понедельник"></label><div class="field"><span>Тема собрания</span><textarea name="topic[]" class="js-rich" data-label="Тема собрания" rows="4"></textarea></div><?php admin_schedule_scenario_editor([],count($data['days']??[])); ?><button type="button" class="remove-row">Убрать день</button></div></template></fieldset><button class="button">Сохранить расписание</button></form><?php endif; ?>
 <?php if ($section === 'library'): $data=$content['library']??[]; ?>
 <h1>Библиотека</h1>
 <form method="post" enctype="multipart/form-data" class="admin-form">
@@ -804,4 +982,4 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
     <button class="button" type="submit">Сохранить заголовки и подписи</button>
   </form>
 <?php endif; ?>
-</main></div><script src="admin.js?v=25"></script></body></html>
+</main></div><script src="admin.js?v=28"></script></body></html>
