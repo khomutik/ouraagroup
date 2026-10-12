@@ -34,9 +34,7 @@ function site_newcomer_description(string $html, string $fallback): string {
 }
 
 function site_newcomer_body(string $html, array $publishedPages): string {
-    return preg_replace_callback('~href="(?:/?newcomers\.html#|#)([a-z0-9-]+)"~i', static function (array $match) use ($publishedPages): string {
-        return isset($publishedPages[$match[1]]) ? 'href="' . h(cms_newcomer_path($match[1])) . '"' : $match[0];
-    }, cms_rich($html)) ?? cms_rich($html);
+    return cms_newcomer_body($html, $publishedPages);
 }
 
 if ($kind === 'home') {

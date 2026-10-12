@@ -342,6 +342,20 @@ function cms_newcomer_seo_defaults(string $slug): array {
     };
 }
 
+function cms_newcomer_body(string $html, array $publishedPages): string {
+    return preg_replace_callback('~href="([^"]*)"~iu', static function (array $match) use ($publishedPages): string {
+        $url = html_entity_decode($match[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        if (preg_match('~^(?:/?newcomers\.html)?#([a-z0-9-]+)$~i', $url, $anchor) && isset($publishedPages[$anchor[1]])) {
+            return 'href="' . h(cms_newcomer_path($anchor[1])) . '"';
+        }
+        // These legacy links were authored on /newcomers.html, not below /newcomers/<slug>/.
+        if (preg_match('~^[a-z0-9][a-z0-9_-]*\.html(?:\#[a-z0-9-]+)?$~i', $url)) {
+            return 'href="' . h('/' . $url) . '"';
+        }
+        return $match[0];
+    }, cms_rich($html)) ?? cms_rich($html);
+}
+
 function cms_newcomer_actions(array $actions, array $publishedSlugs): array {
     foreach ($actions as &$action) {
         $url = (string)($action['url'] ?? '');

@@ -26,6 +26,16 @@ check(cms_newcomer_actions([['url'=>'#aa','label'=>'АА']], ['aa'=>true])[0]['u
 check(cms_newcomer_actions([['url'=>'newcomers.html#aa','label'=>'АА']], ['aa'=>true])[0]['url'] === '/newcomers/aa/', 'Старая кнопка с хешем должна вести на отдельную статью.');
 check(in_array('https://example.org/groups', array_column($items, 'url'), true), 'Кнопки страниц для новичков должны попадать в меню.');
 
+$newcomerBody = cms_newcomer_body('<p>Read <a href="library.html">Library</a> <a href="schedule.html#top">Schedule</a> <a href="#aa">AA</a> <a href="#local">Local</a> <a href="/archive.html">Archive</a> <a href="https://example.org/library.html">External</a> <a href="javascript:alert(1)">Unsafe</a></p>', ['aa'=>true]);
+check(str_contains($newcomerBody, 'href="/library.html"'), 'Legacy library links must resolve from the site root on nested newcomer pages.');
+check(str_contains($newcomerBody, 'href="/schedule.html#top"'), 'Root HTML links must preserve fragments.');
+check(str_contains($newcomerBody, 'href="/newcomers/aa/"'), 'Published newcomer sections must retain their canonical links.');
+check(str_contains($newcomerBody, 'href="#local"'), 'Unrelated same-page fragments must remain unchanged.');
+check(str_contains($newcomerBody, 'href="/archive.html"'), 'Already rooted paths must not gain a second slash.');
+check(str_contains($newcomerBody, 'href="https://example.org/library.html"'), 'External links must not be rewritten.');
+check(!str_contains($newcomerBody, 'javascript:'), 'Link normalization must retain HTML sanitization.');
+check(str_contains(cms_newcomer_body("<a href='newcomers.html#aa'>AA</a>", ['aa'=>true]), 'href="/newcomers/aa/"'), 'Single-quoted legacy links must be normalized after sanitization.');
+
 $preview = cms_drive_audio_preview_url('https://drive.google.com/file/d/ABC_123/view?resourcekey=0-KEY');
 check($preview === 'https://drive.google.com/file/d/ABC_123/preview?resourcekey=0-KEY', 'Ссылка на плеер Google Диска составлена неверно.');
 check(cms_drive_audio_preview_url('https://example.com/file/d/ABC_123/view') === '', 'Посторонний сайт не должен попадать в плеер.');
