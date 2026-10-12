@@ -6,7 +6,7 @@ const CMS_DATA = CMS_ROOT . '/cms-data';
 const CMS_BACKUPS = CMS_ROOT . '/cms-backups';
 const CMS_UPLOADS = CMS_ROOT . '/uploads';
 const CMS_SECTIONS = ['announcements', 'schedule', 'library', 'speakers', 'services', 'newcomers', 'tradition', 'archive', 'scenarios', 'pages', 'navigation', 'site_texts'];
-function cms_section_labels(): array { return ['announcements'=>'Объявления','schedule'=>'Расписание собраний','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','newcomers'=>'Новичкам','tradition'=>'7-я традиция','archive'=>'Архив решений','scenarios'=>'Сценарии собраний','rs_audio'=>'Аудиозаписи РС','pages'=>'Главная и пользовательские страницы','navigation'=>'Кнопки и меню','site_texts'=>'Заголовки и подписи']; }
+function cms_section_labels(): array { return ['announcements'=>'Объявления','schedule'=>'Расписание собраний','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','newcomers'=>'Новичкам','tradition'=>'7-я традиция','archive'=>'Архив решений','scenarios'=>'Сценарии собраний','pages'=>'Главная и пользовательские страницы','navigation'=>'Кнопки и меню','site_texts'=>'Заголовки и подписи']; }
 
 function cms_config(): array {
     static $config = null;
@@ -95,7 +95,10 @@ function cms_speakers_newest_first(array $items): array {
     return $items;
 }
 function cms_rs_audio_newest_first(array $items): array {
-    usort($items, static fn($a, $b): int => strcmp((string)($b['event_date'] ?? ''), (string)($a['event_date'] ?? '')));
+    $indexed = [];
+    foreach (array_values($items) as $index=>$item) $indexed[] = ['index'=>$index,'item'=>$item];
+    usort($indexed, static fn($a, $b): int => strcmp((string)($b['item']['event_date'] ?? ''), (string)($a['item']['event_date'] ?? '')) ?: ($a['index'] <=> $b['index']));
+    $items = array_column($indexed, 'item');
     return $items;
 }
 function cms_parse_service_schedule_csv(string $csv): array {
@@ -211,7 +214,7 @@ function cms_speaker_button(array $speaker, string $kind): array {
     return $defaults;
 }
 function cms_speaker_download_url(array $speaker): string {
-    $url = cms_safe_url($speaker['audio_url'] ?? '');
+    $url = cms_speaker_preview_url($speaker);
     if (cms_drive_audio_preview_url($url) === '') return '';
     $parts = parse_url($url);
     $path = (string)($parts['path'] ?? '');
@@ -326,7 +329,7 @@ function cms_sanitize_html($html): string {
         preg_match('/\bhref\s*=\s*(["\'])(.*?)\1/iu', $m[1], $href);
         $url = cms_safe_url(html_entity_decode($href[2] ?? '', ENT_QUOTES, 'UTF-8'));
         if ($url === '') return '<a>';
-        $allowed = ['content-button','content-button--primary','content-button--soft','content-button--outline','content-button--link','content-button--blue','content-button--beige','content-button--orange','content-button--pill','content-button--square','content-button--align-left','content-button--align-center','content-button--align-right','content-button--align-full'];
+        $allowed = ['content-button','content-button--primary','content-button--soft','content-button--outline','content-button--tab','content-button--link','content-button--blue','content-button--beige','content-button--orange','content-button--pill','content-button--square','content-button--align-left','content-button--align-center','content-button--align-right','content-button--align-full'];
         $classes = array_values(array_intersect(cms_html_classes($m[1]), $allowed));
         $class = $classes ? ' class="' . h(implode(' ', array_unique($classes))) . '"' : '';
         return '<a' . $class . ' href="' . h($url) . '" target="_blank" rel="noopener noreferrer">';
@@ -546,14 +549,14 @@ function cms_default_navigation(): array {
     return [
         'items'=>[
             ['id'=>'home','title'=>'Главная страница','url'=>'index.html','parent'=>'','icon'=>'','external'=>false],
-            ['id'=>'newcomers','title'=>'Новичкам','url'=>'newcomers.html','parent'=>'','icon'=>'assets/emoji/aa_heart_hands.png','external'=>false],
-            ['id'=>'schedule','title'=>'Расписание собраний','url'=>'schedule.html','parent'=>'','icon'=>'assets/emoji/aa_calendar.png','external'=>false],
-            ['id'=>'announcements','title'=>'Объявления','url'=>'announcements.html','parent'=>'','icon'=>'assets/emoji/aa_double_exclamation.png','external'=>false],
-            ['id'=>'library','title'=>'Библиотека','url'=>'library.html','parent'=>'','icon'=>'assets/emoji/aa_book_blue.png','external'=>false],
-            ['id'=>'speakers','title'=>'Спикерские','url'=>'speakers.html','parent'=>'','icon'=>'assets/emoji/aa_microphone.png','external'=>false],
-            ['id'=>'services','title'=>'Служения','url'=>'service.html','parent'=>'','icon'=>'assets/emoji/aa_people.png','external'=>false],
-            ['id'=>'tradition','title'=>'7-я традиция','url'=>'tradition.html','parent'=>'','icon'=>'assets/emoji/aa_check.png','external'=>false],
-            ['id'=>'archive','title'=>'Архив решений','url'=>'archive.html','parent'=>'','icon'=>'assets/emoji/aa_book_blue.png','external'=>false],
+            ['id'=>'newcomers','title'=>'Новичкам','url'=>'newcomers.html','parent'=>'','icon'=>'assets/menu-newcomers.png','external'=>false],
+            ['id'=>'schedule','title'=>'Расписание собраний','url'=>'schedule.html','parent'=>'','icon'=>'assets/menu-schedule.png','external'=>false],
+            ['id'=>'announcements','title'=>'Объявления','url'=>'announcements.html','parent'=>'','icon'=>'assets/menu-announcements.png','external'=>false],
+            ['id'=>'library','title'=>'Библиотека','url'=>'library.html','parent'=>'','icon'=>'assets/menu-library.png','external'=>false],
+            ['id'=>'speakers','title'=>'Спикерские','url'=>'speakers.html','parent'=>'','icon'=>'assets/menu-speakers.png','external'=>false],
+            ['id'=>'services','title'=>'Служения','url'=>'service.html','parent'=>'','icon'=>'assets/menu-services.png','external'=>false],
+            ['id'=>'tradition','title'=>'7-я традиция','url'=>'tradition.html','parent'=>'','icon'=>'assets/menu-tradition.png','external'=>false],
+            ['id'=>'archive','title'=>'Архив решений','url'=>'archive.html','parent'=>'','icon'=>'assets/menu-archive.png','external'=>false],
         ],
         'socials'=>[
             ['title'=>'Zoom','url'=>'https://us06web.zoom.us/j/5487249245?pwd=UE3buqca6pTDt8kGPJDW9pRoaC7gkt.1','icon'=>'assets/social-zoom-v2.png'],
@@ -565,6 +568,7 @@ function cms_default_navigation(): array {
 
 function cms_navigation_payload(array $content): array {
     $nav = $content['navigation'] ?? cms_default_navigation();
+    $illustratedIcons = ['newcomers'=>'assets/menu-newcomers.png','schedule'=>'assets/menu-schedule.png','announcements'=>'assets/menu-announcements.png','library'=>'assets/menu-library.png','speakers'=>'assets/menu-speakers.png','services'=>'assets/menu-services.png','tradition'=>'assets/menu-tradition.png','archive'=>'assets/menu-archive.png'];
     $hiddenTitles = ['Другая литература', 'График служений', 'Отчет казначея', 'Отчёт казначея'];
     $pages = [];
     foreach (($content['newcomers']['pages'] ?? []) as $page) {
@@ -574,6 +578,7 @@ function cms_navigation_payload(array $content): array {
     foreach (($nav['items'] ?? []) as $item) {
         if (($item['id'] ?? '') === 'nafanya-zoom-control' || parse_url((string)($item['url'] ?? ''), PHP_URL_PATH) === '/nafanya-zoom-control/app') continue;
         if (in_array((string)($item['title'] ?? ''), $hiddenTitles, true)) continue;
+        if (isset($illustratedIcons[(string)($item['id'] ?? '')])) $item['icon'] = $illustratedIcons[(string)$item['id']];
         $url = (string)($item['url'] ?? '');
         if (preg_match('~^/?newcomers\.html#([a-z0-9-]+)$~', $url, $match)) {
             if (!isset($pages[$match[1]])) continue;
@@ -647,13 +652,13 @@ function cms_default_content(): array {
             ['id'=>'speaker','label'=>'Сценарий (спикерская)','url'=>'https://drive.google.com/file/d/1TwNXAXbapoFEhJdg_03Z63lYIeE7f8t-/view?usp=drive_link','type'=>'primary','color'=>'orange','shape'=>'pill','align'=>'left'],
             ['id'=>'free-topics','label'=>'Сценарий (свободные темы)','url'=>'https://drive.google.com/file/d/1jZCXdncdxrxObPZTA9BCm6zecDVelAaA/view?usp=drive_link','type'=>'primary','color'=>'orange','shape'=>'pill','align'=>'left'],
         ]],
-        'admin_portal' => ['order'=>['services','scenarios','nafanya','edit_site','edit_admin'],'labels'=>[
+        'admin_portal' => ['order'=>['services','scenarios','nafanya','edit_site','edit_admin','rs_audio'],'labels'=>[
             'services'=>'График служений','scenarios'=>'Сценарии собраний','nafanya'=>'Нафаня в ZOOM',
-            'edit_site'=>'Редактировать сайт','edit_admin'=>'Редактировать админку',
+            'edit_site'=>'Редактировать сайт','edit_admin'=>'Редактировать админку','rs_audio'=>'Аудиозаписи РС',
         ],'links'=>[
             'services'=>'/admin/?tab=service_schedule',
             'scenarios'=>'/admin/?tab=scenarios','nafanya'=>'/nafanya-zoom-control/app',
-            'edit_site'=>'/admin/?tab=site','edit_admin'=>'/admin/?tab=admin_settings',
+            'edit_site'=>'/admin/?tab=site','edit_admin'=>'/admin/?tab=admin_settings','rs_audio'=>'/admin/?tab=rs_audio',
         ]],
         'library' => ['note'=>'<p>Купить печатную литературу АА на русском языке в России можно на <a href="https://aarussia.ru/litra#!/tab/744553584-1">официальном сайте АА России</a>. За помощью с покупкой литературы за рубежом можно обратиться к членам нашей группы.</p>','other_url'=>'https://drive.google.com/drive/folders/1vKX6abhQRFOKIhHaqXmYcUWgjVcCpmHu?usp=sharing','items'=>[
             ['id'=>'big-book','title'=>'Большая Книга «Анонимные Алкоголики»','description'=>'Большая книга с историями. В ней описан опыт первых членов Содружества и принципы, которые помогают алкоголикам оставаться трезвыми.','cover'=>'assets/book-big-book.webp','resource'=>'assets/big-book-with-stories.pdf'],['id'=>'12x12','title'=>'Двенадцать шагов и Двенадцать традиций','description'=>'Книга подробно раскрывает Двенадцать Шагов как путь личного выздоровления и Двенадцать Традиций как основу единства и работы групп АА.','cover'=>'assets/book-12x12.webp','resource'=>'assets/twelve-steps-twelve-traditions.pdf'],['id'=>'living-sober','title'=>'Жить трезвыми','description'=>'Практическая книга с методами сохранения трезвости, которые используют члены АА.','cover'=>'assets/book-living-sober.jpg','resource'=>'assets/living-sober.pdf'],['id'=>'44','title'=>'Брошюра «44 вопроса и ответа»','description'=>'Короткая брошюра с простыми ответами на частые вопросы об Анонимных Алкоголиках.','cover'=>'assets/brochure-44-questions.jpg','resource'=>'assets/forty-four-questions-answers.pdf'],['id'=>'sponsorship','title'=>'Брошюра «Вопросы и ответы о наставничестве»','description'=>'Краткое руководство о наставничестве в АА.','cover'=>'assets/brochure-sponsorship-qa.jpg','resource'=>'assets/sponsorship-questions-answers.pdf']]],
@@ -663,7 +668,20 @@ function cms_default_content(): array {
         'newcomers' => ['pages'=>cms_default_newcomers_pages()],
         'tradition' => ['report_url'=>'https://docs.google.com/spreadsheets/d/1uFKVQ6Orlz2GMTyIWsB4ux7eDRKejFTQ120p6JowZSE/edit?usp=sharing','lead'=>'<p>Пожертвования добровольны и не являются условием членства в нашей группе. Это не касается гостей нашей группы, не являющихся алкоголиками.</p>','thanks'=>'<p>Благодарим за участие и поддержку!</p>','treasurer'=>'Владимир Э.','payments'=>[['id'=>'sber','title'=>'СБП Сбер, Владимир Э.','value'=>'+7 981 188-15-62','url'=>'tel:+79811881562','comment'=>'В комментариях к переводу пишите, пожалуйста, «7 традиция».','icon'=>'С'],['id'=>'paypal','title'=>'PayPal (для переводов из ЕС, США и других стран)','value'=>'paypal.me/Vlad1954','url'=>'https://paypal.me/Vlad1954','comment'=>'','icon'=>'P']]],
         'archive' => ['drive_url'=>'https://docs.google.com/document/d/14c8l7aYBO2R3Gz-PgVV3y0CCMXS4gBflpFp4pQsn9v8/edit?usp=sharing','items'=>[]],
-        'rs_audio' => ['intro'=>'','items'=>[]],
+        'rs_audio' => ['intro'=>'','items'=>[
+            ['id'=>'17oVbCFVYwyndZhu0a4kPAwoRfr9pKIGX','event_date'=>'2026-10-03','title'=>'РС 03.10.2026','url'=>'https://drive.google.com/file/d/17oVbCFVYwyndZhu0a4kPAwoRfr9pKIGX/view?usp=drivesdk'],
+            ['id'=>'10xUbwjKtA4_rCiTL-Rv5A3GuL9vsGsO2','event_date'=>'2026-08-29','title'=>'РС 29.08.2026','url'=>'https://drive.google.com/file/d/10xUbwjKtA4_rCiTL-Rv5A3GuL9vsGsO2/view?usp=drivesdk'],
+            ['id'=>'1uJHka_QmamKx6R89bzv36zBvC7tZ7Cu3','event_date'=>'2026-07-25','title'=>'РС 25.07.2026','url'=>'https://drive.google.com/file/d/1uJHka_QmamKx6R89bzv36zBvC7tZ7Cu3/view?usp=drivesdk'],
+            ['id'=>'16UkK2SpsjO919tHJxV5itT2Eck5Of7yn','event_date'=>'2026-06-27','title'=>'РС 27.06.2026','url'=>'https://drive.google.com/file/d/16UkK2SpsjO919tHJxV5itT2Eck5Of7yn/view?usp=drivesdk'],
+            ['id'=>'1rprhqwiEwTtXdFX6E6lA8uXoWcoD5GzH','event_date'=>'2026-05-31','title'=>'РС 31.05.2026','url'=>'https://drive.google.com/file/d/1rprhqwiEwTtXdFX6E6lA8uXoWcoD5GzH/view?usp=drivesdk'],
+            ['id'=>'1EFtJB2e1PtECbLa0S3EI44g_-zP6xDfN','event_date'=>'2026-05-24','title'=>'РС 24.05.2026','url'=>'https://drive.google.com/file/d/1EFtJB2e1PtECbLa0S3EI44g_-zP6xDfN/view?usp=drivesdk'],
+            ['id'=>'1LCuMdWyFuIVJxu5UPQvXmna5c8FOvtAL','event_date'=>'2026-05-03','title'=>'РС 03.05.2026','url'=>'https://drive.google.com/file/d/1LCuMdWyFuIVJxu5UPQvXmna5c8FOvtAL/view?usp=drivesdk'],
+            ['id'=>'18CAn7Qzxer6iY9dQX9aYLb9Bcp_AwY8y','event_date'=>'2026-04-26','title'=>'РС 26.04.2026, часть 1','url'=>'https://drive.google.com/file/d/18CAn7Qzxer6iY9dQX9aYLb9Bcp_AwY8y/view?usp=drivesdk'],
+            ['id'=>'1lDmFlmPoDMduy3cd71VJ8PxnsNV8sAqy','event_date'=>'2026-04-26','title'=>'РС 26.04.2026, часть 2','url'=>'https://drive.google.com/file/d/1lDmFlmPoDMduy3cd71VJ8PxnsNV8sAqy/view?usp=drivesdk'],
+            ['id'=>'19Zgq-TUyu4stgdQ-MhmDxlgf9ihZRMR8','event_date'=>'2026-04-10','title'=>'РС 10.04.2026, часть 1','url'=>'https://drive.google.com/file/d/19Zgq-TUyu4stgdQ-MhmDxlgf9ihZRMR8/view?usp=drivesdk'],
+            ['id'=>'13Mpm3ccybjtZ52Cs4XIK4qLXVBeUtOK4','event_date'=>'2026-04-10','title'=>'РС 10.04.2026, часть 2','url'=>'https://drive.google.com/file/d/13Mpm3ccybjtZ52Cs4XIK4qLXVBeUtOK4/view?usp=drivesdk'],
+            ['id'=>'1si64_SniOhp0XchrLAvB16tT3gf3WytE','event_date'=>'2026-03-28','title'=>'РС 28.03.2026','url'=>'https://drive.google.com/file/d/1si64_SniOhp0XchrLAvB16tT3gf3WytE/view?usp=drivesdk'],
+        ]],
         'pages' => ['home_intro'=>'<p><strong>Группа Анонимных Алкоголиков «Почти нормальные»</strong> - это место для алкоголиков, которым нужна трезвость, опыт других алкоголиков, живое общение, человеческое тепло и поддержка.</p><p>Группа создана для того, чтобы оставаться трезвыми самим и помогать другим алкоголикам обрести трезвость.</p><p>К нам можно прийти новичком, вернуться после срыва или перерыва, прийти с вопросами, сомнениями, тревогой, выключенным микрофоном и ощущением: «Я вообще не знаю, что делать». Всё нормально, мы сами начинали с этого.</p><p>Мы не делим людей на «настоящих» или «не настоящих» алкоголиков, у нас нет «правильно» или «не правильно» выздоравливающих. Не надо заранее знать Шаги, Традиции и быть святым. Не надо уметь красиво говорить и понимать всё с полуслова.</p><p class="intro__lines">Нормальным быть не обязательно.<br>Анонимность уважаем.<br>Атмосферу бережём.<br>Трезвость поддерживаем.</p><p class="intro__invite">Приходите к нам на собрания.<br>🫶 Места хватит всем 🫶</p>','custom'=>[]],
         'site_texts' => [],
         'page_actions' => [],
@@ -706,7 +724,6 @@ function cms_site_text_fields(): array {
         'zoom_subtitle'=>['Главная','Подпись кнопки Zoom','Собрание группы'],
         'schedule_button_title'=>['Главная','Название кнопки расписания','Расписание собраний'],
         'schedule_button_subtitle'=>['Главная','Подпись кнопки расписания','Дни и время'],
-        'admin_link'=>['Главная','Ссылка на админку','↗ Вход в админку'],
         'newcomers_heading'=>['Новичкам','Заголовок страницы','Новичкам'],
         'newcomers_seo_title'=>['Новичкам','Заголовок для поиска (не на странице)','Новичкам: как попасть на онлайн-собрание АА | Почти нормальные'],
         'newcomers_description'=>['Новичкам','Описание для поисковиков','Если хочешь бросить пить или сомневаешься, есть ли проблема с алкоголем, узнай, как попасть на онлайн-собрание АА «Почти нормальные». Можно сначала просто послушать.'],

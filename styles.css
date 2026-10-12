@@ -2153,9 +2153,13 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 .content-button--soft { color: var(--blue) !important; background: var(--cream-2); border-color: var(--line); }
 .content-button--outline { color: var(--blue) !important; background: transparent; border-color: var(--blue); }
 .content-button--link { min-height: 0; padding: 4px 0; color: var(--orange-dark) !important; border-color: transparent; background: transparent; text-decoration: underline; text-underline-offset: 3px; }
+.content-button--tab { color: var(--blue) !important; background: #f3f6ff; border-color: #9cafdf; box-shadow: none; }
 .content-button--blue { color: #fff !important; background: var(--blue); border-color: var(--blue); }
 .content-button--beige { color: var(--blue) !important; background: var(--cream-3); border-color: #c9ad84; }
 .content-button--orange { color: #fff !important; background: var(--orange); border-color: var(--orange); }
+.content-button--tab.content-button--orange { color: var(--blue) !important; background: #fff8f0; border-color: #dfa36f; }
+.content-button--tab.content-button--blue { color: var(--blue) !important; background: #f3f6ff; border-color: #9cafdf; }
+.content-button--tab.content-button--beige { color: var(--blue) !important; background: #fffdf8; border-color: #d8c8aa; }
 .content-button--pill,.content-button--square { border-radius: 12px !important; }
 .content-button--align-center { display: flex; width: fit-content; margin-inline: auto; }
 .content-button--align-right { display: flex; width: fit-content; margin-left: auto; }
@@ -2964,3 +2968,9 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 .schedule-scenario{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
 .schedule-scenario .flow-button{width:100%;min-width:0;min-height:36px;padding:6px 10px;border-radius:10px;font-size:15px;font-weight:700;line-height:1.2;box-shadow:none;overflow-wrap:anywhere}
 @media(max-width:520px){.schedule-scenario{gap:6px}.schedule-scenario .flow-button{min-height:34px;padding:5px 7px;font-size:13px}}
+
+/* Homepage masthead: use the group's real brush-stroke logo as one composition. */
+.hero{grid-template-columns:minmax(0,1fr);justify-items:center;min-height:0;padding:4px 12px;border-radius:20px;background:linear-gradient(180deg,rgba(255,248,234,.99),rgba(247,239,223,.97));}
+.hero__logo{width:min(100%,620px);}
+.hero__mark{width:100%;height:auto;max-height:none;}
+@media(max-width:560px){.hero{display:flex;min-height:0;padding:6px 10px}.hero__logo{width:100%}.hero__mark{width:min(100%,440px);max-height:none}}

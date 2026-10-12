@@ -13,4 +13,9 @@ assert.match(source, /\$section === '' && \$tab === 'service_schedule' && !cms_c
 assert.match(source, /\$section === '' && \$tab === 'scenarios' && !cms_can\('scenarios'\)/);
 assert.match(home, /class="social-link social-link--nafanya" href="\/admin\/" aria-label="Вход в админку"/);
 assert.doesNotMatch(home, /class="social-link social-link--nafanya" href="\/nafanya-login"/);
+assert.match(source, /\$section === '' && \$tab === 'rs_audio' && !cms_is_admin\(\) && !array_filter\(CMS_SECTIONS, 'cms_can'\)/);
+assert.doesNotMatch(source, /admin_home_navigation_fields\s*\(/, 'Главная больше не вызывает удалённую функцию.');
+assert.doesNotMatch(source, /Ссылка на MP3-файл в Google Диске \(необязательно\)/);
+assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '..', 'cms.php'), 'utf8'), /'admin_link'=>\['Главная','Ссылка на админку'/);
+assert.match(source, /'rs_audio' => cms_is_admin\(\) \|\| \(bool\)array_filter\(CMS_SECTIONS, 'cms_can'\)/);
 console.log('Admin page-read permission guards present.');

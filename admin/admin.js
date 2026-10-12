@@ -252,8 +252,7 @@
       if (!label) return;
       const type = chooseOption('Тип кнопки', [
         {label:'Основная (оранжевая)', className:'content-button--primary'},
-        {label:'Спокойная (светлая)', className:'content-button--soft'},
-        {label:'Контурная', className:'content-button--outline'},
+        {label:'Вкладка', className:'content-button--tab'},
         {label:'Ссылка-текст', className:'content-button--link'}
       ]);
       if (!type) return;

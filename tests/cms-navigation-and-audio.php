@@ -58,7 +58,8 @@ check(!in_array('rs_audio', CMS_SECTIONS, true), 'Аудиозаписи РС д
 check(in_array('scenarios', CMS_SECTIONS, true), 'Сценарии собраний должны быть отдельным разделом CMS.');
 check(count(cms_default_content()['scenarios']['items']) === 5, 'В отдельном разделе должны быть ровно пять исходных сценариев.');
 check(array_column(cms_default_content()['scenarios']['items'], 'label') === ['Сценарий (чтение книги)','Сценарий (обычное собрание)','Сценарий (для новичков)','Сценарий (спикерская)','Сценарий (свободные темы)'], 'Подписи пяти сценариев должны соответствовать расписанию.');
-check(cms_default_content()['admin_portal']['order'] === ['services','scenarios','nafanya','edit_site','edit_admin'], 'Кнопка аудиозаписей РС должна находиться в настройках админки, а не в кабинете служащего.');
+check(cms_default_content()['admin_portal']['order'] === ['services','scenarios','nafanya','edit_site','edit_admin','rs_audio'], 'Кнопка аудиозаписей РС должна вести на страницу блоков в кабинете служащего.');
+check(cms_default_content()['admin_portal']['links']['rs_audio'] === '/admin/?tab=rs_audio', 'Кнопка аудиозаписей РС должна открывать страницу записей в кабинете.');
 check(cms_default_content()['admin_portal']['links']['services'] === '/admin/?tab=service_schedule', 'График служений должен открывать таблицу внутри кабинета.');
 check(cms_default_content()['admin_portal']['links']['scenarios'] === '/admin/?tab=scenarios', 'Сценарии в кабинете должны открывать список PDF, а не редактор.');
 check(cms_schedule_scenario_button(['url'=>'/file.pdf','shape'=>'square'])['shape'] === 'rounded', 'Форма кнопок должна быть скруглённой независимо от старых значений.');
@@ -67,6 +68,8 @@ check(array_column(cms_rs_audio_newest_first([
     ['id'=>'new','event_date'=>'2026-10-03'],
     ['id'=>'middle','event_date'=>'2026-08-29'],
 ]), 'event_date') === ['2026-10-03','2026-08-29','2026-06-27'], 'Аудиозаписи РС должны сортироваться от новых к старым.');
+check(count(cms_default_content()['rs_audio']['items']) === 12, 'В кабинете должны быть карточки всех 12 доступных записей РС.');
+check(array_column(cms_default_content()['rs_audio']['items'], 'id') === array_column(cms_rs_audio_newest_first(cms_default_content()['rs_audio']['items']), 'id'), 'Карточки аудио РС должны быть сразу отсортированы от новых к старым, сохраняя порядок частей.');
 check(cms_drive_audio_preview_url('https://drive.google.com/file/d/RS_AUDIO_123/view?usp=sharing') === 'https://drive.google.com/file/d/RS_AUDIO_123/preview', 'Для архивной записи нужен встроенный предпросмотр Google Диска.');
 
 $speakers = cms_speakers_newest_first([

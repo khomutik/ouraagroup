@@ -13,6 +13,8 @@ const config = {
   ],
   socials: []
 };
+const homeSource = fs.readFileSync(path.join(__dirname, '..', 'site-page.php'), 'utf8');
+assert.match(homeSource, /\$pages=\$content\['pages'\]\?\?\[\]; \$nav=cms_navigation_payload\(\$content\)/, 'Главная должна использовать те же актуальные иконки меню, что и остальная навигация.');
 let html = '';
 const shell = {
   insertAdjacentHTML(_where, markup) { html = markup; },
