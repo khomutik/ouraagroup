@@ -6,11 +6,14 @@ $texts = require dirname(__DIR__) . '/admin/scenario-texts.php';
 $expected = ['big-book','regular','newcomers','speaker','free-topics'];
 if (array_keys($texts) !== $expected) throw new RuntimeException('Должны быть доступны тексты всех пяти сценариев.');
 $pageCount = 0;
+$lineBreakCount = 0;
 foreach ($texts as $slug=>$html) {
     if (!str_contains($html, 'scenario-reader-page')) throw new RuntimeException("В сценарии {$slug} отсутствуют страницы.");
     $pageCount += substr_count($html, 'scenario-reader-page');
+    $lineBreakCount += substr_count($html, '<br>');
 }
 if ($pageCount !== 33) throw new RuntimeException('Число страниц сценариев должно совпадать с исходными PDF.');
+if ($lineBreakCount < 250) throw new RuntimeException('В текстах сценариев должны сохраняться заметные переносы строк.');
 foreach (['host','actions','newcomers'] as $kind) {
     $hasKind = false;
     foreach ($texts as $html) if (str_contains($html, 'scenario-text-block--' . $kind)) $hasKind = true;

@@ -128,6 +128,16 @@ function cms_parse_service_schedule_csv(string $csv): array {
     usort($rows, static fn($a,$b): int => strcmp($a['date'],$b['date']));
     return $rows;
 }
+/** Show the current two-week rota (previous Monday through the end of next week), including shifts already passed. */
+function cms_service_schedule_display_rows(array $rows, ?DateTimeImmutable $today = null): array {
+    $timezone = new DateTimeZone('Europe/Moscow');
+    $today = ($today ?? new DateTimeImmutable('today', $timezone))->setTimezone($timezone);
+    $start = $today->modify('monday this week')->modify('-7 days')->format('Y-m-d');
+    $end = $today->modify('monday this week')->modify('+6 days')->format('Y-m-d');
+    return array_values(array_filter($rows, static fn(array $row): bool =>
+        isset($row['date']) && $row['date'] >= $start && $row['date'] <= $end
+    ));
+}
 /** Read the staff rota from the shared Google Sheet, cache it outside the web root, and retain the last good copy during brief outages. */
 function cms_live_service_schedule(): array {
     $sheetId = '1VAWzdnevTgTmfyx83wfSig9BW6PfdKK1wZorpW0bIvU';

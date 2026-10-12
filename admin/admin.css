@@ -280,3 +280,28 @@ input,textarea,select{min-width:0;max-width:100%}
 .scenario-text-block--newcomers:before{content:"Только при наличии новичков";display:block;margin-bottom:5px;color:#555;font-size:.78em;font-weight:800}
 .scenario-text-block--highlight{background:#e3f5f5;border-color:#37989a}
 @media(max-width:650px){.admin-scenario-card{padding:14px}.admin-scenario-actions .button{flex:1 1 130px;min-width:0}.scenario-reader__legend{display:grid;gap:8px}.scenario-reader-page{gap:7px}}
+
+/* Keep the desktop cabinet in a two-column layout; the full-height menu belongs beside, not above, the workspace. */
+@media(min-width:761px){
+  .admin-header{max-width:1680px}
+  .admin-layout:not(:has(.admin-portal)){display:grid;grid-template-columns:minmax(230px,300px) minmax(0,1fr);align-items:start;max-width:1680px}
+  .admin-layout:not(:has(.admin-portal))>.admin-nav{position:sticky;top:12px;height:calc(100vh - 24px);min-height:0}
+  .admin-layout:not(:has(.admin-portal))>.admin-main{min-width:0}
+}
+@media(max-width:760px){.admin-layout:not(:has(.admin-portal)){display:block}}
+
+/* Match the staff audio cards to the public speaker-card surface and spacing. */
+.rs-audio-card{position:relative;display:grid;gap:14px;margin-top:12px;padding:14px;overflow:hidden;border:0;border-radius:14px;background:#fff8ea;box-shadow:0 10px 24px rgba(7,27,68,.12)}
+.rs-audio-card::before{content:"";position:absolute;top:0;bottom:0;left:0;width:6px;background:#df5b0b;pointer-events:none}
+.rs-audio-card .announcement-copy{display:grid;gap:14px;min-width:0;padding:2px 6px 6px;color:#061a43;font-size:16px;line-height:1.45}
+.rs-audio-card .announcement-title{margin:0;color:#061a43;font-family:"Unbounded","Manrope",sans-serif;font-size:clamp(21px,5vw,27px);line-height:1.18;overflow-wrap:anywhere}
+.rs-audio-card .speaker-audio{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rs-audio-card .speaker-audio__load,.rs-audio-card .speaker-audio__download{display:inline-flex;align-items:center;justify-content:center;width:auto;max-width:100%;min-height:46px;padding:9px 17px;border-radius:12px;font:800 clamp(16px,3vw,20px)/1.25 "Manrope",sans-serif;text-decoration:none;cursor:pointer}
+.rs-audio-card .speaker-audio__load{border:1px solid #142451;background:#142451;color:#fff}
+.rs-audio-card .speaker-audio__download{border:1px solid #142451;background:transparent;color:#142451}
+.rs-audio-card .speaker-audio__load:hover,.rs-audio-card .speaker-audio__download:hover,.rs-audio-card .speaker-audio__load:focus-visible,.rs-audio-card .speaker-audio__download:focus-visible{outline:2px solid #142451;outline-offset:2px}
+.rs-audio-card .speaker-audio__frame{flex-basis:100%;width:100%}
+.rs-audio-card iframe{display:block;width:100%;height:220px;margin-top:10px;border:1px solid #d9cdb7;border-radius:12px;background:#fff}
+@media(max-width:650px){.rs-audio-card{padding:14px}.rs-audio-card .speaker-audio__load,.rs-audio-card .speaker-audio__download{width:100%}.rs-audio-card iframe{height:220px}}
+.scenario-text-block p+p{margin-top:.55em}
+.scenario-reader-page>p+p{margin-top:.55em}
