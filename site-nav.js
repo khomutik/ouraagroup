@@ -82,7 +82,7 @@
     `;
   }).join("");
 
- const socialHtml = `<div class="site-nav-socials" aria-label="Соцсети и быстрые ссылки">${socialLinks.map((item) => `<a class="site-nav-socials__link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${item.icon ? `<img src="${escapeHtml(item.icon)}" alt="" />` : ''}<span>${escapeHtml(item.title)}</span></a>`).join('')}<a class="site-nav-socials__link site-nav-socials__link--nafanya" href="/nafanya-login" aria-label="Вход в пульт Нафани"><img src="/assets/nafanya.png" alt=""><span>Нафаня</span></a></div>`;
+ const socialHtml = `<div class="site-nav-socials" aria-label="Соцсети и быстрые ссылки">${socialLinks.map((item) => `<a class="site-nav-socials__link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${item.icon ? `<img src="${escapeHtml(item.icon)}" alt="" />` : ''}<span>${escapeHtml(item.title)}</span></a>`).join('')}<a class="site-nav-socials__link site-nav-socials__link--nafanya" href="/admin/" aria-label="Вход в админку"><img src="/assets/nafanya.png" alt=""><span>Нафаня</span></a></div>`;
 
   shell.insertAdjacentHTML("beforeend", `
     <aside class="site-side-nav" aria-label="Меню сайта">

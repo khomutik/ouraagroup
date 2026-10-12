@@ -193,5 +193,50 @@ h1,h2,h3{font-family:"Unbounded",Arial,sans-serif}
   .button-choice{min-width:0;overflow-wrap:anywhere}
 }
 
+/* Единый компактный вид админки: тёмно-синее поле и кремовая рабочая карточка. */
+body:not(.admin-login){min-height:100vh;background:#111a40;color:#111a40}
+.admin-header{max-width:1240px;margin:auto;padding:12px 20px;background:#111a40}
+.admin-layout{display:block;max-width:1240px;margin:14px auto 32px;padding:0 14px}
+.admin-layout>.admin-nav{display:none!important}
+.admin-main{width:100%;max-width:none;min-width:0;margin:0;padding:clamp(16px,3vw,34px);border:1px solid #d7ccb8;border-radius:24px;background:#fbf7ea;box-shadow:0 8px 24px #050d2860;overflow:hidden}
+.admin-main>h1,.admin-portal>h1{font-family:"Unbounded","Manrope",sans-serif;color:#111a40}
+.admin-back{display:inline-flex;align-items:center;min-height:42px;margin:0 0 18px;padding:8px 14px;border:1px solid #cf6726;border-radius:12px;background:#fffaf0;color:#a94c1b;text-decoration:none;font-weight:800}
+.admin-back:hover,.admin-back:focus-visible{background:#f4e1c8;outline:2px solid #cf6726;outline-offset:2px}
+.admin-portal{max-width:760px;margin:8px auto 20px}
+.admin-portal__grid{grid-template-columns:1fr;gap:12px}
+.admin-portal__button,.admin-scenarios__button{min-height:66px;padding:14px 18px;border:1px solid #c9c4b8;border-radius:16px;background:linear-gradient(90deg,#f2dfca,transparent 38%),#fbf7ea;color:#111a40;box-shadow:0 7px 0 #d0c7b7,0 11px 22px #111a401a}
+.admin-portal__icon{display:grid;flex:0 0 42px;width:42px;height:42px;place-items:center;border-radius:12px;background:#111a40;color:#fff;font-size:23px}
+.admin-portal__button strong{font-size:clamp(17px,3vw,23px)}
+.admin-portal__button:hover,.admin-portal__button:focus-visible,.admin-scenarios__button:hover,.admin-scenarios__button:focus-visible{transform:translateY(-1px);outline:2px solid #cf6726;outline-offset:2px}
+.admin-form{min-width:0;background:#fffdf8;border-color:#d7ccb8;border-radius:18px}
+.admin-form fieldset{min-width:0}
+.admin-portal-order .repeat-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 42px 42px;align-items:end}
+.admin-scenarios__grid{display:grid;grid-template-columns:1fr;gap:12px;max-width:760px;margin:auto}
+.admin-scenarios__button{display:flex;align-items:center;gap:12px;text-decoration:none;font-size:clamp(17px,3vw,22px);font-weight:850}
+.service-rota{max-width:850px;margin:auto}
+.service-rota__table-wrap{width:100%;overflow-x:auto;border:1px solid #d8cfbf;border-radius:16px;background:#fffdf8}
+.service-rota__table{min-width:0;background:transparent}
+.service-rota__table th{background:#111a40;color:#fff}
+.service-rota__table td:first-child{white-space:nowrap;font-weight:850;color:#a94c1b}
+.service-rota__source{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;font-size:14px}
+.service-rota__source a{color:#a94c1b;font-weight:800}
+.service-rota__empty{padding:16px;border-radius:12px;background:#fffdf8}
+@media(max-width:600px){
+  .admin-header{min-height:56px;padding:10px 14px}
+  .admin-layout{margin:8px auto 20px;padding:0 8px}
+  .admin-main{padding:16px 12px 24px;border-radius:18px}
+  .admin-main h1{font-size:clamp(23px,7vw,31px)}
+  .admin-portal-order .repeat-row{grid-template-columns:minmax(0,1fr) 42px 42px}
+  .admin-portal-order .repeat-row .field:nth-of-type(2){grid-column:1/-1;grid-row:2}
+  .service-rota__table th,.service-rota__table td{padding:9px 7px;font-size:14px;overflow-wrap:anywhere}
+  .service-rota__table td:first-child{white-space:normal}
+  .service-rota__source{font-size:12px}
+}
+.rich-editor .content-button--pill,.rich-editor .content-button--square,.button-preview--pill,.button-preview--square{border-radius:12px!important}
+.button-preview,.button-preview--rounded{border-radius:12px}
+.button-editor__settings{grid-template-columns:repeat(4,minmax(125px,1fr)) minmax(190px,1.3fr)}
+@media(max-width:1050px){.button-editor__settings{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.button-editor__settings{grid-template-columns:1fr}}
+
 /* Читаемый белый текст на кнопке входа, без изменения других кнопок редактора. */
 .admin-login .button{background:#b84908}

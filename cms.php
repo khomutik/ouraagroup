@@ -5,7 +5,7 @@ const CMS_ROOT = __DIR__;
 const CMS_DATA = CMS_ROOT . '/cms-data';
 const CMS_BACKUPS = CMS_ROOT . '/cms-backups';
 const CMS_UPLOADS = CMS_ROOT . '/uploads';
-const CMS_SECTIONS = ['announcements', 'schedule', 'library', 'speakers', 'services', 'newcomers', 'tradition', 'archive', 'scenarios', 'rs_audio', 'pages', 'navigation', 'site_texts'];
+const CMS_SECTIONS = ['announcements', 'schedule', 'library', 'speakers', 'services', 'newcomers', 'tradition', 'archive', 'scenarios', 'pages', 'navigation', 'site_texts'];
 function cms_section_labels(): array { return ['announcements'=>'Объявления','schedule'=>'Расписание собраний','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','newcomers'=>'Новичкам','tradition'=>'7-я традиция','archive'=>'Архив решений','scenarios'=>'Сценарии собраний','rs_audio'=>'Аудиозаписи РС','pages'=>'Главная и пользовательские страницы','navigation'=>'Кнопки и меню','site_texts'=>'Заголовки и подписи']; }
 
 function cms_config(): array {
@@ -98,6 +98,77 @@ function cms_rs_audio_newest_first(array $items): array {
     usort($items, static fn($a, $b): int => strcmp((string)($b['event_date'] ?? ''), (string)($a['event_date'] ?? '')));
     return $items;
 }
+function cms_parse_service_schedule_csv(string $csv): array {
+    $stream = fopen('php://temp', 'r+');
+    if ($stream === false) return [];
+    fwrite($stream, $csv); rewind($stream);
+    $headers = fgetcsv($stream, 0, ',', '"', '\\');
+    $headerMap = [];
+    foreach (($headers ?: []) as $i=>$heading) $headerMap[trim((string)$heading, "\xEF\xBB\xBF \t\r\n")] = $i;
+    $findColumn = static function (array $aliases) use ($headerMap): ?int {
+        foreach ($aliases as $alias) if (isset($headerMap[$alias])) return $headerMap[$alias];
+        return null;
+    };
+    $dateIndex = $findColumn(['дата','Дата','ДАТА']);
+    $speakerIndex = $findColumn(['ведущий','Ведущий','ВЕДУЩИЙ']);
+    $techIndex = $findColumn(['техвед','Техвед','ТЕХВЕД','тех.вед','ТЕХ.ВЕД']);
+    $rows = [];
+    if ($dateIndex !== null && $speakerIndex !== null && $techIndex !== null) {
+        while (($cells = fgetcsv($stream, 0, ',', '"', '\\')) !== false) {
+            $dateRaw = trim((string)($cells[$dateIndex] ?? ''));
+            $date = DateTimeImmutable::createFromFormat('!d.m.Y', $dateRaw, new DateTimeZone('Europe/Moscow'));
+            if (!$date || $date->format('d.m.Y') !== $dateRaw) continue;
+            $rows[] = ['date'=>$date->format('Y-m-d'),'day'=>(int)$date->format('N'),'speaker'=>cms_text($cells[$speakerIndex] ?? '',100),'tech'=>cms_text($cells[$techIndex] ?? '',100)];
+        }
+    }
+    fclose($stream);
+    usort($rows, static fn($a,$b): int => strcmp($a['date'],$b['date']));
+    return $rows;
+}
+/** Read the staff rota from the shared Google Sheet, cache it outside the web root, and retain the last good copy during brief outages. */
+function cms_live_service_schedule(): array {
+    $sheetId = '1VAWzdnevTgTmfyx83wfSig9BW6PfdKK1wZorpW0bIvU';
+    $gid = '311328672';
+    $cachePath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'pn-service-rota-' . hash('sha256', $sheetId . ':' . $gid) . '.json';
+    $cached = [];
+    if (is_file($cachePath)) {
+        $decoded = json_decode((string)@file_get_contents($cachePath), true);
+        if (is_array($decoded)) $cached = $decoded;
+        if (is_array($cached['rows'] ?? null) && (int)($cached['fetched_at'] ?? 0) >= time() - 300) {
+            return ['rows'=>$cached['rows'],'fetched_at'=>(int)$cached['fetched_at'],'stale'=>false,'available'=>true];
+        }
+    }
+
+    $url = 'https://docs.google.com/spreadsheets/d/' . $sheetId . '/export?format=csv&gid=' . $gid;
+    $csv = false;
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true,CURLOPT_FOLLOWLOCATION=>true,CURLOPT_MAXREDIRS=>4,CURLOPT_CONNECTTIMEOUT=>3,CURLOPT_TIMEOUT=>8,CURLOPT_PROTOCOLS=>CURLPROTO_HTTPS,CURLOPT_REDIR_PROTOCOLS=>CURLPROTO_HTTPS,CURLOPT_USERAGENT=>'Pochtinormalnye-Rota/1.0']);
+        $response = curl_exec($ch);
+        $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        $csv = is_string($response) && $status === 200 && strlen($response) <= 200000 ? $response : false;
+        curl_close($ch);
+    } else {
+        $context = stream_context_create(['http'=>['timeout'=>8,'follow_location'=>1,'max_redirects'=>4,'user_agent'=>'Pochtinormalnye-Rota/1.0'],'ssl'=>['verify_peer'=>true,'verify_peer_name'=>true]]);
+        $response = @file_get_contents($url, false, $context);
+        $csv = is_string($response) && strlen($response) <= 200000 ? $response : false;
+    }
+
+    if (is_string($csv) && $csv !== '') {
+        $rows = cms_parse_service_schedule_csv($csv);
+        if ($rows) {
+            $record = ['fetched_at'=>time(),'rows'=>$rows];
+            $tmp = $cachePath . '.' . bin2hex(random_bytes(4)) . '.tmp';
+            if (@file_put_contents($tmp, json_encode($record, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES), LOCK_EX) !== false) {
+                @chmod($tmp, 0600);
+                @rename($tmp, $cachePath);
+            } else @unlink($tmp);
+            return ['rows'=>$rows,'fetched_at'=>$record['fetched_at'],'stale'=>false,'available'=>true];
+        }
+    }
+    if (is_array($cached['rows'] ?? null) && $cached['rows']) return ['rows'=>$cached['rows'],'fetched_at'=>(int)($cached['fetched_at']??0),'stale'=>true,'available'=>true];
+    return ['rows'=>[],'fetched_at'=>0,'stale'=>false,'available'=>false];
+}
 function cms_safe_url($value, bool $empty = true): string {
     $url = trim((string) $value);
     if ($url === '' && $empty) return '';
@@ -133,9 +204,10 @@ function cms_speaker_button(array $speaker, string $kind): array {
         : ['label'=>'Открыть плеер', 'type'=>'primary', 'color'=>'blue', 'shape'=>'rounded', 'align'=>'left'];
     $stored = $speaker[$kind === 'download' ? 'download_button' : 'player_button'] ?? [];
     if (!is_array($stored)) return $defaults;
-    foreach (['label','type','color','shape','align'] as $key) {
+    foreach (['label','type','color','align'] as $key) {
         if (isset($stored[$key]) && is_string($stored[$key]) && $stored[$key] !== '') $defaults[$key] = $stored[$key];
     }
+    $defaults['shape'] = 'rounded';
     return $defaults;
 }
 function cms_speaker_download_url(array $speaker): string {
@@ -288,11 +360,9 @@ function cms_action_classes(array $action): string {
     if (!in_array($type, ['classic','primary','soft','outline','link','tab'], true)) $type = 'primary';
     $color = (string)($action['color'] ?? 'orange');
     if (!in_array($color, ['orange','blue','beige'], true)) $color = 'orange';
-    $shape = (string)($action['shape'] ?? 'rounded');
-    if (!in_array($shape, ['rounded','pill','square'], true)) $shape = 'rounded';
     $align = (string)($action['align'] ?? 'left');
     if (!in_array($align, ['left','center','right','full'], true)) $align = 'left';
-    return 'flow-button flow-button--' . $type . ' flow-button--' . $color . ' flow-button--' . $shape . ' flow-button--align-' . $align;
+    return 'flow-button flow-button--' . $type . ' flow-button--' . $color . ' flow-button--rounded flow-button--align-' . $align;
 }
 function cms_actions_html(array $actions, string $class = 'page-actions', string $placementFilter = ''): string {
     $html = '';
@@ -315,14 +385,14 @@ function cms_schedule_scenario_button(array $action): array {
     foreach ([
         'type'=>['primary','soft','outline','tab','link'],
         'color'=>['orange','blue','beige'],
-        'shape'=>['rounded','pill','square'],
         'align'=>['left','center','right','full'],
     ] as $key=>$allowed) {
         $value = $action[$key] ?? '';
         $button[$key] = is_string($value) && in_array($value, $allowed, true) ? $value : match ($key) {
-            'type'=>'primary', 'color'=>'orange', 'shape'=>'rounded', default=>'left'
+            'type'=>'primary', 'color'=>'orange', default=>'left'
         };
     }
+    $button['shape'] = 'rounded';
     return $button;
 }
 
@@ -577,9 +647,13 @@ function cms_default_content(): array {
             ['id'=>'speaker','label'=>'Сценарий (спикерская)','url'=>'https://drive.google.com/file/d/1TwNXAXbapoFEhJdg_03Z63lYIeE7f8t-/view?usp=drive_link','type'=>'primary','color'=>'orange','shape'=>'pill','align'=>'left'],
             ['id'=>'free-topics','label'=>'Сценарий (свободные темы)','url'=>'https://drive.google.com/file/d/1jZCXdncdxrxObPZTA9BCm6zecDVelAaA/view?usp=drive_link','type'=>'primary','color'=>'orange','shape'=>'pill','align'=>'left'],
         ]],
-        'admin_portal' => ['order'=>['services','scenarios','nafanya','edit_site','edit_admin','rs_audio'],'labels'=>[
+        'admin_portal' => ['order'=>['services','scenarios','nafanya','edit_site','edit_admin'],'labels'=>[
             'services'=>'График служений','scenarios'=>'Сценарии собраний','nafanya'=>'Нафаня в ZOOM',
-            'edit_site'=>'Редактировать сайт','edit_admin'=>'Редактировать админку','rs_audio'=>'Аудиозаписи РС',
+            'edit_site'=>'Редактировать сайт','edit_admin'=>'Редактировать админку',
+        ],'links'=>[
+            'services'=>'/admin/?tab=service_schedule',
+            'scenarios'=>'/admin/?tab=scenarios','nafanya'=>'/nafanya-zoom-control/app',
+            'edit_site'=>'/admin/?tab=site','edit_admin'=>'/admin/?tab=admin_settings',
         ]],
         'library' => ['note'=>'<p>Купить печатную литературу АА на русском языке в России можно на <a href="https://aarussia.ru/litra#!/tab/744553584-1">официальном сайте АА России</a>. За помощью с покупкой литературы за рубежом можно обратиться к членам нашей группы.</p>','other_url'=>'https://drive.google.com/drive/folders/1vKX6abhQRFOKIhHaqXmYcUWgjVcCpmHu?usp=sharing','items'=>[
             ['id'=>'big-book','title'=>'Большая Книга «Анонимные Алкоголики»','description'=>'Большая книга с историями. В ней описан опыт первых членов Содружества и принципы, которые помогают алкоголикам оставаться трезвыми.','cover'=>'assets/book-big-book.webp','resource'=>'assets/big-book-with-stories.pdf'],['id'=>'12x12','title'=>'Двенадцать шагов и Двенадцать традиций','description'=>'Книга подробно раскрывает Двенадцать Шагов как путь личного выздоровления и Двенадцать Традиций как основу единства и работы групп АА.','cover'=>'assets/book-12x12.webp','resource'=>'assets/twelve-steps-twelve-traditions.pdf'],['id'=>'living-sober','title'=>'Жить трезвыми','description'=>'Практическая книга с методами сохранения трезвости, которые используют члены АА.','cover'=>'assets/book-living-sober.jpg','resource'=>'assets/living-sober.pdf'],['id'=>'44','title'=>'Брошюра «44 вопроса и ответа»','description'=>'Короткая брошюра с простыми ответами на частые вопросы об Анонимных Алкоголиках.','cover'=>'assets/brochure-44-questions.jpg','resource'=>'assets/forty-four-questions-answers.pdf'],['id'=>'sponsorship','title'=>'Брошюра «Вопросы и ответы о наставничестве»','description'=>'Краткое руководство о наставничестве в АА.','cover'=>'assets/brochure-sponsorship-qa.jpg','resource'=>'assets/sponsorship-questions-answers.pdf']]],

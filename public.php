@@ -139,13 +139,11 @@ if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms
   <script defer src="/speakers-audio.js?v=4"></script>
 <?php }
 
-if ($section === 'services') { $data = $content['services'] ?? []; $chartUrl=cms_safe_url($data['chart_url']??''); $chartTop=($data['chart_position']??'top')!=='bottom'; ?>
-  <?php if ($chartUrl && $chartTop): ?><a class="document-link" href="<?= h($chartUrl) ?>" target="_blank" rel="noopener"><img src="assets/emoji/aa_calendar.png" alt="" /><span><?=h(cms_site_text($content, 'services_chart_button'))?></span></a><?php endif; ?>
+if ($section === 'services') { $data = $content['services'] ?? []; ?>
   <div class="service-lead"><?= cms_rich((string)($data['lead'] ?? '')) ?></div>
   <section class="content-card service-list">
     <?php foreach (($data['items'] ?? []) as $i => $item): ?><article class="service-item" id="<?=h(site_search_anchor('service', $item['id'] ?? '', (int)$i))?>"><h2><?= cms_display_text($item['title'] ?? '') ?><?php if (!empty($item['open'])): ?> - <span class="service-open"><?=h(cms_site_text($content, 'services_open_label'))?></span><?php endif; ?></h2><p><em>Ценз трезвости — <?= cms_display_text($item['sobriety'] ?? '') ?>; срок служения — <?= cms_display_text($item['term'] ?? '') ?></em></p><?php $holders = $item['holders'] ?? []; if (count($holders) > 1): ?><ol><?php foreach ($holders as $holder): ?><li><?= cms_display_text($holder['name'] ?? '') ?><?php if (!empty($holder['rotation'])): ?><br>Дата ротации: <?= h(date('d.m.Y', strtotime($holder['rotation']))) ?><?php endif; ?></li><?php endforeach; ?></ol><?php else: foreach ($holders as $holder): ?><p><?= cms_display_text($holder['name'] ?? '') ?></p><?php if (!empty($holder['rotation'])): ?><p>Дата ротации: <?= h(date('d.m.Y', strtotime($holder['rotation']))) ?></p><?php endif; endforeach; endif; ?><?=cms_actions_html($item['actions']??[], 'service-actions')?></article><?php endforeach; ?>
   </section>
-  <?php if ($chartUrl && !$chartTop): ?><a class="document-link" href="<?= h($chartUrl) ?>" target="_blank" rel="noopener"><img src="assets/emoji/aa_calendar.png" alt="" /><span><?=h(cms_site_text($content, 'services_chart_button'))?></span></a><?php endif; ?>
   <?=cms_actions_html(cms_page_actions($content,'services'))?>
 <?php }
 page_foot();

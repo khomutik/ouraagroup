@@ -54,11 +54,14 @@ check(cms_speaker_download_url(['audio_url'=>'https://drive.google.com/file/d/OR
 check(cms_speaker_download_url(['audio_url'=>'https://example.org/file']) === '', 'Скачивание не должно принимать посторонний адрес.');
 check(cms_speaker_button([], 'player')['color'] === 'blue', 'Кнопка плеера должна быть синей.');
 check(cms_speaker_button([], 'download')['type'] === 'outline', 'Кнопка скачивания должна быть прозрачной.');
-check(in_array('rs_audio', CMS_SECTIONS, true), 'Аудиозаписи РС должны быть отдельным разделом CMS.');
+check(!in_array('rs_audio', CMS_SECTIONS, true), 'Аудиозаписи РС доступны только администраторам, а не через права разделов сайта.');
 check(in_array('scenarios', CMS_SECTIONS, true), 'Сценарии собраний должны быть отдельным разделом CMS.');
 check(count(cms_default_content()['scenarios']['items']) === 5, 'В отдельном разделе должны быть ровно пять исходных сценариев.');
 check(array_column(cms_default_content()['scenarios']['items'], 'label') === ['Сценарий (чтение книги)','Сценарий (обычное собрание)','Сценарий (для новичков)','Сценарий (спикерская)','Сценарий (свободные темы)'], 'Подписи пяти сценариев должны соответствовать расписанию.');
-check(cms_default_content()['admin_portal']['order'] === ['services','scenarios','nafanya','edit_site','edit_admin','rs_audio'], 'Порядок кабинета должен ставить редактирование админки сразу под редактированием сайта.');
+check(cms_default_content()['admin_portal']['order'] === ['services','scenarios','nafanya','edit_site','edit_admin'], 'Кнопка аудиозаписей РС должна находиться в настройках админки, а не в кабинете служащего.');
+check(cms_default_content()['admin_portal']['links']['services'] === '/admin/?tab=service_schedule', 'График служений должен открывать таблицу внутри кабинета.');
+check(cms_default_content()['admin_portal']['links']['scenarios'] === '/admin/?tab=scenarios', 'Сценарии в кабинете должны открывать список PDF, а не редактор.');
+check(cms_schedule_scenario_button(['url'=>'/file.pdf','shape'=>'square'])['shape'] === 'rounded', 'Форма кнопок должна быть скруглённой независимо от старых значений.');
 check(array_column(cms_rs_audio_newest_first([
     ['id'=>'old','event_date'=>'2026-06-27'],
     ['id'=>'new','event_date'=>'2026-10-03'],

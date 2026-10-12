@@ -104,5 +104,11 @@ $("adminPanel").addEventListener("toggle",()=>status());
 
 export function hideWorkerAdminPanel(html, access) {
   if (access === "admin") return html;
-  return html.replace('<details class="admin">', '<details class="admin" hidden>');
+  return html.replace(/<details\b[^>]*>/giu, (openingTag) => {
+    const className = openingTag.match(/\bclass=["']([^"']*)["']/iu)?.[1] ?? "";
+    const id = openingTag.match(/\bid=["']([^"']*)["']/iu)?.[1] ?? "";
+    const privileged = className.split(/\s+/u).some((name) => name === "admin" || name === "admin-panel") || id === "adminPanel";
+    if (!privileged || /\shidden(?:\s|>)/iu.test(openingTag)) return openingTag;
+    return openingTag.replace(/>$/u, " hidden>");
+  });
 }

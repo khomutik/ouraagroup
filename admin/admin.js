@@ -263,12 +263,6 @@
         {label:'Бежевый', className:'content-button--beige'}
       ]);
       if (!color) return;
-      const shape = chooseOption('Форма кнопки', [
-        {label:'Скругленная', className:''},
-        {label:'Пилюля', className:'content-button--pill'},
-        {label:'Прямоугольная', className:'content-button--square'}
-      ]);
-      if (!shape) return;
       const align = chooseOption('Расположение', [
         {label:'Слева', className:'content-button--align-left'},
         {label:'По центру', className:'content-button--align-center'},
@@ -276,7 +270,7 @@
         {label:'На всю ширину', className:'content-button--align-full'}
       ]);
       if (!align) return;
-      const classes = ['content-button', type.className, color.className, shape.className, align.className].filter(Boolean).join(' ');
+      const classes = ['content-button', type.className, color.className, align.className].filter(Boolean).join(' ');
       insertHtml(`<a class="${classes}" href="${escapeHtml(url)}">${escapeHtml(label)}</a>`);
     };
     addMenu('🔗', 'Ссылки', [
@@ -596,7 +590,7 @@
     const text = label || 'Пример кнопки';
     previews.forEach((preview) => {
       const isSummary = preview.classList.contains('button-preview--summary');
-      preview.className = `button-preview${isSummary ? ' button-preview--summary' : ''} button-preview--${value('type','primary')} button-preview--${value('color','orange')} button-preview--${value('shape','rounded')} button-preview--${value('align','left')}`;
+      preview.className = `button-preview button-preview--rounded${isSummary ? ' button-preview--summary' : ''} button-preview--${value('type','primary')} button-preview--${value('color','orange')} button-preview--${value('align','left')}`;
       preview.textContent = text;
     });
     const summaryLabel = editor.querySelector('.button-editor__summary-label');

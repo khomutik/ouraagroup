@@ -90,17 +90,13 @@ function admin_collect_pairs(string $labels, string $urls): array {
     $result = []; foreach (($_POST[$labels] ?? []) as $i => $label) { $url = cms_safe_url($_POST[$urls][$i] ?? ''); if ($url !== '') $result[] = ['label'=>cms_text($label, 160), 'url'=>$url]; } return $result;
 }
 function admin_collect_actions(string $prefix): array {
-    $result = []; foreach (($_POST[$prefix . '_label'] ?? []) as $i => $label) { $url = cms_safe_url($_POST[$prefix . '_url'][$i] ?? ''); if (cms_text($label,160) === '' || $url === '') continue; $result[] = ['label'=>cms_text($label,160),'url'=>$url,'type'=>cms_text($_POST[$prefix . '_type'][$i] ?? 'primary',20),'color'=>cms_text($_POST[$prefix . '_color'][$i] ?? 'orange',20),'shape'=>cms_text($_POST[$prefix . '_shape'][$i] ?? 'rounded',20),'placement'=>cms_text($_POST[$prefix . '_placement'][$i] ?? 'bottom',20),'align'=>cms_text($_POST[$prefix . '_align'][$i] ?? 'center',20)]; } return $result;
+    $result = []; foreach (($_POST[$prefix . '_label'] ?? []) as $i => $label) { $url = cms_safe_url($_POST[$prefix . '_url'][$i] ?? ''); if (cms_text($label,160) === '' || $url === '') continue; $result[] = ['label'=>cms_text($label,160),'url'=>$url,'type'=>cms_text($_POST[$prefix . '_type'][$i] ?? 'primary',20),'color'=>cms_text($_POST[$prefix . '_color'][$i] ?? 'orange',20),'shape'=>'rounded','placement'=>cms_text($_POST[$prefix . '_placement'][$i] ?? 'bottom',20),'align'=>cms_text($_POST[$prefix . '_align'][$i] ?? 'center',20)]; } return $result;
 }
 function admin_collect_navigation(): array {
     $items=[]; foreach(($_POST['nav_title']??[]) as $i=>$title){$title=cms_text($title,120);$url=cms_safe_url($_POST['nav_url'][$i]??'');$path=parse_url($url,PHP_URL_PATH);if($title===''||$url===''||($path==='/nafanya-zoom-control/app'))continue;$items[]=['id'=>cms_text($_POST['nav_id'][$i]??'',40)?:cms_id(),'title'=>$title,'url'=>$url,'parent'=>cms_text($_POST['nav_parent'][$i]??'',80),'icon'=>admin_upload_value('nav_icon',$i,(string)($_POST['nav_icon_url'][$i]??''),'image'),'external'=>isset($_POST['nav_external'][$i])];}
     $socials=[]; foreach(($_POST['social_title']??[]) as $i=>$title){$title=cms_text($title,80);$url=cms_safe_url($_POST['social_url'][$i]??'');if($title===''||$url==='')continue;$socials[]=['title'=>$title,'url'=>$url,'icon'=>admin_upload_value('social_icon',$i,(string)($_POST['social_icon_url'][$i]??''),'image')];}
     return ['items'=>$items,'socials'=>$socials];
 }
-function admin_home_navigation_fields(array $navigation): void { ?>
-<fieldset class="repeatable" data-repeat="navigation"><legend>Кнопки главной страницы и меню</legend><p class="admin-tip">Здесь меняются кнопки главной страницы и меню. Укажите название, ссылку и, при необходимости, картинку. Чтобы разместить пункт внутри раздела меню, заполните поле «Вложить в раздел».</p><div data-repeat-items><?php foreach(($navigation['items']??[]) as $i=>$item): ?><div class="card-editor" data-nav-item><input type="hidden" name="nav_id[]" value="<?=h($item['id']??'')?>"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="nav_title[]" value="<?=h($item['title']??'')?>" placeholder="Надпись"></label><label class="field"><span>Куда ведёт</span><input name="nav_url[]" value="<?=h($item['url']??'')?>" placeholder="Ссылка"></label><label class="field"><span>Вложить в раздел</span><input name="nav_parent[]" value="<?=h($item['parent']??'')?>" placeholder="Оставьте пустым для главной"></label><label class="field"><span>Картинка кнопки</span><input name="nav_icon_url[]" value="<?=h($item['icon']??'')?>" placeholder="Ссылка на картинку"></label></div><input type="file" name="nav_icon_file[]" accept="image/jpeg,image/png,image/webp"><label class="check"><input type="checkbox" name="nav_external[<?=$i?>]" <?=!empty($item['external'])?'checked':''?>> Открывать в новой вкладке</label><button type="button" class="remove-row">Удалить кнопку</button></div><?php endforeach; ?></div><button type="button" class="button button--quiet" data-add-row>Добавить кнопку</button><template><div class="card-editor" data-nav-item><input type="hidden" name="nav_id[]"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="nav_title[]" placeholder="Надпись"></label><label class="field"><span>Куда ведёт</span><input name="nav_url[]" placeholder="Ссылка"></label><label class="field"><span>Вложить в раздел</span><input name="nav_parent[]" placeholder="Оставьте пустым для главной"></label><label class="field"><span>Картинка кнопки</span><input name="nav_icon_url[]" placeholder="Ссылка на картинку"></label></div><input type="file" name="nav_icon_file[]" accept="image/jpeg,image/png,image/webp"><label class="check"><input type="checkbox" data-nav-external> Открывать в новой вкладке</label><button type="button" class="remove-row">Удалить кнопку</button></div></template></fieldset>
-<fieldset class="repeatable" data-repeat="socials"><legend>Быстрые кнопки: Zoom, Telegram, MAX и другие</legend><p class="admin-tip">Первая ссылка управляет большой кнопкой входа на главной. Остальные быстрые ссылки показываются внизу главной страницы. Для каждой можно изменить название, адрес и картинку.</p><div data-repeat-items><?php foreach(($navigation['socials']??[]) as $item): ?><div class="card-editor"><div class="form-grid"><label class="field"><span>Название</span><input name="social_title[]" value="<?=h($item['title']??'')?>" placeholder="Название"></label><label class="field"><span>Ссылка</span><input name="social_url[]" value="<?=h($item['url']??'')?>" placeholder="Ссылка"></label><label class="field"><span>Картинка</span><input name="social_icon_url[]" value="<?=h($item['icon']??'')?>" placeholder="Ссылка на картинку"></label></div><input type="file" name="social_icon_file[]" accept="image/jpeg,image/png,image/webp"><button type="button" class="remove-row">Удалить</button></div><?php endforeach; ?></div><button type="button" class="button button--quiet" data-add-row>Добавить быструю ссылку</button><template><div class="card-editor"><div class="form-grid"><label class="field"><span>Название</span><input name="social_title[]" placeholder="Название"></label><label class="field"><span>Ссылка</span><input name="social_url[]" placeholder="Ссылка"></label><label class="field"><span>Картинка</span><input name="social_icon_url[]" placeholder="Ссылка на картинку"></label></div><input type="file" name="social_icon_file[]" accept="image/jpeg,image/png,image/webp"><button type="button" class="remove-row">Удалить</button></div></template></fieldset>
-<?php }
 function admin_page_catalog(array $content): array {
     $pages = [['key'=>'home','title'=>'Главная страница','section'=>'pages','group'=>'Основные страницы','published'=>true]];
     foreach (['schedule'=>'Расписание собраний','announcements'=>'Объявления','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','tradition'=>'7-я традиция','archive'=>'Архив решений'] as $key=>$title) {
@@ -238,7 +234,6 @@ function admin_structure_page_detail(array $content, array $graph, string $key):
         <form method="post" enctype="multipart/form-data" class="admin-form site-explorer__actions-form">
           <input type="hidden" name="action" value="save_page_actions"><input type="hidden" name="page_key" value="<?=h($key)?>"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
           <?php if ($key === 'home'): ?>
-            <?php admin_home_navigation_fields($content['navigation'] ?? cms_default_navigation()); ?>
             <h4>Дополнительные кнопки на главной</h4>
             <?php admin_page_actions_fieldset(cms_page_actions($content, 'home'), 'page_action'); ?>
           <?php else: ?>
@@ -281,8 +276,8 @@ function admin_action_destination(array $options, string $selected): void {
 <label class="field"><span>Куда ведёт кнопка</span><select data-action-destination><option value="">Внешняя ссылка или адрес вручную</option><?php foreach ($options as $url=>$title): ?><option value="<?=h($url)?>" <?=$selected===$url?'selected':''?>><?=h($title)?></option><?php endforeach; ?></select></label>
 <?php }
 function admin_action_select(string $name, string $label, array $options, string $selected, ?string $optionKind = null): void { $kind = $optionKind ?? substr($name, strrpos($name, '_') + 1); ?><fieldset class="button-option" data-button-kind="<?=h($kind)?>"><legend><?=h($label)?></legend><input type="hidden" name="<?=h($name)?>[]" value="<?=h($selected)?>" data-button-option="<?=h($kind)?>"<?=str_starts_with($name, 'schedule_scenario_buttons[')?' data-scenario-field="'.h($kind).'"':''?>><div class="button-option__choices"><?php foreach($options as $value=>$caption): ?><button type="button" class="button-choice button-choice--<?=h($kind)?>-<?=h($value)?> <?=$selected===$value?'is-selected':''?>" data-button-value="<?=h($value)?>" aria-pressed="<?=$selected===$value?'true':'false'?>"><span><?=h($caption)?></span></button><?php endforeach; ?></div></fieldset><?php }
-function admin_action_row(array $action, string $prefix, bool $showPlacement = true, bool $showRowActions = true): void { $types=['primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст']; $colors=['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый']; $shapes=['rounded'=>'Скруглённая','pill'=>'Пилюля','square'=>'Прямоугольная']; $placements=['under-title'=>'Под заголовком','bottom'=>'Внизу страницы']; $aligns=['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину']; $url=$action['url']??''; ?>
-<article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($action['label']??'Новая кнопка')?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="<?=h($prefix)?>_label[]" value="<?=h($action['label']??'')?>" placeholder="Например: Сценарий собрания"></label><?php admin_action_destination(admin_action_link_options(), $url); ?></div><label class="field button-editor__manual-url"><span>Внешняя ссылка или адрес вручную</span><input name="<?=h($prefix)?>_url[]" value="<?=h($url)?>" data-action-url placeholder="https://... (заполнять, только если страницы нет в списке)"></label><div class="button-editor__settings"><?php admin_action_select($prefix . '_type','Вид',$types,$action['type']??'primary'); admin_action_select($prefix . '_color','Цвет',$colors,$action['color']??'orange'); admin_action_select($prefix . '_shape','Форма',$shapes,$action['shape']??'rounded'); if ($showPlacement) admin_action_select($prefix . '_placement','Место',$placements,$action['placement']??'bottom'); admin_action_select($prefix . '_align','Выравнивание',$aligns,$action['align']??'left'); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div><?php if ($showRowActions): ?><span class="row-actions"><button type="button" class="move-row" data-move="up">↑ Выше</button><button type="button" class="move-row" data-move="down">↓ Ниже</button><button type="button" class="remove-row">Убрать</button></span><?php endif; ?></div></article>
+function admin_action_row(array $action, string $prefix, bool $showPlacement = true, bool $showRowActions = true): void { $types=['primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст']; $colors=['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый']; $placements=['under-title'=>'Под заголовком','bottom'=>'Внизу страницы']; $aligns=['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину']; $url=$action['url']??''; ?>
+<article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($action['label']??'Новая кнопка')?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="<?=h($prefix)?>_label[]" value="<?=h($action['label']??'')?>" placeholder="Например: Сценарий собрания"></label><?php admin_action_destination(admin_action_link_options(), $url); ?></div><label class="field button-editor__manual-url"><span>Внешняя ссылка или адрес вручную</span><input name="<?=h($prefix)?>_url[]" value="<?=h($url)?>" data-action-url placeholder="https://... (заполнять, только если страницы нет в списке)"></label><div class="button-editor__settings"><?php admin_action_select($prefix . '_type','Вид',$types,$action['type']??'primary'); admin_action_select($prefix . '_color','Цвет',$colors,$action['color']??'orange'); if ($showPlacement) admin_action_select($prefix . '_placement','Место',$placements,$action['placement']??'bottom'); admin_action_select($prefix . '_align','Выравнивание',$aligns,$action['align']??'left'); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div><?php if ($showRowActions): ?><span class="row-actions"><button type="button" class="move-row" data-move="up">↑ Выше</button><button type="button" class="move-row" data-move="down">↓ Ниже</button><button type="button" class="remove-row">Убрать</button></span><?php endif; ?></div></article>
 <?php }
 function admin_schedule_scenario_button_editor(array $action, int $dayIndex): void {
     $defaults = ['label'=>'Сценарий собрания','type'=>'outline','color'=>'orange','shape'=>'rounded','align'=>'left'];
@@ -290,9 +285,8 @@ function admin_schedule_scenario_button_editor(array $action, int $dayIndex): vo
     $prefix = 'schedule_scenario_buttons[' . $dayIndex . ']';
     $types=['primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст'];
     $colors=['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый'];
-    $shapes=['rounded'=>'Скруглённая','pill'=>'Пилюля','square'=>'Прямоугольная'];
     $aligns=['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину']; ?>
-<article class="button-editor schedule-scenario-button"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($button['label'])?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="<?=h($prefix)?>[label][]" value="<?=h($button['label'])?>" data-scenario-field="label" data-action-label placeholder="Сценарий собрания"></label><?php admin_action_destination(admin_action_link_options(), $button['url']??''); ?></div><label class="field button-editor__manual-url"><span>Ссылка на PDF или файл</span><input name="<?=h($prefix)?>[url][]" value="<?=h($button['url']??'')?>" data-action-url data-scenario-field="url" placeholder="Ссылка Google Диска"></label><div class="button-editor__settings"><?php admin_action_select($prefix . '[type]','Вид',$types,$button['type'],'type'); admin_action_select($prefix . '[color]','Цвет',$colors,$button['color'],'color'); admin_action_select($prefix . '[shape]','Форма',$shapes,$button['shape'],'shape'); admin_action_select($prefix . '[align]','Выравнивание',$aligns,$button['align'],'align'); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div><button type="button" class="remove-row schedule-scenario-remove">Убрать кнопку</button></div></article>
+<article class="button-editor schedule-scenario-button"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($button['label'])?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="<?=h($prefix)?>[label][]" value="<?=h($button['label'])?>" data-scenario-field="label" data-action-label placeholder="Сценарий собрания"></label><?php admin_action_destination(admin_action_link_options(), $button['url']??''); ?></div><label class="field button-editor__manual-url"><span>Ссылка на PDF или файл</span><input name="<?=h($prefix)?>[url][]" value="<?=h($button['url']??'')?>" data-action-url data-scenario-field="url" placeholder="Ссылка Google Диска"></label><div class="button-editor__settings"><?php admin_action_select($prefix . '[type]','Вид',$types,$button['type'],'type'); admin_action_select($prefix . '[color]','Цвет',$colors,$button['color'],'color'); admin_action_select($prefix . '[align]','Выравнивание',$aligns,$button['align'],'align'); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div><button type="button" class="remove-row schedule-scenario-remove">Убрать кнопку</button></div></article>
 <?php }
 function admin_schedule_scenario_editor(array $day, int $dayIndex): void {
     // PDF scenarios are maintained once in the dedicated admin section, not per weekday.
@@ -312,7 +306,7 @@ function admin_speaker_button_from_post(string $kind, array $current): array {
     $prefix = 'speaker_' . $kind;
     $button = cms_speaker_button($current, $kind);
     $button['label'] = cms_text($_POST[$prefix . '_label'] ?? $button['label'], 80) ?: $button['label'];
-    foreach (['type'=>['primary','soft','outline','tab','link'], 'color'=>['orange','blue','beige'], 'shape'=>['rounded','pill','square'], 'align'=>['left','center','right','full']] as $key=>$allowed) {
+    foreach (['type'=>['primary','soft','outline','tab','link'], 'color'=>['orange','blue','beige'], 'align'=>['left','center','right','full']] as $key=>$allowed) {
         $value = $_POST[$prefix . '_' . $key][0] ?? $button[$key];
         if (is_string($value) && in_array($value, $allowed, true)) $button[$key] = $value;
     }
@@ -324,35 +318,33 @@ function admin_speaker_button_editor(array $speaker, string $kind): void {
     $purpose = $kind === 'player' ? 'Основная кнопка плеера' : 'Кнопка скачивания';
     $types = ['primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст'];
     $colors = ['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый'];
-    $shapes = ['rounded'=>'Скруглённая','pill'=>'Пилюля','square'=>'Прямоугольная'];
     $aligns = ['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину']; ?>
-<article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($purpose)?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><label class="field"><span><?=h($purpose)?> — надпись</span><input name="<?=h($prefix)?>_label" value="<?=h($button['label'])?>" data-action-label></label><div class="button-editor__settings"><?php admin_action_select($prefix . '_type','Вид',$types,$button['type']); admin_action_select($prefix . '_color','Цвет',$colors,$button['color']); admin_action_select($prefix . '_shape','Форма',$shapes,$button['shape']); admin_action_select($prefix . '_align','Выравнивание',$aligns,$button['align']); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div></div></article>
+<article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($purpose)?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><label class="field"><span><?=h($purpose)?> — надпись</span><input name="<?=h($prefix)?>_label" value="<?=h($button['label'])?>" data-action-label></label><div class="button-editor__settings"><?php admin_action_select($prefix . '_type','Вид',$types,$button['type']); admin_action_select($prefix . '_color','Цвет',$colors,$button['color']); admin_action_select($prefix . '_align','Выравнивание',$aligns,$button['align']); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div></div></article>
 <?php }
 function admin_library_button_editor(array $item, array $content): void {
     $button = is_array($item['read_button'] ?? null) ? $item['read_button'] : [];
     $label = (string)($button['label'] ?? cms_site_text($content, 'library_read_button'));
     $types = ['classic'=>'Как сейчас','primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст'];
     $colors = ['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый'];
-    $shapes = ['rounded'=>'Скруглённая','pill'=>'Пилюля','square'=>'Прямоугольная'];
     $aligns = ['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину'];
 ?>
 <article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($label)?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body">
   <label class="field"><span>Название кнопки «Читать»</span><input name="lib_button_label[]" value="<?=h($label)?>" data-action-label></label>
   <p class="admin-tip">Кнопка открывает PDF или ссылку из поля выше. Если адрес не задан, кнопка не показывается.</p>
-  <div class="button-editor__settings"><?php admin_action_select('lib_button_type','Вид',$types,$button['type']??'classic'); admin_action_select('lib_button_color','Цвет',$colors,$button['color']??'orange'); admin_action_select('lib_button_shape','Форма',$shapes,$button['shape']??'rounded'); admin_action_select('lib_button_align','Выравнивание',$aligns,$button['align']??'full'); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div>
+  <div class="button-editor__settings"><?php admin_action_select('lib_button_type','Вид',$types,$button['type']??'classic'); admin_action_select('lib_button_color','Цвет',$colors,$button['color']??'orange'); admin_action_select('lib_button_align','Выравнивание',$aligns,$button['align']??'full'); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div>
 </div></article>
 <?php }
 function admin_service_action_select(string $field, string $label, array $options, string $selected, int $serviceIndex): void { ?>
 <fieldset class="button-option" data-button-kind="<?=h($field)?>"><legend><?=h($label)?></legend><input type="hidden" name="service_action_<?=h($field)?>[<?=h((string)$serviceIndex)?>][]" value="<?=h($selected)?>" data-button-option="<?=h($field)?>"><div class="button-option__choices"><?php foreach($options as $value=>$caption): ?><button type="button" class="button-choice button-choice--<?=h($field)?>-<?=h($value)?> <?=$selected===$value?'is-selected':''?>" data-button-value="<?=h($value)?>" aria-pressed="<?=$selected===$value?'true':'false'?>"><span><?=h($caption)?></span></button><?php endforeach; ?></div></fieldset>
 <?php }
-function admin_service_action_row(array $action, int $serviceIndex): void { $types=['primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст']; $colors=['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый']; $shapes=['rounded'=>'Скруглённая','pill'=>'Пилюля','square'=>'Прямоугольная']; $aligns=['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину']; $url=$action['url']??''; ?>
-<article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($action['label']??'Новая кнопка')?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="service_action_label[<?=h((string)$serviceIndex)?>][]" value="<?=h($action['label']??'')?>" placeholder="Например: Написать служащему" data-action-label></label><?php admin_action_destination(admin_action_link_options(), $url); ?></div><label class="field button-editor__manual-url"><span>Внешняя ссылка или адрес вручную</span><input name="service_action_url[<?=h((string)$serviceIndex)?>][]" value="<?=h($url)?>" data-action-url placeholder="https://... (заполнять, только если страницы нет в списке)"></label><div class="button-editor__settings"><?php admin_service_action_select('type','Вид',$types,$action['type']??'tab',$serviceIndex); admin_service_action_select('color','Цвет',$colors,$action['color']??'orange',$serviceIndex); admin_service_action_select('shape','Форма',$shapes,$action['shape']??'pill',$serviceIndex); admin_service_action_select('align','Выравнивание',$aligns,$action['align']??'left',$serviceIndex); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div><span class="row-actions"><button type="button" class="move-row" data-move="up">↑ Выше</button><button type="button" class="move-row" data-move="down">↓ Ниже</button><button type="button" class="remove-row">Убрать</button></span></div></article>
+function admin_service_action_row(array $action, int $serviceIndex): void { $types=['primary'=>'Основная','soft'=>'Светлая','outline'=>'Контурная','tab'=>'Вкладка','link'=>'Ссылка-текст']; $colors=['orange'=>'Оранжевый','blue'=>'Тёмно-синий','beige'=>'Бежевый']; $aligns=['left'=>'Слева','center'=>'По центру','right'=>'Справа','full'=>'На всю ширину']; $url=$action['url']??''; ?>
+<article class="button-editor"><button type="button" class="button-editor__mobile-toggle" data-button-editor-toggle aria-expanded="false"><span class="button-editor__summary-label"><?=h($action['label']??'Новая кнопка')?></span><span class="button-preview button-preview--summary">Пример кнопки</span><span aria-hidden="true">⌄</span></button><div class="button-editor__body"><div class="form-grid"><label class="field"><span>Название кнопки</span><input name="service_action_label[<?=h((string)$serviceIndex)?>][]" value="<?=h($action['label']??'')?>" placeholder="Например: Написать служащему" data-action-label></label><?php admin_action_destination(admin_action_link_options(), $url); ?></div><label class="field button-editor__manual-url"><span>Внешняя ссылка или адрес вручную</span><input name="service_action_url[<?=h((string)$serviceIndex)?>][]" value="<?=h($url)?>" data-action-url placeholder="https://... (заполнять, только если страницы нет в списке)"></label><div class="button-editor__settings"><?php admin_service_action_select('type','Вид',$types,$action['type']??'tab',$serviceIndex); admin_service_action_select('color','Цвет',$colors,$action['color']??'orange',$serviceIndex); admin_service_action_select('align','Выравнивание',$aligns,$action['align']??'left',$serviceIndex); ?><div class="button-preview-wrap"><span>Так будет выглядеть</span><span class="button-preview">Пример кнопки</span></div></div><span class="row-actions"><button type="button" class="move-row" data-move="up">↑ Выше</button><button type="button" class="move-row" data-move="down">↓ Ниже</button><button type="button" class="remove-row">Убрать</button></span></div></article>
 <?php }
 function admin_service_actions_fieldset(array $actions, int $serviceIndex): void { ?>
 <fieldset class="repeatable page-actions-editor" data-repeat="service-actions"><legend>Кнопки внизу карточки служения</legend><p class="admin-tip">Кнопки служения показываются под описанием карточки. Укажите название, ссылку и внешний вид; образец показывает результат.</p><div data-repeat-items><?php foreach ($actions as $action) admin_service_action_row($action, $serviceIndex); ?></div><button type="button" class="button button--quiet" data-add-row>Добавить кнопку</button><template><?php admin_service_action_row(['type'=>'tab','color'=>'orange','shape'=>'pill','align'=>'left'], $serviceIndex); ?></template></fieldset>
 <?php }
 function admin_collect_service_actions(int $serviceIndex): array {
-    $result=[]; foreach (($_POST['service_action_label'][$serviceIndex] ?? []) as $i=>$label) { $url=cms_safe_url($_POST['service_action_url'][$serviceIndex][$i] ?? ''); if (cms_text($label,160)==='' || $url==='') continue; $result[]=['label'=>cms_text($label,160),'url'=>$url,'type'=>cms_text($_POST['service_action_type'][$serviceIndex][$i]??'tab',20),'color'=>cms_text($_POST['service_action_color'][$serviceIndex][$i]??'orange',20),'shape'=>cms_text($_POST['service_action_shape'][$serviceIndex][$i]??'pill',20),'placement'=>'bottom','align'=>cms_text($_POST['service_action_align'][$serviceIndex][$i]??'left',20)]; }
+    $result=[]; foreach (($_POST['service_action_label'][$serviceIndex] ?? []) as $i=>$label) { $url=cms_safe_url($_POST['service_action_url'][$serviceIndex][$i] ?? ''); if (cms_text($label,160)==='' || $url==='') continue; $result[]=['label'=>cms_text($label,160),'url'=>$url,'type'=>cms_text($_POST['service_action_type'][$serviceIndex][$i]??'tab',20),'color'=>cms_text($_POST['service_action_color'][$serviceIndex][$i]??'orange',20),'shape'=>'rounded','placement'=>'bottom','align'=>cms_text($_POST['service_action_align'][$serviceIndex][$i]??'left',20)]; }
     return $result;
 }
 function admin_service_editor(array $item, int $serviceIndex): void { ?>
@@ -381,17 +373,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!cms_is_admin()) throw new RuntimeException('Вы не являетесь администратором сайта, обратитесь к сисадмину.');
             $content = cms_content();
             $labels = $content['admin_portal']['labels'] ?? cms_default_content()['admin_portal']['labels'];
-            foreach (array_keys(cms_default_content()['admin_portal']['labels']) as $key) {
+            $defaults = cms_default_content()['admin_portal'];
+            foreach (array_keys($defaults['labels']) as $key) {
                 $labels[$key] = cms_text($_POST['portal_label'][$key] ?? $labels[$key], 80) ?: $labels[$key];
             }
-            $validKeys = array_keys(cms_default_content()['admin_portal']['labels']);
+            $validKeys = array_keys($defaults['labels']);
             $order = [];
             foreach (($_POST['portal_order'] ?? []) as $key) if (in_array($key, $validKeys, true) && !in_array($key, $order, true)) $order[] = $key;
             foreach ($validKeys as $key) if (!in_array($key, $order, true)) $order[] = $key;
-            $content['admin_portal'] = ['order'=>$order,'labels'=>$labels];
+            $links = $content['admin_portal']['links'] ?? $defaults['links'];
+            foreach ($validKeys as $key) $links[$key] = cms_safe_url($_POST['portal_link'][$key] ?? ($links[$key] ?? $defaults['links'][$key]));
+            $content['admin_portal'] = ['order'=>$order,'labels'=>$labels,'links'=>$links];
             cms_write('content', $content);
-            admin_flash('Названия кнопок админки сохранены.');
-            admin_redirect('/admin/?tab=admin_settings');
+            admin_flash('Названия, адреса и порядок кнопок кабинета сохранены.');
+            admin_redirect('/admin/?tab=admin_settings&manage=portal');
         }
 
         if ($action === 'save_user') {
@@ -457,7 +452,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $requiredSection = str_starts_with($key, 'newcomer:') ? 'newcomers' : (($key === 'home' || str_starts_with($key, 'custom:')) ? 'pages' : $key);
             cms_require($requiredSection);
             $content = cms_content();
-            if ($key === 'home') $content['navigation'] = admin_collect_navigation();
+            if ($key === 'home' && (isset($_POST['nav_title']) || isset($_POST['social_title']))) $content['navigation'] = admin_collect_navigation();
             cms_set_page_actions($content, $key, admin_collect_actions('page_action'));
             cms_write('content', $content); cms_log('Кнопки страницы сохранены', $key); admin_flash('Кнопки страницы сохранены.'); admin_redirect('/admin/?tab=structure&page=' . rawurlencode($key));
         }
@@ -467,6 +462,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $textReturnTo = (string)($_POST['return_to'] ?? '');
             $textGroup = $section === 'site_texts' ? admin_site_text_group_for_section($textReturnTo) : '';
             cms_require($textGroup !== '' ? ($textReturnTo === 'home' ? 'pages' : $textReturnTo) : $section);
+            if (in_array($section, ['scenarios','rs_audio'], true) && !cms_is_admin()) throw new RuntimeException('Вы не являетесь администратором сайта, обратитесь к сисадмину.');
             $content = cms_content();
             if ($section === 'announcements') {
                 $items = $content['announcements'] ?? []; $id = cms_text($_POST['id'] ?? '', 40); $index = null; foreach ($items as $i=>$item) if (($item['id']??'')===$id) $index=$i;
@@ -506,12 +502,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'url'=>$url,
                         'type'=>in_array($_POST['scenario_action_type'][$i] ?? '', ['primary','soft','outline','tab','link'], true) ? $_POST['scenario_action_type'][$i] : 'primary',
                         'color'=>in_array($_POST['scenario_action_color'][$i] ?? '', ['orange','blue','beige'], true) ? $_POST['scenario_action_color'][$i] : 'orange',
-                        'shape'=>in_array($_POST['scenario_action_shape'][$i] ?? '', ['rounded','pill','square'], true) ? $_POST['scenario_action_shape'][$i] : 'pill',
+                        'shape'=>'rounded',
                         'align'=>in_array($_POST['scenario_action_align'][$i] ?? '', ['left','center','right','full'], true) ? $_POST['scenario_action_align'][$i] : 'left',
                     ];
                 }
                 $content['scenarios'] = ['items'=>$items];
-                $target = '/admin/?section=scenarios';
+                $target = '/admin/?tab=admin_settings&manage=scenarios';
             } elseif ($section === 'rs_audio') {
                 $items = [];
                 foreach (($_POST['rs_audio_date'] ?? []) as $i => $dateRaw) {
@@ -523,7 +519,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $items[] = ['id'=>cms_text($_POST['rs_audio_id'][$i] ?? '', 40) ?: cms_id(), 'event_date'=>$date, 'url'=>$url];
                 }
                 $content['rs_audio'] = ['intro'=>cms_sanitize_html($_POST['intro'] ?? ''), 'items'=>cms_rs_audio_newest_first($items)];
-                $target = '/admin/?section=rs_audio';
+                $target = '/admin/?tab=admin_settings&manage=rs_audio';
             } elseif ($section === 'schedule') {
                 $days=[]; foreach (($_POST['day'] ?? []) as $i=>$day) {
                     if (cms_text($day,60)==='') continue;
@@ -537,7 +533,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'label'=>cms_text($_POST['lib_button_label'][$i]??cms_site_text($content,'library_read_button'),160),
                         'type'=>cms_text($_POST['lib_button_type'][$i]??'classic',20),
                         'color'=>cms_text($_POST['lib_button_color'][$i]??'orange',20),
-                        'shape'=>cms_text($_POST['lib_button_shape'][$i]??'rounded',20),
+                        'shape'=>'rounded',
                         'align'=>cms_text($_POST['lib_button_align'][$i]??'full',20),
                     ];
                     $items[]=['id'=>cms_text($_POST['lib_id'][$i]??'',40) ?: cms_id(),'title'=>cms_text($title,180),'description'=>cms_sanitize_html($_POST['lib_description'][$i]??''),'cover'=>admin_upload_value('cover',$i,(string)($_POST['cover_url'][$i]??''),'image'),'resource'=>admin_upload_value('resource',$i,(string)($_POST['resource_url'][$i]??''),'pdf'),'read_button'=>$readButton];
@@ -571,7 +567,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $content['speakers']=$data; $target='/admin/?section=speakers';
             } elseif ($section === 'services') {
                 $items=[]; foreach (($_POST['service_title'] ?? []) as $i=>$title) { if (cms_text($title,180)==='') continue; $holders=[]; foreach (($_POST['holder_name'][$i] ?? []) as $j=>$name) if (cms_text($name,180)!=='') $holders[]=['name'=>cms_text($name,180),'rotation'=>cms_text($_POST['holder_rotation'][$i][$j]??'',10)]; $items[]=['id'=>cms_text($_POST['service_id'][$i]??'',40) ?: cms_id(),'title'=>cms_text($title,180),'sobriety'=>cms_text($_POST['sobriety'][$i]??'',100),'term'=>cms_text($_POST['term'][$i]??'',100),'open'=>isset($_POST['service_open'][$i]),'holders'=>$holders,'actions'=>admin_collect_service_actions((int)$i)]; }
-                $content['services']=['chart_url'=>cms_safe_url($_POST['chart_url'] ?? ''),'chart_position'=>(($_POST['chart_position']??'top')==='bottom'?'bottom':'top'),'lead'=>cms_sanitize_html($_POST['lead'] ?? ''),'items'=>$items]; $target='/admin/?section=services';
+                $content['services']=['lead'=>cms_sanitize_html($_POST['lead'] ?? ''),'items'=>$items]; $target='/admin/?section=services';
             } elseif ($section === 'newcomers') {
                 $items = $content['newcomers']['pages'] ?? []; $id = cms_text($_POST['id'] ?? '', 40); $index = null;
                 foreach ($items as $i=>$item) if (($item['id']??'')===$id) $index=$i;
@@ -599,7 +595,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (($_POST['page_kind']??'') === 'basics') {
                     $content['pages']['home_intro']=cms_sanitize_html(cms_replace_inline_uploads($_POST['home_intro']??'','home_intro_inline_images'));
                     cms_set_page_actions($content, 'home', admin_collect_actions('home_action'));
-                    $content['navigation'] = admin_collect_navigation();
+                    if (isset($_POST['nav_title']) || isset($_POST['social_title'])) $content['navigation'] = admin_collect_navigation();
                 } else {
                     $items=$content['pages']['custom']??[]; $id=cms_text($_POST['id']??'',40); $index=null; foreach($items as $i=>$item)if(($item['id']??'')===$id)$index=$i;
                     $slug=strtolower(cms_text($_POST['slug']??'',80)); if(!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/',$slug))throw new RuntimeException('Адрес страницы: только латинские буквы, цифры и дефисы.');
@@ -633,20 +629,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $users = cms_users(); $user = cms_current_user(); $flash = admin_take_flash();
 if (!$user): ?>
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=29"></head><body class="admin-login"><main class="login-card"><h1>Админка сайта</h1><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?><?php if (!$users): ?><p>Админка ещё не настроена. Администратор должен открыть <code>/setup.php</code> по инструкции.</p><?php else: ?><form method="post"><input type="hidden" name="action" value="login"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><?php admin_input('username','','text','Логин'); ?><label class="field"><span>Пароль</span><input type="password" name="password" autocomplete="current-password" required></label><button class="button" type="submit">Войти</button></form><?php endif; ?></main></body></html>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=30"></head><body class="admin-login"><main class="login-card"><h1>Админка сайта</h1><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?><?php if (!$users): ?><p>Админка ещё не настроена. Администратор должен открыть <code>/setup.php</code> по инструкции.</p><?php else: ?><form method="post"><input type="hidden" name="action" value="login"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><?php admin_input('username','','text','Логин'); ?><label class="field"><span>Пароль</span><input type="password" name="password" autocomplete="current-password" required></label><button class="button" type="submit">Войти</button></form><?php endif; ?></main></body></html>
 <?php exit; endif;
 
-$tab = (string)($_GET['tab'] ?? 'portal'); $section = (string)($_GET['section'] ?? ''); $content = cms_content();
+$tab = (string)($_GET['tab'] ?? 'portal'); $section = (string)($_GET['section'] ?? ''); $manage = cms_text($_GET['manage'] ?? '', 40); $content = cms_content();
 if (isset($content['navigation']['items'])) $content['navigation']['items'] = array_values(array_filter($content['navigation']['items'], static fn($item): bool => is_array($item) && ($item['id'] ?? '') !== 'nafanya-zoom-control' && parse_url((string)($item['url'] ?? ''), PHP_URL_PATH) !== '/nafanya-zoom-control/app'));
 if ($section === '' && isset($_GET['edit']) && !isset($_GET['tab'])) admin_redirect('/admin/?tab=home&edit=' . rawurlencode((string)$_GET['edit']));
 if ($section === 'pages') {
     $edit = (string)($_GET['edit'] ?? '');
     admin_redirect('/admin/?tab=home' . ($edit !== '' ? '&edit=' . rawurlencode($edit) : ''));
 }
+if ($section === 'rs_audio') {
+    if (!cms_is_admin()) { http_response_code(403); exit('Вы не являетесь администратором сайта, обратитесь к сисадмину.'); }
+    admin_redirect('/admin/?tab=admin_settings&manage=rs_audio');
+}
+if ($section === 'scenarios') admin_redirect('/admin/?tab=scenarios');
 if ($section !== '' && !cms_can($section)) { http_response_code(403); exit('Нет доступа к этому разделу.'); }
 if ($section === '' && $tab === 'home' && !cms_can('pages')) { http_response_code(403); exit('Нет доступа к редактору страниц.'); }
 if ($section === '' && $tab === 'portal' && !cms_is_admin() && empty($user['nafanya_access']) && !array_filter(CMS_SECTIONS, 'cms_can')) {
     http_response_code(403); exit('Для кабинета не выдан доступ. Обратитесь к администратору.');
+}
+if ($section === '' && $tab === 'service_schedule' && !cms_can('services')) {
+    http_response_code(403); exit('Нет доступа к графику служений. Обратитесь к администратору.');
+}
+if ($section === '' && $tab === 'scenarios' && !cms_can('scenarios')) {
+    http_response_code(403); exit('Нет доступа к сценариям собраний. Обратитесь к администратору.');
+}
+if ($section === '' && $tab === 'users' && !cms_is_admin()) {
+    http_response_code(403); exit('Вы не являетесь администратором сайта, обратитесь к сисадмину.');
 }
 if ($section === '' && $tab === 'site' && !cms_is_admin() && !array_filter(CMS_SECTIONS, 'cms_can')) {
     http_response_code(403); exit('Нет доступа к редактору сайта.');
@@ -657,8 +667,10 @@ if ($section === '' && $tab === 'structure' && !cms_can('pages')) {
 $adminSettingsDenied = $section === '' && $tab === 'admin_settings' && !cms_is_admin();
 $portalDefaults = cms_default_content()['admin_portal'];
 $portalLabels = $content['admin_portal']['labels'] ?? $portalDefaults['labels'];
-$portalOrder = array_values(array_filter($content['admin_portal']['order'] ?? $portalDefaults['order'], static fn($key): bool => isset($portalLabels[$key])));
+$portalLinks = array_merge($portalDefaults['links'], $content['admin_portal']['links'] ?? []);
+$portalOrder = array_values(array_filter($content['admin_portal']['order'] ?? $portalDefaults['order'], static fn($key): bool => isset($portalDefaults['labels'][$key]) && isset($portalLabels[$key])));
 foreach (array_keys($portalLabels) as $key) if (!in_array($key, $portalOrder, true)) $portalOrder[] = $key;
+$portalOrder = array_values(array_filter($portalOrder, static fn($key): bool => isset($portalDefaults['labels'][$key])));
 $structureGraph = null; $structureGroups = []; $structureSelectedPage = '';
 if ($tab === 'structure' && !$section) {
     $structureGraph = admin_page_graph($content);
@@ -674,55 +686,105 @@ if ($tab === 'structure' && !$section) {
     foreach ($cycleRoots as $key) $structureGroups['Замкнутые переходы'][] = $key;
 }
 $structureMobileLanding = $structureGraph !== null && !isset($_GET['page']);
+$backUrl = '';
+if ($tab === 'service_schedule' || $tab === 'scenarios' || $tab === 'site') $backUrl = '/admin/?tab=portal';
+elseif ($tab === 'admin_settings') $backUrl = $manage !== '' ? '/admin/?tab=admin_settings' : '/admin/?tab=portal';
+elseif ($tab === 'users') $backUrl = '/admin/?tab=admin_settings';
+elseif ($tab === 'structure' || $tab === 'home') $backUrl = '/admin/?tab=site';
+elseif ($section !== '') $backUrl = isset($_GET['edit']) ? '/admin/?section=' . rawurlencode($section) : '/admin/?tab=site';
 ?>
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=29"></head><body class="<?=$structureMobileLanding?'admin-structure--landing':''?>"><header class="admin-header"><button type="button" class="admin-menu-toggle" data-admin-menu-toggle aria-controls="admin-nav" aria-expanded="false">☰ <span>Разделы</span></button><a href="/" class="admin-brand">Почти нормальные <small>админка</small></a><form method="post"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><button class="link-button">Выйти (<?=h($user['username'])?>)</button></form></header><div class="admin-layout"><aside id="admin-nav" class="admin-nav" aria-label="Разделы админки"><div class="admin-nav__mobile-heading"><strong>Разделы</strong><button type="button" class="admin-nav__close" data-admin-menu-close aria-label="Закрыть разделы">×</button></div><a href="/admin/" class="<?=(!$section && $tab==='home')?'is-active':''?>">Главная страница</a><a href="?tab=structure" class="<?=($tab==='structure')?'is-active':''?>">Структура сайта</a><?php if ($structureGraph): ?><section class="admin-nav__explorer" aria-label="Проводник реальных переходов"><p>Переходы страниц</p><?php foreach ($structureGroups as $group=>$keys): if (!$keys) continue; ?><section class="site-explorer__group"><h3><?=h($group)?></h3><ul class="site-explorer__list"><?php foreach ($keys as $key) admin_structure_tree_node($structureGraph, $key, $structureSelectedPage); ?></ul></section><?php endforeach; ?></section><?php endif; ?><?php foreach (cms_section_labels() as $key=>$label): if (cms_can($key) && !in_array($key, ['navigation','pages','site_texts'], true)): ?><a href="?section=<?=$key?>" class="<?=$section===$key?'is-active':''?>"><?=h($label)?></a><?php endif; endforeach; ?><?php if (cms_is_admin()): ?><a href="?tab=users" class="<?=($tab==='users')?'is-active':''?>">Пользователи</a><?php endif; ?></aside><main class="admin-main"><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=30"></head><body class="<?=$structureMobileLanding?'admin-structure--landing':''?>"><header class="admin-header"><button type="button" class="admin-menu-toggle" data-admin-menu-toggle aria-controls="admin-nav" aria-expanded="false">☰ <span>Разделы</span></button><a href="/" class="admin-brand">Почти нормальные <small>админка</small></a><form method="post"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><button class="link-button">Выйти (<?=h($user['username'])?>)</button></form></header><div class="admin-layout"><aside id="admin-nav" class="admin-nav" aria-label="Разделы админки"><div class="admin-nav__mobile-heading"><strong>Разделы</strong><button type="button" class="admin-nav__close" data-admin-menu-close aria-label="Закрыть разделы">×</button></div><a href="/admin/" class="<?=(!$section && $tab==='home')?'is-active':''?>">Главная страница</a><a href="?tab=structure" class="<?=($tab==='structure')?'is-active':''?>">Структура сайта</a><?php if ($structureGraph): ?><section class="admin-nav__explorer" aria-label="Проводник реальных переходов"><p>Переходы страниц</p><?php foreach ($structureGroups as $group=>$keys): if (!$keys) continue; ?><section class="site-explorer__group"><h3><?=h($group)?></h3><ul class="site-explorer__list"><?php foreach ($keys as $key) admin_structure_tree_node($structureGraph, $key, $structureSelectedPage); ?></ul></section><?php endforeach; ?></section><?php endif; ?><?php foreach (cms_section_labels() as $key=>$label): if (cms_can($key) && !in_array($key, ['navigation','pages','site_texts'], true)): ?><a href="?section=<?=$key?>" class="<?=$section===$key?'is-active':''?>"><?=h($label)?></a><?php endif; endforeach; ?><?php if (cms_is_admin()): ?><a href="?tab=users" class="<?=($tab==='users')?'is-active':''?>">Пользователи</a><?php endif; ?></aside><main class="admin-main"><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?><?php if ($backUrl !== ''): ?><a class="admin-back" href="<?=h($backUrl)?>">← Назад</a><?php endif; ?>
 <?php
-$pageTextGroup = admin_site_text_group_for_section(
-    (!$section && $tab === 'home' && empty($_GET['edit'])) ? 'home' : $section
-);
+$pageTextGroup = '';
 if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $section ?: 'home');
 ?>
 <?php if (!$section && $tab === 'portal'): ?>
   <section class="admin-portal" aria-labelledby="admin-portal-title">
     <h1 id="admin-portal-title">Кабинет служащего</h1>
-    <p>Нужный раздел — одной кнопкой, без квеста по лабиринту админки.</p>
     <nav class="admin-portal__grid" aria-label="Служебные разделы">
-      <?php foreach ($portalOrder as $portalKey): ?>
-        <?php if ($portalKey === 'services' && cms_can('services')): ?><a class="admin-portal__button" href="https://docs.google.com/spreadsheets/d/1VAWzdnevTgTmfyx83wfSig9BW6PfdKK1wZorpW0bIvU/edit?usp=sharing" target="_blank" rel="noopener"><strong><?=h($portalLabels['services'])?></strong></a>
-        <?php elseif ($portalKey === 'scenarios' && cms_can('scenarios')): ?><a class="admin-portal__button" href="?section=scenarios"><strong><?=h($portalLabels['scenarios'])?></strong></a>
-        <?php elseif ($portalKey === 'nafanya' && !empty($user['nafanya_access'])): ?><a class="admin-portal__button" href="/nafanya-zoom-control/app"><img src="/assets/nafanya.png" alt=""><strong><?=h($portalLabels['nafanya'])?></strong></a>
-        <?php elseif ($portalKey === 'edit_site' && (cms_is_admin() || array_filter(CMS_SECTIONS, 'cms_can'))): ?><a class="admin-portal__button" href="?tab=site"><strong><?=h($portalLabels['edit_site'])?></strong></a>
-        <?php elseif ($portalKey === 'edit_admin' && cms_is_admin()): ?><a class="admin-portal__button" href="?tab=admin_settings"><strong><?=h($portalLabels['edit_admin'])?></strong></a>
-        <?php elseif ($portalKey === 'rs_audio' && cms_can('rs_audio')): ?><a class="admin-portal__button" href="?section=rs_audio"><strong><?=h($portalLabels['rs_audio'])?></strong></a><?php endif; ?>
+      <?php foreach ($portalOrder as $portalKey):
+        $allowed = match ($portalKey) {
+          'services' => cms_can('services'), 'scenarios' => cms_can('scenarios'),
+          'nafanya' => !empty($user['nafanya_access']),
+          'edit_site' => cms_is_admin() || (bool)array_filter(CMS_SECTIONS, 'cms_can'),
+          'edit_admin' => cms_is_admin(), default => false,
+        };
+        $destination = cms_safe_url($portalLinks[$portalKey] ?? '');
+        if (!$allowed || $destination === '') continue;
+        $icon = match ($portalKey) { 'services'=>'📊','scenarios'=>'📄','nafanya'=>'🧚','edit_site'=>'🔧','edit_admin'=>'🔒',default=>'•' };
+        $external = (bool)preg_match('~^https?://~i', $destination);
+      ?><a class="admin-portal__button" href="<?=h($destination)?>"<?=$external?' target="_blank" rel="noopener"':''?>><span class="admin-portal__icon" aria-hidden="true"><?=h($icon)?></span><strong><?=h($portalLabels[$portalKey])?></strong></a>
       <?php endforeach; ?>
     </nav>
   </section>
+<?php endif; ?>
+<?php if (!$section && $tab === 'service_schedule'):
+    $rota = cms_live_service_schedule();
+    $today = (new DateTimeImmutable('today', new DateTimeZone('Europe/Moscow')))->format('Y-m-d');
+    $rotaRows = array_values(array_filter($rota['rows'], static fn(array $row): bool => ($row['date'] ?? '') >= $today));
+    $weekdayShort = ['пн','вт','ср','чт','пт','сб','вс']; ?>
+  <section class="service-rota" aria-labelledby="service-rota-title">
+    <h1 id="service-rota-title">График служений</h1>
+    <p class="admin-tip"><?php if ($rota['available'] && $rota['stale']): ?>Показана последняя сохранённая таблица; связь с Google Таблицей временно не обновилась.<?php elseif ($rota['available']): ?>Таблица автоматически обновляется из общей Google Таблицы.<?php else: ?>Не удалось загрузить опубликованный график. Проверьте доступность исходной таблицы.<?php endif; ?></p>
+    <?php if ($rota['available'] && $rotaRows): ?><div class="service-rota__table-wrap"><table class="service-rota__table"><thead><tr><th>Дата</th><th>Ведущий</th><th>Техвед</th></tr></thead><tbody>
+      <?php foreach ($rotaRows as $row): $weekDay = max(1, min(7, (int)$row['day'])) - 1; ?><tr><td><time datetime="<?=h($row['date'])?>"><?=h(date('d.m', strtotime($row['date'])))?>, <?=h($weekdayShort[$weekDay])?></time></td><td><?=h($row['speaker'] ?: '—')?></td><td><?=h($row['tech'] ?: '—')?></td></tr><?php endforeach; ?>
+    </tbody></table></div><?php elseif ($rota['available']): ?><p class="service-rota__empty">В таблице пока нет будущих смен.</p><?php endif; ?>
+    <p class="service-rota__source"><a href="https://docs.google.com/spreadsheets/d/1VAWzdnevTgTmfyx83wfSig9BW6PfdKK1wZorpW0bIvU/edit?gid=311328672#gid=311328672" target="_blank" rel="noopener">Открыть исходную таблицу</a><?php if ($rota['available'] && $rota['fetched_at']): ?><span>Обновлено <?=h(date('d.m.Y H:i', (int)$rota['fetched_at']))?> МСК</span><?php endif; ?></p>
+  </section>
+<?php endif; ?>
+<?php if (!$section && $tab === 'scenarios'):
+    $scenarioItems = $content['scenarios']['items'] ?? cms_default_content()['scenarios']['items']; ?>
+  <section class="admin-scenarios" aria-labelledby="admin-scenarios-title"><h1 id="admin-scenarios-title">Сценарии собраний</h1><div class="admin-scenarios__grid">
+    <?php foreach ($scenarioItems as $item): $url = cms_safe_url($item['url'] ?? ''); if ($url === '') continue; ?><a class="admin-scenarios__button" href="<?=h($url)?>" target="_blank" rel="noopener"><span aria-hidden="true">📄</span><?=h($item['label'] ?? 'Открыть сценарий')?></a><?php endforeach; ?>
+  </div></section>
 <?php endif; ?>
 <?php if (!$section && $tab === 'site'): ?>
   <section class="admin-portal" aria-labelledby="admin-site-title">
     <h1 id="admin-site-title">Редактировать сайт</h1>
     <p>Показаны только разделы, которые доступны вашей учётной записи.</p>
     <nav class="admin-portal__grid" aria-label="Разделы сайта">
-      <?php foreach (cms_section_labels() as $key=>$label): if (!cms_can($key)) continue; ?>
-        <a class="admin-portal__button" href="?section=<?=rawurlencode($key)?>"><strong><?=h($label)?></strong></a>
+      <?php if (cms_can('pages')): ?><a class="admin-portal__button" href="?tab=home"><span class="admin-portal__icon" aria-hidden="true">🏠</span><strong>Главная</strong></a><?php endif; ?>
+      <?php if (cms_can('navigation')): ?><a class="admin-portal__button" href="?section=navigation"><span class="admin-portal__icon" aria-hidden="true">🧭</span><strong>Кнопки и меню</strong></a><?php endif; ?>
+      <?php if (cms_can('site_texts')): ?><a class="admin-portal__button" href="?section=site_texts"><span class="admin-portal__icon" aria-hidden="true">🔤</span><strong>Заголовки и подписи</strong></a><?php endif; ?>
+      <?php if (cms_can('pages')): ?><a class="admin-portal__button" href="?tab=structure"><span class="admin-portal__icon" aria-hidden="true">🗺️</span><strong>Структура сайта</strong></a><?php endif; ?>
+      <?php foreach (cms_section_labels() as $key=>$label): if (!cms_can($key) || in_array($key,['navigation','pages','site_texts','scenarios','rs_audio'],true)) continue; ?>
+        <a class="admin-portal__button" href="?section=<?=rawurlencode($key)?>"><span class="admin-portal__icon" aria-hidden="true">📁</span><strong><?=h($label)?></strong></a>
       <?php endforeach; ?>
     </nav>
   </section>
 <?php endif; ?>
-<?php if (!$section && $tab === 'admin_settings' && !$adminSettingsDenied): ?>
+<?php if (!$section && $tab === 'admin_settings' && !$adminSettingsDenied && $manage === ''): ?>
   <section class="admin-portal" aria-labelledby="admin-settings-title">
     <h1 id="admin-settings-title">Редактировать админку</h1>
-    <p>Здесь отдельно от материалов сайта настраиваются кнопки кабинета и права служащих. Этот раздел доступен только администраторам сайта.</p>
-    <form method="post" class="admin-form">
-      <input type="hidden" name="action" value="save_admin_portal"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
-      <h2>Кнопки кабинета: названия и порядок</h2>
-      <fieldset class="admin-portal-order"><legend>Перетасуйте стрелками; названия можно изменить</legend>
-      <div><?php foreach ($portalOrder as $index=>$key): ?><div class="repeat-row"><input type="hidden" name="portal_order[]" value="<?=h($key)?>"><label class="field"><span><?=h(match($key){'services'=>'График служений','scenarios'=>'Сценарии собраний','nafanya'=>'Нафаня в ZOOM','edit_site'=>'Редактировать сайт','edit_admin'=>'Редактировать админку','rs_audio'=>'Аудиозаписи РС',default=>$key})?></span><input name="portal_label[<?=h($key)?>]" value="<?=h($portalLabels[$key])?>" maxlength="80"></label><button type="button" class="move-row" data-move="up" aria-label="Переместить выше">↑</button><button type="button" class="move-row" data-move="down" aria-label="Переместить ниже">↓</button></div><?php endforeach; ?></div>
-      </fieldset>
-      <button class="button">Сохранить названия</button>
-    </form>
-    <a class="admin-portal__button" href="?tab=users"><strong>Пользователи, роли и доступы</strong></a>
+    <p>Настройки кабинета служащих — отдельно от содержания основного сайта.</p>
+    <nav class="admin-portal__grid" aria-label="Настройки админки">
+      <a class="admin-portal__button" href="?tab=admin_settings&amp;manage=portal"><span class="admin-portal__icon" aria-hidden="true">🔘</span><strong>Кнопки и меню кабинета</strong></a>
+      <a class="admin-portal__button" href="?tab=admin_settings&amp;manage=scenarios"><span class="admin-portal__icon" aria-hidden="true">📄</span><strong>Сценарии собраний</strong></a>
+      <a class="admin-portal__button" href="?tab=admin_settings&amp;manage=rs_audio"><span class="admin-portal__icon" aria-hidden="true">🎵</span><strong>Аудиозаписи РС</strong></a>
+      <a class="admin-portal__button" href="?tab=users"><span class="admin-portal__icon" aria-hidden="true">👥</span><strong>Пользователи, роли и доступы</strong></a>
+    </nav>
   </section>
+<?php elseif (!$section && $tab === 'admin_settings' && !$adminSettingsDenied && $manage === 'portal'): ?>
+  <h1>Кнопки и меню кабинета</h1>
+  <p class="admin-tip">Меняйте название, адрес и порядок. Стрелки переставляют кнопку вверх или вниз.</p>
+  <form method="post" class="admin-form">
+    <input type="hidden" name="action" value="save_admin_portal"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
+    <fieldset class="admin-portal-order"><legend>Настройка кнопок</legend>
+      <div><?php foreach ($portalOrder as $key): ?><div class="repeat-row"><input type="hidden" name="portal_order[]" value="<?=h($key)?>"><label class="field"><span><?=h(match($key){'services'=>'График служений','scenarios'=>'Сценарии собраний','nafanya'=>'Нафаня в ZOOM','edit_site'=>'Редактировать сайт','edit_admin'=>'Редактировать админку',default=>$key})?></span><input name="portal_label[<?=h($key)?>]" value="<?=h($portalLabels[$key])?>" maxlength="80"></label><label class="field"><span>Адрес кнопки</span><input name="portal_link[<?=h($key)?>]" value="<?=h($portalLinks[$key] ?? '')?>" maxlength="500" required></label><button type="button" class="move-row" data-move="up" aria-label="Переместить выше">↑</button><button type="button" class="move-row" data-move="down" aria-label="Переместить ниже">↓</button></div><?php endforeach; ?></div>
+    </fieldset>
+    <button class="button">Сохранить кнопки</button>
+  </form>
+<?php elseif (!$section && $tab === 'admin_settings' && !$adminSettingsDenied && $manage === 'scenarios'):
+    $scenarioItems = $content['scenarios']['items'] ?? cms_default_content()['scenarios']['items'];
+    $scenarioDefaults = cms_default_content()['scenarios']['items'];
+    $scenarioItems = array_values(array_slice(array_merge($scenarioItems, array_slice($scenarioDefaults, count($scenarioItems))), 0, 5)); ?>
+  <h1>Сценарии собраний</h1>
+  <p class="admin-tip">Настройте подпись и ссылку на PDF каждого сценария.</p>
+  <form method="post" class="admin-form">
+    <input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="scenarios"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
+    <?php foreach ($scenarioItems as $index=>$item): ?><h2><?=h($scenarioDefaults[$index]['label'])?></h2><?php admin_action_row($item, 'scenario_action', false, false); ?><?php endforeach; ?>
+    <button class="button">Сохранить сценарии</button>
+  </form>
 <?php elseif (!$section && $tab === 'admin_settings' && $adminSettingsDenied): ?>
   <section class="admin-portal"><h1>Редактировать админку</h1><p>Вы не являетесь администратором сайта, обратитесь к сисадмину.</p></section>
 <?php endif; ?>
@@ -739,7 +801,7 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
 <?php endif; ?>
 <?php if ($tab === 'users' && cms_is_admin()): $editId=(string)($_GET['edit']??''); $edit=[]; foreach ($users as $candidate) if (($candidate['id']??'')===$editId) $edit=$candidate; ?>
   <div class="section-heading"><h1>Пользователи</h1><a class="button button--quiet" href="?tab=users&edit=new">Добавить пользователя</a></div>
-  <?php if ($editId): ?><form method="post" class="admin-form"><input type="hidden" name="action" value="save_user"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($edit['id']??'')?>"><h2><?= $edit ? 'Редактирование: '.h($edit['username']) : 'Новый пользователь' ?></h2><div class="form-grid"><?php admin_input('username',$edit['username']??'','text','Логин'); ?><label class="field"><span><?= $edit?'Новый пароль (оставьте пустым, чтобы не менять)':'Пароль (минимум 12 символов)' ?></span><input type="password" name="password" autocomplete="new-password"></label></div><label class="check"><input type="checkbox" name="active" <?=(!$edit || !empty($edit['active']))?'checked':''?>> Аккаунт активен</label><label class="check"><input type="checkbox" name="admin" <?=!empty($edit['admin'])?'checked':''?>> Администратор: может управлять пользователями и всеми разделами</label><label class="check"><input type="checkbox" name="nafanya_access" <?=!empty($edit['nafanya_access'])?'checked':''?>> Доступ к пульту Нафани (только активным пользователям)</label><fieldset><legend>Разрешённые разделы</legend><?php foreach (cms_section_labels() as $key=>$label): ?><label class="check"><input type="checkbox" name="permissions[]" value="<?=$key?>" <?=in_array($key,$edit['permissions']??[],true)?'checked':''?>> <?=h($label)?></label><?php endforeach; ?></fieldset><div class="form-actions"><button class="button">Сохранить пользователя</button><a class="button button--quiet" href="?tab=users">Отмена</a></div></form><?php endif; ?>
+  <?php if ($editId): ?><form method="post" class="admin-form"><input type="hidden" name="action" value="save_user"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($edit['id']??'')?>"><h2><?= $edit ? 'Редактирование: '.h($edit['username']) : 'Новый пользователь' ?></h2><div class="form-grid"><?php admin_input('username',$edit['username']??'','text','Логин'); ?><label class="field"><span><?= $edit?'Новый пароль (оставьте пустым, чтобы не менять)':'Пароль (минимум 12 символов)' ?></span><input type="password" name="password" autocomplete="new-password"></label></div><label class="check"><input type="checkbox" name="active" <?=(!$edit || !empty($edit['active']))?'checked':''?>> Аккаунт активен</label><label class="check"><input type="checkbox" name="admin" <?=!empty($edit['admin'])?'checked':''?>> Администратор: может управлять пользователями и всеми разделами</label><label class="check"><input type="checkbox" name="nafanya_access" <?=!empty($edit['nafanya_access'])?'checked':''?>> Доступ к пульту Нафани (только активным пользователям)</label><fieldset><legend>Разрешённые разделы</legend><?php foreach (cms_section_labels() as $key=>$label): if ($key === 'rs_audio') continue; ?><label class="check"><input type="checkbox" name="permissions[]" value="<?=$key?>" <?=in_array($key,$edit['permissions']??[],true)?'checked':''?>> <?=h($label)?></label><?php endforeach; ?></fieldset><div class="form-actions"><button class="button">Сохранить пользователя</button><a class="button button--quiet" href="?tab=users">Отмена</a></div></form><?php endif; ?>
   <div class="table-wrap"><table><thead><tr><th>Логин</th><th>Доступ</th><th>Пульт Нафани</th><th>Состояние</th><th></th></tr></thead><tbody><?php foreach ($users as $candidate): ?><tr><td><?=h($candidate['username'])?></td><td><?=!empty($candidate['admin'])?'Администратор':h(implode(', ',array_map(static fn($p)=>cms_section_labels()[$p]??$p,$candidate['permissions']??[])))?></td><td><?=!empty($candidate['nafanya_access'])?'Разрешён':'Нет'?></td><td><?=!empty($candidate['active'])?'Активен':'Отключён'?></td><td><a href="?tab=users&edit=<?=h($candidate['id'])?>">Изменить</a></td></tr><?php endforeach; ?></tbody></table></div>
 <?php endif; ?>
 <?php if ($section === 'announcements'): $items=$content['announcements']??[]; $editId=(string)($_GET['edit']??''); $edit=[]; foreach($items as $item)if(($item['id']??'')===$editId)$edit=$item; ?>
@@ -786,27 +848,7 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
   <?php endif; ?>
   <div class="item-list"><?php foreach($items as $item): ?><article><strong><?=h($item['title']??'')?></strong><span><?=h($item['event_date']??'')?></span><div class="item-list__actions"><form method="post"><input type="hidden" name="action" value="reorder_archive_item"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($item['id']??'')?>"><input type="hidden" name="direction" value="up"><button class="move-row" title="Поднять выше" aria-label="Поднять решение выше">↑</button></form><form method="post"><input type="hidden" name="action" value="reorder_archive_item"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($item['id']??'')?>"><input type="hidden" name="direction" value="down"><button class="move-row" title="Опустить ниже" aria-label="Опустить решение ниже">↓</button></form><a href="?section=archive&edit=<?=h($item['id']??'')?>">Изменить</a><form method="post" onsubmit="return confirm('Удалить решение?')"><input type="hidden" name="action" value="delete_archive_item"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><input type="hidden" name="id" value="<?=h($item['id']??'')?>"><button class="link-danger">Удалить</button></form></div></article><?php endforeach; ?></div>
 <?php endif; ?>
-<?php if ($section === 'scenarios'):
-    $items = $content['scenarios']['items'] ?? cms_default_content()['scenarios']['items'];
-    $defaults = cms_default_content()['scenarios']['items'];
-    $items = array_values(array_slice(array_merge($items, array_slice($defaults, count($items))), 0, 5));
-?>
-  <h1>Сценарии собраний</h1>
-  <p class="admin-tip">Пять кнопок сценариев — отдельно от расписания по дням. Здесь настраиваются подписи, ссылки на PDF и оформление.</p>
-  <form method="post" class="admin-form">
-    <input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="scenarios"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
-    <?php foreach ($items as $index=>$item): ?>
-      <h2><?=h($defaults[$index]['label'])?></h2>
-      <?php admin_action_row($item, 'scenario_action', false, false); ?>
-    <?php endforeach; ?>
-    <button class="button">Сохранить сценарии</button>
-  </form>
-  <section class="content-card scenario-preview" aria-label="Предпросмотр пяти кнопок">
-    <h2>Предпросмотр кнопок</h2>
-    <?=cms_actions_html($items, 'scenario-links')?>
-  </section>
-<?php endif; ?>
-<?php if ($section === 'rs_audio'):
+<?php if (!$section && $tab === 'admin_settings' && $manage === 'rs_audio' && !$adminSettingsDenied):
     $items = cms_rs_audio_newest_first($content['rs_audio']['items'] ?? []);
 ?>
   <h1>Аудиозаписи РС</h1>
@@ -908,7 +950,6 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
   <h1>Служения</h1>
   <form method="post" class="admin-form" id="services-form">
     <input type="hidden" name="action" value="save_section"><input type="hidden" name="section" value="services"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>">
-    <?php admin_input('chart_url',$data['chart_url']??'','url','Ссылка на график служений'); admin_document_position('chart_position',$data['chart_position']??'top','Где показывать кнопку графика'); ?>
     <?php admin_rich('lead',admin_rich_legacy_text((string)($data['lead']??'')),'Вступительный текст'); ?>
     <fieldset class="repeatable" data-repeat="services"><legend>Список служений</legend><div data-repeat-items><?php foreach(($data['items']??[]) as $i=>$item) admin_service_editor($item, $i); ?></div><button type="button" class="button button--quiet" data-add-row>Добавить служение</button><template><?php admin_service_editor([], 0); ?></template></fieldset>
     <button class="button">Сохранить служения</button>
@@ -982,4 +1023,4 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
     <button class="button" type="submit">Сохранить заголовки и подписи</button>
   </form>
 <?php endif; ?>
-</main></div><script src="admin.js?v=28"></script></body></html>
+</main></div><script src="admin.js?v=29"></script></body></html>

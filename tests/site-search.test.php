@@ -15,6 +15,9 @@ $content['pages']['custom'][array_key_last($content['pages']['custom'])]['descri
 $content['site_texts']['schedule_description'] = 'СЕКРЕТ_SEO_РАСПИСАНИЕ';
 $content['site_texts']['announcements_description'] = 'СЕКРЕТ_SEO_ОБЪЯВЛЕНИЯ';
 $content['site_texts']['archive_description'] = 'СЕКРЕТ_SEO_АРХИВ';
+$content['admin_portal'] = ['labels'=>['edit_admin'=>'СЕКРЕТ_АДМИН_МЕНЮ'],'links'=>['edit_admin'=>'/admin/?tab=admin_settings']];
+$content['users'] = [['username'=>'СЕКРЕТ_ЛОГИН','permissions'=>['archive']]];
+$content['admin_settings'] = ['private_note'=>'СЕКРЕТ_ЗАКРЫТЫЕ_НАСТРОЙКИ'];
 $content['announcements'][] = ['id'=>'expired','title'=>'СЕКРЕТ_УСТАРЕЛО','body'=>'Не показывать','hide_after'=>'2020-01-01'];
 $content['speakers']['items'][] = ['id'=>'record-1','title'=>'Первый шаг','speaker'=>'Мария','event_date'=>'2026-10-03'];
 $documents = site_search_documents($content, '2026-10-04');
@@ -28,6 +31,8 @@ expect_search(in_array('/speakers.html#speaker-record-1', $urls, true), 'Пои�
 expect_search(in_array('/p/test-na-alkogolizm', $urls, true) === in_array('aa-test', array_column($content['newcomers']['pages'], 'slug'), true), 'Тест включается только при публикации.');
 expect_search(!str_contains($dump, 'СЕКРЕТ_'), 'Черновики и устаревшие объявления не должны попасть в поиск.');
 expect_search(!str_contains($dump, '+7 981'), 'Платёжные реквизиты не должны попадать в поиск.');
+expect_search(!str_contains($dump, 'СЕКРЕТ_АДМИН') && !str_contains($dump, 'СЕКРЕТ_ЛОГИН') && !str_contains($dump, 'СЕКРЕТ_ЗАКРЫТЫЕ'), 'Данные админки и пользователей не должны попадать в поиск.');
+expect_search(!array_filter($urls, static fn(string $url): bool => str_starts_with($url, '/admin') || str_contains($url, 'admin_settings') || str_contains($url, 'admin_portal')), 'Поисковый индекс должен содержать только публичные URL.');
 expect_search(site_search_text('<p>Текст<br><strong>после</strong> &amp; ещё</p>') === 'Текст после & ещё', 'Поисковый текст должен быть чистым и читаемым.');
 
 echo "Site search document checks passed.\n";

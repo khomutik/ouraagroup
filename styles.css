@@ -403,9 +403,11 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 }
 
 .social-link--nafanya img {
-  border-radius: 14px;
-  background: var(--cream-2);
-  object-fit: cover;
+  padding: 3px;
+  border: 2px solid rgba(255,255,255,.8);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #f6d9ae, #fff8e8);
+  object-fit: contain;
 }
 
 .social-link small {
@@ -1399,9 +1401,11 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 }
 
 .site-nav-socials__link--nafanya img {
-  border-radius: 12px;
-  background: var(--cream-2);
-  object-fit: cover;
+  padding: 2px;
+  border: 1px solid rgba(17,26,64,.16);
+  border-radius: 11px;
+  background: linear-gradient(145deg, #f6d9ae, #fff8e8);
+  object-fit: contain;
 }
 
 .mobile-bottom-nav {
@@ -2152,8 +2156,7 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 .content-button--blue { color: #fff !important; background: var(--blue); border-color: var(--blue); }
 .content-button--beige { color: var(--blue) !important; background: var(--cream-3); border-color: #c9ad84; }
 .content-button--orange { color: #fff !important; background: var(--orange); border-color: var(--orange); }
-.content-button--pill { border-radius: 999px; }
-.content-button--square { border-radius: 4px; }
+.content-button--pill,.content-button--square { border-radius: 12px !important; }
 .content-button--align-center { display: flex; width: fit-content; margin-inline: auto; }
 .content-button--align-right { display: flex; width: fit-content; margin-left: auto; }
 .content-button--align-full { display: flex; width: 100%; }

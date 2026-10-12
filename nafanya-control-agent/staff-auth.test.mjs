@@ -47,6 +47,12 @@ test("the embedded Zoom admin and book-base section is hidden for staff and Zoom
   assert.equal(hideWorkerAdminPanel(workerHtml, "admin"), workerHtml);
 });
 
+test("the current Zoom admin login panel stays hidden in worker HTML for non-admin roles", () => {
+  const currentHtml = '<details id="adminPanel" class="admin-panel"><summary>Админ / вход Zoom</summary></details>';
+  assert.match(hideWorkerAdminPanel(currentHtml, "staff"), /<details id="adminPanel" class="admin-panel" hidden>/u);
+  assert.equal(hideWorkerAdminPanel(currentHtml, "admin"), currentHtml);
+});
+
 test("book-base endpoints require the CMS Administrator role", () => {
   assert.equal(workerPathRequiresAdmin("/zoom-only/library/status"), true);
   assert.equal(workerPathRequiresAdmin("/zoom-only/library/import"), true);
