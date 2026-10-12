@@ -28,7 +28,7 @@ check(in_array('https://example.org/groups', array_column($items, 'url'), true),
 check(!in_array('nafanya-zoom-control', array_column($items, 'id'), true), 'Служебный пульт Нафани не должен отображаться в публичном меню сайта.');
 $unsafeMenu = $content;
 $unsafeMenu['navigation']['items'] = [
-    ['id'=>'archive','title'=>'Архив','url'=>'archive.html','parent'=>''],
+    ['id'=>'archive','title'=>'Архив решений','url'=>'archive.html','parent'=>''],
     ['id'=>'nafanya-zoom-control','title'=>'Старый пункт','url'=>'/nafanya-zoom-control/app?token=do-not-publish','parent'=>''],
 ];
 $safeMenu = cms_navigation_payload($unsafeMenu)['items'];

@@ -21,7 +21,7 @@ function admin_site_text_group_for_section(string $section): string {
         'services' => 'Служения',
         'newcomers' => 'Новичкам',
         'tradition' => '7-я традиция',
-        'archive' => 'Архив',
+        'archive' => 'Архив решений',
         default => '',
     };
 }
@@ -55,7 +55,7 @@ function admin_page_links(array $content): void { ?>
   <nav class="admin-page-links" aria-label="Редактировать страницу сайта">
     <h2>Какую страницу изменить?</h2>
     <div class="admin-page-links__grid">
-      <?php foreach ([''=>'Главная страница','schedule'=>'Расписание','newcomers'=>'Новичкам','announcements'=>'Объявления','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','tradition'=>'7-я традиция','archive'=>'Архив'] as $key=>$label):
+      <?php foreach ([''=>'Главная страница','schedule'=>'Расписание','newcomers'=>'Новичкам','announcements'=>'Объявления','library'=>'Библиотека','speakers'=>'Спикерские','services'=>'Служения','tradition'=>'7-я традиция','archive'=>'Архив решений'] as $key=>$label):
         if (!cms_can($key === '' ? 'pages' : $key)) continue; ?>
         <a href="<?= $key === '' ? '/admin/?tab=home' : '/admin/?section=' . rawurlencode($key) ?>"><?=h($label)?></a>
       <?php endforeach; ?>
