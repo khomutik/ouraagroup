@@ -1,0 +1,67 @@
+{
+  "observedOn": "2026-10-12",
+  "site": "https://pochtinormalnye.ru/",
+  "google": {
+    "performanceSource": "https://search.google.com/search-console/performance/search-analytics?resource_id=https%3A%2F%2Fpochtinormalnye.ru%2F&num_of_days=7&compare_date=PREV",
+    "searchType": "Web",
+    "datesAsDisplayedByProvider": true,
+    "currentPeriod": {"start": "2026-10-03", "end": "2026-10-09", "days": 7, "clicks": 1, "impressions": 11, "ctrPercent": 9.1, "averagePosition": 17.7},
+    "comparisonPeriod": {"start": "2026-09-30", "end": "2026-10-02", "days": 3, "clicks": 0, "impressions": 3, "ctrPercent": 0, "averagePosition": 26},
+    "weekOverWeekComparable": false,
+    "weekOverWeekPercent": null,
+    "caveat": "The UI labels the comparison as previous 7 days, but its date fields clamp it to 3 available days. Do not interpret the totals as two complete comparable weeks or infer an SEO effect from one click.",
+    "visibleQueries": ["aa safety statement", "aa group conscience guidelines", "aa bylaws"],
+    "allAvailablePeriod": {"start": "2026-09-30", "end": "2026-10-09", "clicks": 1, "impressions": 14, "ctrPercent": 7.1, "averagePosition": 19.5},
+    "indexSource": "https://search.google.com/search-console/index?resource_id=https%3A%2F%2Fpochtinormalnye.ru%2F",
+    "indexReportUpdated": "2026-10-09",
+    "indexScope": "All processed URLs, including PDFs and alternate URLs; not the 17 HTML URLs of the sitemap alone",
+    "indexedUrls": 13,
+    "notIndexedUrls": 9,
+    "notIndexedReasons": {"alternateCanonical": 1, "discoveredNotIndexed": 7, "crawledNotIndexed": 1},
+    "previousObservedOn": "2026-10-09",
+    "previousReportUpdated": "2026-10-04",
+    "previousIndexedUrls": 7,
+    "indexedNewcomerExamples": ["/newcomers/twelve-steps/", "/newcomers/meetings/", "/newcomers/sponsor-steps/", "/newcomers/not-about-aa/", "/newcomers/pn-meetings/", "/newcomers/aa/"],
+    "sitemap": {"status": "Success", "lastRead": "2026-10-10", "discoveredUrls": 17},
+    "manualActions": "No issues",
+    "securityIssues": "No issues",
+    "fieldCoreWebVitals": "No data in the overview",
+    "aiSource": "https://search.google.com/search-console/performance/search-analytics/ai?resource_id=https%3A%2F%2Fpochtinormalnye.ru%2F",
+    "aiAvailablePeriod": {"start": "2026-09-30", "end": "2026-10-09", "siteImpressions": 3},
+    "aiDailyImpressions": [{"date": "2026-09-30", "value": 0}, {"date": "2026-10-01", "value": null}, {"date": "2026-10-02", "value": 0}, {"date": "2026-10-03", "value": 1}, {"date": "2026-10-04", "value": 1}, {"date": "2026-10-05", "value": 0}, {"date": "2026-10-06", "value": 0}, {"date": "2026-10-07", "value": 0}, {"date": "2026-10-08", "value": 1}, {"date": "2026-10-09", "value": 0}],
+    "aiCaveat": "October 1 is absent from the visible daily table, not assumed zero. Page rows are not summed into site impressions. This beta report is not a measure of all AI engines or conversions."
+  },
+  "bing": {
+    "sitemapSource": "https://www.bing.com/webmasters/sitemaps?siteUrl=https://pochtinormalnye.ru/",
+    "sitemap": {"status": "Success", "lastCrawl": "2026-10-10", "discoveredUrls": 17, "errors": 0, "warnings": 0},
+    "performanceSource": "https://www.bing.com/webmasters/searchperf?siteUrl=https://pochtinormalnye.ru/",
+    "performanceScope": "All verticals, as selected by the UI",
+    "performancePeriod": {"start": "2026-07-12", "end": "2026-10-11", "displayedClicks": 0, "displayedViews": 0},
+    "queryRowsAvailable": false,
+    "aiSource": "https://www.bing.com/webmasters/aiperformance?siteUrl=https://pochtinormalnye.ru/",
+    "aiDisplay": {"citations": 0, "citedPages": 0, "message": "No data available"},
+    "aiCaveat": "The report explicitly describes a sample from Microsoft Copilots and partners. The empty report does not establish zero citations across all AI search engines."
+  },
+  "yandex": {
+    "source": "https://webmaster.yandex.ru/site/https:pochtinormalnye.ru:443/dashboard/",
+    "status": "Official temporary-unavailability page after a network timeout and a retry",
+    "weeklyMetrics": null,
+    "lastConfirmedSitemapObservation": "2026-10-09: 17 URLs, status OK; not today's verified status"
+  },
+  "metrika": {
+    "source": "https://metrika.yandex.ru/",
+    "status": "Official temporary-unavailability page",
+    "weeklyMetrics": null,
+    "privacy": "Site code continues to require explicit visitor consent; Webvisor, clickmap and link tracking remain disabled. Settings were not changed."
+  },
+  "wordstat": {
+    "source": "https://wordstat.yandex.ru/",
+    "period": {"start": "2026-09-05", "end": "2026-10-04"},
+    "regions": "All",
+    "devices": "Desktop, smartphone and tablet",
+    "matchType": "Broad, includes longer and inflected queries; overlapping frequencies must not be summed",
+    "queries": {"как бросить пить": 30546, "как бросить пить алкоголь": 9539, "как бросить пить самостоятельно": 5919, "как бросить пить алкоголь самостоятельно": 4843, "алкогольная зависимость": 39331, "как избавиться от алкогольной зависимости": 1203, "тест на алкогольную зависимость": 435, "как избавиться от алкогольной зависимости самостоятельно": 374},
+    "excludedMedicalIntents": {"лечение алкогольной зависимости": 5058, "таблетки от алкогольной зависимости": 1627},
+    "caveat": "This is the period actually returned by Wordstat today, not a fresh October 12 week. The previous research uses an overlapping monthly window shifted by one day, so differences are not weekly growth."
+  }
+}
