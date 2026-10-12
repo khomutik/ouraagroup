@@ -305,3 +305,23 @@ input,textarea,select{min-width:0;max-width:100%}
 @media(max-width:650px){.rs-audio-card{padding:14px}.rs-audio-card .speaker-audio__load,.rs-audio-card .speaker-audio__download{width:100%}.rs-audio-card iframe{height:220px}}
 .scenario-text-block p+p{margin-top:.55em}
 .scenario-reader-page>p+p{margin-top:.55em}
+
+/* The desktop navigation sits directly on the navy page background. Keep its
+   default labels and page tree light; only the selected/hovered row turns dark. */
+@media(min-width:761px){
+  .admin-layout:not(:has(.admin-portal))>.admin-nav{color:#fbf7ea;border-right-color:#fbf7ea55}
+  .admin-layout:not(:has(.admin-portal))>.admin-nav>a{color:#fbf7ea}
+  .admin-layout:not(:has(.admin-portal))>.admin-nav>a.is-active,
+  .admin-layout:not(:has(.admin-portal))>.admin-nav>a:hover,
+  .admin-layout:not(:has(.admin-portal))>.admin-nav>a:focus-visible{background:#eadbc1;color:#111a40}
+  .admin-layout:not(:has(.admin-portal)) .admin-nav__explorer{border-color:#fbf7ea55}
+  .admin-layout:not(:has(.admin-portal)) .admin-nav__explorer>p,
+  .admin-layout:not(:has(.admin-portal)) .admin-nav__explorer .site-explorer__group>h3,
+  .admin-layout:not(:has(.admin-portal)) .admin-nav__explorer .site-explorer__name,
+  .admin-layout:not(:has(.admin-portal)) .admin-nav__explorer .site-explorer__via,
+  .admin-layout:not(:has(.admin-portal)) .admin-nav__explorer .site-explorer__draft,
+  .admin-layout:not(:has(.admin-portal)) .admin-nav__explorer .site-explorer__cycle{color:#fbf7ea}
+  .admin-layout:not(:has(.admin-portal)) .admin-nav__explorer .site-explorer__toggle{color:#fbf7ea}
+  .admin-layout:not(:has(.admin-portal)) .admin-nav__explorer .site-explorer__page-icon{border-color:#fbf7ea;background:#111a40}
+  .admin-layout:not(:has(.admin-portal)) .admin-nav__explorer .site-explorer__page-icon:after{border-color:#fbf7ea;box-shadow:0 4px 0 #fbf7ea,0 8px 0 #fbf7ea}
+}
