@@ -62,6 +62,11 @@ check(cms_default_content()['admin_portal']['order'] === ['services','scenarios'
 check(cms_default_content()['admin_portal']['links']['rs_audio'] === '/admin/?tab=rs_audio', 'Кнопка аудиозаписей РС должна открывать страницу записей в кабинете.');
 check(cms_default_content()['admin_portal']['links']['services'] === '/admin/?tab=service_schedule', 'График служений должен открывать таблицу внутри кабинета.');
 check(cms_default_content()['admin_portal']['links']['scenarios'] === '/admin/?tab=scenarios', 'Сценарии в кабинете должны открывать список PDF, а не редактор.');
+check(cms_rs_audio_display_title('РС 03.10.2026', '2026-10-03') === 'РС', 'Дату из названия аудио нужно убрать, если она уже выводится отдельно.');
+check(cms_rs_audio_display_title('РС 26.04.2026, часть 1', '2026-04-26') === 'РС, часть 1', 'Удаление повторной даты должно сохранять подпись части записи.');
+check(cms_rs_audio_display_title('Особая запись', '2026-10-03') === 'Особая запись', 'Название без даты должно оставаться без изменений.');
+check(cms_rs_audio_display_title('РС 03.10.2026', '2026-10-04') === 'РС 03.10.2026', 'Несовпадающую дату в названии нельзя удалять.');
+check(cms_rs_audio_display_title('', '2026-10-03') === 'Рабочее собрание', 'Для пустого названия аудио нужно оставить резервную подпись.');
 check(cms_schedule_scenario_button(['url'=>'/file.pdf','shape'=>'square'])['shape'] === 'rounded', 'Форма кнопок должна быть скруглённой независимо от старых значений.');
 check(array_column(cms_rs_audio_newest_first([
     ['id'=>'old','event_date'=>'2026-06-27'],

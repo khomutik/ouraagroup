@@ -1,4 +1,4 @@
-const CACHE_NAME = "aa-pn-v176";
+const CACHE_NAME = "aa-pn-v181";
 // Dynamic CMS pages are deliberately excluded: visitors must receive a fresh
 // version after publication, rather than a copy saved by the service worker.
 const APP_SHELL = [
@@ -8,12 +8,13 @@ const APP_SHELL = [
   "./tradition.html",
   "./robots.txt",
   "./sitemap.xml",
-  "./styles.css?v=118",
+  "./styles.css?v=126",
   "./site-nav.js?v=22",
-  "./pwa-install.js?v=11",
+  "./pwa-install.js?v=12",
   "./site-chat.js?v=7",
   "./site-search.js?v=6",
   "./manifest.webmanifest",
+  "./meeting-countdown.js?v=1",
   "./favicon.ico",
   "./icons/favicon-16.png",
   "./icons/favicon-32.png",
@@ -29,9 +30,15 @@ const APP_SHELL = [
   "./assets/emoji/aa_ballot.png",
   "./assets/emoji/aa_book_blue.png",
   "./assets/emoji/aa_heart_hands.png",
-  "./icons/icon-192-v3.png",
-  "./icons/icon-512-v3.png",
-  "./icons/apple-touch-icon-v3.png"
+  "./icons/icon-192-v4.png",
+  "./icons/icon-512-v4.png",
+  "./icons/apple-touch-icon-v4.png",
+  "./assets/pn-text-transparent.png?v=1",
+  "./assets/home-header-mobile-v1.jpg?v=1",
+  "./assets/nafanya.png?v=5",
+  "./assets/menu-schedule.png?v=1",
+  "./assets/menu-scenarios-512.png",
+  "./assets/menu-audio-rs-512.png"
 ];
 
 self.addEventListener("install", (event) => {

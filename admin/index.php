@@ -485,7 +485,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $title=cms_text($_POST['title']??'',180); if($title==='')throw new RuntimeException('Введите тему решения.');
                     $date=cms_text($_POST['event_date']??'',10); if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date))throw new RuntimeException('Укажите дату решения.');
                     $current=$index===null?[]:$items[$index]; $image=cms_upload('image_file','image')?:cms_safe_url($_POST['image_url']??($current['image']??''));
-                    $record=['id'=>$id?:cms_id(),'title'=>$title,'event_date'=>$date,'event_time'=>cms_text($_POST['event_time']??'',5),'order'=>$index===null?0:(int)($current['order']??$index),'image'=>$image,'body'=>cms_sanitize_html(cms_replace_inline_uploads($_POST['body']??'','body_inline_images')),'protocol_text'=>archive_plain_text(cms_text($_POST['protocol_text']??($current['protocol_text']??''),200000)),'treasurer_report'=>cms_sanitize_html($_POST['treasurer_report']??($current['treasurer_report']??'')),'links'=>admin_collect_actions('card_action')];
+                    $treasurerImage = cms_upload('treasurer_image_file','image') ?: cms_safe_url($_POST['treasurer_image_url'] ?? ($current['treasurer_image'] ?? ''));
+                    $record=['id'=>$id?:cms_id(),'title'=>$title,'event_date'=>$date,'event_time'=>cms_text($_POST['event_time']??'',5),'order'=>$index===null?0:(int)($current['order']??$index),'image'=>$image,'body'=>archive_plain_text(cms_text($_POST['body']??'',200000)),'protocol_text'=>archive_plain_text(cms_text($_POST['protocol_text']??($current['protocol_text']??''),200000)),'vote_results_text'=>archive_plain_text(cms_text($_POST['vote_results_text']??($current['vote_results_text']??''),200000)),'treasurer_report'=>archive_plain_text(cms_text($_POST['treasurer_report']??($current['treasurer_report']??''),200000), true),'treasurer_image'=>$treasurerImage,'links'=>admin_collect_actions('card_action')];
                     if($index===null)array_unshift($items,$record);else $items[$index]=$record; foreach($items as $i=>$item)$items[$i]['order']=$i;
                     $content['archive']=['drive_url'=>$driveUrl,'drive_position'=>$drivePosition,'items'=>$items]; $target='/admin/?section=archive';
                 }
@@ -628,7 +629,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $users = cms_users(); $user = cms_current_user(); $flash = admin_take_flash();
 if (!$user): ?>
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=31"></head><body class="admin-login"><main class="login-card"><h1>Админка сайта</h1><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?><?php if (!$users): ?><p>Админка ещё не настроена. Администратор должен открыть <code>/setup.php</code> по инструкции.</p><?php else: ?><form method="post"><input type="hidden" name="action" value="login"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><?php admin_input('username','','text','Логин'); ?><label class="field"><span>Пароль</span><input type="password" name="password" autocomplete="current-password" required></label><button class="button" type="submit">Войти</button></form><?php endif; ?></main></body></html>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=34"></head><body class="admin-login"><main class="login-card"><h1>Админка сайта</h1><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?><?php if (!$users): ?><p>Админка ещё не настроена. Администратор должен открыть <code>/setup.php</code> по инструкции.</p><?php else: ?><form method="post"><input type="hidden" name="action" value="login"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><?php admin_input('username','','text','Логин'); ?><label class="field"><span>Пароль</span><input type="password" name="password" autocomplete="current-password" required></label><button class="button" type="submit">Войти</button></form><?php endif; ?></main></body></html>
 <?php exit; endif;
 
 $tab = (string)($_GET['tab'] ?? 'portal'); $section = (string)($_GET['section'] ?? ''); $manage = cms_text($_GET['manage'] ?? '', 40); $content = cms_content();
@@ -645,18 +646,6 @@ if ($section === 'rs_audio') {
 if ($section === 'scenarios') admin_redirect('/admin/?tab=scenarios');
 if ($section !== '' && !cms_can($section)) { http_response_code(403); exit('Нет доступа к этому разделу.'); }
 if ($section === '' && $tab === 'home' && !cms_can('pages')) { http_response_code(403); exit('Нет доступа к редактору страниц.'); }
-if ($section === '' && $tab === 'portal' && !cms_is_admin() && empty($user['nafanya_access']) && !array_filter(CMS_SECTIONS, 'cms_can')) {
-    http_response_code(403); exit('Для кабинета не выдан доступ. Обратитесь к администратору.');
-}
-if ($section === '' && $tab === 'service_schedule' && !cms_can('services')) {
-    http_response_code(403); exit('Нет доступа к графику служений. Обратитесь к администратору.');
-}
-if ($section === '' && $tab === 'scenarios' && !cms_can('scenarios')) {
-    http_response_code(403); exit('Нет доступа к сценариям собраний. Обратитесь к администратору.');
-}
-if ($section === '' && $tab === 'rs_audio' && !cms_is_admin() && !array_filter(CMS_SECTIONS, 'cms_can')) {
-    http_response_code(403); exit('Для кабинета не выдан доступ. Обратитесь к администратору.');
-}
 if ($section === '' && $tab === 'users' && !cms_is_admin()) {
     http_response_code(403); exit('Вы не являетесь администратором сайта, обратитесь к сисадмину.');
 }
@@ -695,7 +684,7 @@ elseif ($tab === 'users') $backUrl = '/admin/?tab=admin_settings';
 elseif ($tab === 'structure' || $tab === 'home') $backUrl = '/admin/?tab=site';
 elseif ($section !== '') $backUrl = isset($_GET['edit']) ? '/admin/?section=' . rawurlencode($section) : '/admin/?tab=site';
 ?>
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=33"></head><body class="<?=$structureMobileLanding?'admin-structure--landing':''?>"><header class="admin-header"><button type="button" class="admin-menu-toggle" data-admin-menu-toggle aria-controls="admin-nav" aria-expanded="false">☰ <span>Разделы</span></button><a href="/" class="admin-brand">Почти нормальные <small>админка</small></a><form method="post"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><button class="link-button">Выйти (<?=h($user['username'])?>)</button></form></header><div class="admin-layout"><aside id="admin-nav" class="admin-nav" aria-label="Разделы админки"><div class="admin-nav__mobile-heading"><strong>Разделы</strong><button type="button" class="admin-nav__close" data-admin-menu-close aria-label="Закрыть разделы">×</button></div><a href="/admin/" class="<?=(!$section && $tab==='home')?'is-active':''?>">Главная страница</a><a href="?tab=structure" class="<?=($tab==='structure')?'is-active':''?>">Структура сайта</a><?php if ($structureGraph): ?><section class="admin-nav__explorer" aria-label="Проводник реальных переходов"><p>Переходы страниц</p><?php foreach ($structureGroups as $group=>$keys): if (!$keys) continue; ?><section class="site-explorer__group"><h3><?=h($group)?></h3><ul class="site-explorer__list"><?php foreach ($keys as $key) admin_structure_tree_node($structureGraph, $key, $structureSelectedPage); ?></ul></section><?php endforeach; ?></section><?php endif; ?><?php foreach (cms_section_labels() as $key=>$label): if (cms_can($key) && !in_array($key, ['navigation','pages','site_texts'], true)): ?><a href="?section=<?=$key?>" class="<?=$section===$key?'is-active':''?>"><?=h($label)?></a><?php endif; endforeach; ?><?php if (cms_is_admin()): ?><a href="?tab=users" class="<?=($tab==='users')?'is-active':''?>">Пользователи</a><?php endif; ?></aside><main class="admin-main"><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?><?php if ($backUrl !== ''): ?><a class="admin-back" href="<?=h($backUrl)?>">← Назад</a><?php endif; ?>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Админка — Почти нормальные</title><link rel="stylesheet" href="admin.css?v=34"></head><body class="<?=$structureMobileLanding?'admin-structure--landing':''?>"><header class="admin-header"><button type="button" class="admin-menu-toggle" data-admin-menu-toggle aria-controls="admin-nav" aria-expanded="false">☰ <span>Разделы</span></button><a href="/" class="admin-brand">Почти нормальные <small>админка</small></a><form method="post"><input type="hidden" name="action" value="logout"><input type="hidden" name="csrf" value="<?=h(cms_csrf())?>"><button class="link-button">Выйти (<?=h($user['username'])?>)</button></form></header><div class="admin-layout"><aside id="admin-nav" class="admin-nav" aria-label="Разделы админки"><div class="admin-nav__mobile-heading"><strong>Разделы</strong><button type="button" class="admin-nav__close" data-admin-menu-close aria-label="Закрыть разделы">×</button></div><a href="/admin/" class="<?=(!$section && $tab==='home')?'is-active':''?>">Главная страница</a><a href="?tab=structure" class="<?=($tab==='structure')?'is-active':''?>">Структура сайта</a><?php if ($structureGraph): ?><section class="admin-nav__explorer" aria-label="Проводник реальных переходов"><p>Переходы страниц</p><?php foreach ($structureGroups as $group=>$keys): if (!$keys) continue; ?><section class="site-explorer__group"><h3><?=h($group)?></h3><ul class="site-explorer__list"><?php foreach ($keys as $key) admin_structure_tree_node($structureGraph, $key, $structureSelectedPage); ?></ul></section><?php endforeach; ?></section><?php endif; ?><?php foreach (cms_section_labels() as $key=>$label): if (cms_can($key) && !in_array($key, ['navigation','pages','site_texts'], true)): ?><a href="?section=<?=$key?>" class="<?=$section===$key?'is-active':''?>"><?=h($label)?></a><?php endif; endforeach; ?><?php if (cms_is_admin()): ?><a href="?tab=users" class="<?=($tab==='users')?'is-active':''?>">Пользователи</a><?php endif; ?></aside><main class="admin-main"><?php if ($flash): ?><p class="notice notice--<?=h($flash[0])?>"><?=h($flash[1])?></p><?php endif; ?><?php if ($backUrl !== ''): ?><a class="admin-back" href="<?=h($backUrl)?>">← Назад</a><?php endif; ?>
 <?php
 $pageTextGroup = '';
 if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $section ?: 'home');
@@ -706,16 +695,16 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
     <nav class="admin-portal__grid" aria-label="Служебные разделы">
       <?php foreach ($portalOrder as $portalKey):
         $allowed = match ($portalKey) {
-          'services' => cms_can('services'), 'scenarios' => cms_can('scenarios'),
-          'nafanya' => !empty($user['nafanya_access']),
+          'services' => true, 'scenarios' => true, 'nafanya' => true,
           'edit_site' => cms_is_admin() || (bool)array_filter(CMS_SECTIONS, 'cms_can'),
-          'edit_admin' => cms_is_admin(), 'rs_audio' => cms_is_admin() || (bool)array_filter(CMS_SECTIONS, 'cms_can'), default => false,
+          'edit_admin' => cms_is_admin(), 'rs_audio' => true, default => false,
         };
         $destination = cms_safe_url($portalLinks[$portalKey] ?? '');
         if (!$allowed || $destination === '') continue;
         $icon = match ($portalKey) { 'services'=>'services','scenarios'=>'scenarios','nafanya'=>'nafanya','edit_site'=>'edit-site','edit_admin'=>'edit-admin',default=>'music' };
         $external = (bool)preg_match('~^https?://~i', $destination);
-      ?><a class="admin-portal__button" href="<?=h($destination)?>"<?=$external?' target="_blank" rel="noopener"':''?>><span class="admin-portal__icon admin-portal__icon--<?=h($icon)?>" aria-hidden="true"><?php if ($icon === 'nafanya'): ?><img src="/assets/nafanya.png" alt=""><?php elseif ($icon === 'music'): ?>♫<?php endif; ?></span><strong><?=h($portalLabels[$portalKey])?></strong></a>
+      $iconAsset = match ($icon) { 'services'=>'/assets/menu-schedule.png?v=1','scenarios'=>'/assets/menu-scenarios-512.png?v=1','nafanya'=>'/assets/nafanya.png?v=5','music'=>'/assets/menu-audio-rs-512.png?v=1',default=>'' };
+      ?><a class="admin-portal__button" href="<?=h($destination)?>"<?=$external?' target="_blank" rel="noopener"':''?>><span class="admin-portal__icon admin-portal__icon--<?=h($icon)?>" aria-hidden="true"><?php if ($iconAsset !== ''): ?><img src="<?=h($iconAsset)?>" alt=""><?php endif; ?></span><strong><?=h($portalLabels[$portalKey])?></strong></a>
       <?php endforeach; ?>
     </nav>
   </section>
@@ -766,7 +755,7 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
     <h1 id="rs-audio-title">Аудиозаписи РС</h1>
     <section class="speakers-intro rs-audio-intro"><?=cms_rich((string)($content['rs_audio']['intro'] ?? ''))?></section>
     <section class="rs-audio-list" aria-label="Записи рабочих собраний">
-      <?php foreach ($items as $item): $preview=cms_drive_audio_preview_url((string)($item['url'] ?? '')); if ($preview === '') continue; $date=cms_date_ru((string)($item['event_date'] ?? '')); $title=cms_text($item['title'] ?? '',180) ?: 'Рабочее собрание'; ?>
+      <?php foreach ($items as $item): $preview=cms_drive_audio_preview_url((string)($item['url'] ?? '')); if ($preview === '') continue; $date=cms_date_ru((string)($item['event_date'] ?? '')); $title=cms_rs_audio_display_title((string)($item['title'] ?? ''), (string)($item['event_date'] ?? '')); ?>
         <article class="announcement-card speaker-card rs-audio-card"><div class="announcement-copy">
           <h2 class="announcement-title"><?=h($title)?> · <?=h($date)?></h2>
           <div class="speaker-audio"><button class="speaker-audio__load flow-button flow-button--primary flow-button--blue flow-button--rounded" type="button" data-speaker-preview="<?=h($preview)?>" data-open-label="Открыть плеер" aria-expanded="false">Открыть плеер</button><a class="speaker-audio__download flow-button flow-button--tab flow-button--blue flow-button--rounded" href="<?=h($item['url'])?>" target="_blank" rel="noopener noreferrer">Скачать</a><div class="speaker-audio__frame" hidden></div></div>
@@ -861,6 +850,8 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
 <?php if ($section === 'archive'):
     $data=$content['archive']??[]; $items=$data['items']??[]; $editId=(string)($_GET['edit']??''); $edit=[];
     foreach($items as $item) if(($item['id']??'')===$editId) $edit=$item;
+    $legacyProtocol = (string)($edit['protocol_text'] ?? ''); $legacyVotes = '';
+    if ($edit && !array_key_exists('vote_results_text', $edit)) [$legacyProtocol, $legacyVotes] = archive_split_legacy_protocol($legacyProtocol);
 ?>
   <div class="section-heading"><h1>Архив решений</h1><a class="button button--quiet" href="?section=archive&edit=new">Новое решение</a></div>
   <p class="admin-tip">К каждому решению можно добавить кнопки со ссылками. Для каждой кнопки можно выбрать текст, адрес и внешний вид.</p>
@@ -876,9 +867,12 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
       <h2><?= $edit?'Редактировать решение':'Добавить решение' ?></h2>
       <?php admin_file('image',$edit['image']??'','1. Картинка (необязательно)','image/jpeg,image/png,image/webp'); ?>
       <div class="form-grid"><?php admin_input('event_date',$edit['event_date']??'','date','2. Дата решения *',true); admin_input('event_time',$edit['event_time']??'','time','3. Время (необязательно)'); ?></div>
-      <?php admin_input('title',$edit['title']??'','text','4. Тема решения *',true); admin_rich('body',$edit['body']??'','5. Повестка РС',false,true); ?>
-      <label class="field"><span>6. Протокол РС и результаты голосований</span><textarea name="protocol_text" rows="18"><?=h($edit['protocol_text']??'')?></textarea></label>
-      <?php admin_rich('treasurer_report',$edit['treasurer_report']??'','7. Отчёт казначея (отдельный раскрывающийся блок)'); ?>
+      <?php admin_input('title',$edit['title']??'','text','4. Тема решения *',true); ?>
+      <label class="field field--wide"><span>5. Повестка РС</span><textarea name="body" rows="18"><?=h(archive_plain_text((string)($edit['body']??''), true))?></textarea><small>Вставьте обычный текст. Нумерованные пункты и переносы строк на сайте оформятся автоматически.</small></label>
+      <label class="field field--wide"><span>6. Протокол РС</span><textarea name="protocol_text" rows="18"><?=h(archive_plain_text($legacyProtocol, true))?></textarea><small>Вставьте обычный текст. Заголовки нумерованных пунктов и абзацы будут оформлены как в архиве.</small></label>
+      <label class="field field--wide"><span>7. Результаты голосований</span><textarea name="vote_results_text" rows="14"><?=h(array_key_exists('vote_results_text',$edit) ? archive_plain_text((string)$edit['vote_results_text'], true) : archive_plain_text($legacyVotes))?></textarea><small>Можно вставить несколько результатов подряд — даты, вопросы, варианты и итоги сохранят структуру.</small></label>
+      <label class="field field--wide"><span>8. Отчёт казначея</span><textarea name="treasurer_report" rows="10"><?=h(archive_plain_text((string)($edit['treasurer_report']??''), true))?></textarea><small>Обычный текст; переносы строк и абзацы сохраняются.</small></label>
+      <?php admin_file('treasurer_image',$edit['treasurer_image']??'','Изображение к отчёту казначея (необязательно)','image/jpeg,image/png,image/webp'); ?>
       <?php admin_card_actions_fieldset($edit['links']??[], 'card_action'); ?>
       <div class="form-actions"><button class="button">Опубликовать решение</button><a class="button button--quiet" href="?section=archive">Отмена</a></div>
     </form>
@@ -916,7 +910,7 @@ if ($pageTextGroup !== '') admin_site_texts_form($content, $pageTextGroup, $sect
   <section class="rs-audio-list" aria-label="Предпросмотр списка аудиозаписей">
     <?php foreach ($items as $item): $preview = cms_drive_audio_preview_url((string)($item['url'] ?? '')); if ($preview === '') continue; ?>
       <article class="announcement-card speaker-card rs-audio-card">
-        <div class="announcement-copy"><h2 class="announcement-title"><?=h(cms_text($item['title'] ?? '',180) ?: 'Рабочее собрание')?> · <time datetime="<?=h($item['event_date'] ?? '')?>"><?=h(cms_date_ru((string)($item['event_date'] ?? '')))?></time></h2>
+        <div class="announcement-copy"><h2 class="announcement-title"><?=h(cms_rs_audio_display_title((string)($item['title'] ?? ''), (string)($item['event_date'] ?? '')))?> · <time datetime="<?=h($item['event_date'] ?? '')?>"><?=h(cms_date_ru((string)($item['event_date'] ?? '')))?></time></h2>
         <div class="speaker-audio"><button class="speaker-audio__load flow-button flow-button--primary flow-button--blue flow-button--rounded" type="button" data-speaker-preview="<?=h($preview)?>" data-open-label="Открыть плеер" aria-expanded="false">Открыть плеер</button><a class="speaker-audio__download flow-button flow-button--tab flow-button--blue flow-button--rounded" href="<?=h($item['url'] ?? '')?>" target="_blank" rel="noopener noreferrer">Скачать</a><div class="speaker-audio__frame" hidden></div></div></div>
       </article>
     <?php endforeach; ?>

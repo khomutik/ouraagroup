@@ -2940,6 +2940,7 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 .archive-document__body a,
 .archive-document__intro a { min-width: 0; overflow-wrap: anywhere; }
 .archive-treasurer__body { padding: 14px 16px 16px; overflow-wrap: anywhere; }
+.archive-treasurer__image { display:block; width:auto; max-width:min(100%, 680px); max-height:520px; margin:0 0 14px; border-radius:12px; object-fit:contain; }
 .archive-treasurer__body table { width: 100%; table-layout: fixed; border-collapse: collapse; }
 .archive-treasurer__body :is(th,td) { padding: 7px 9px; border: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
 .archive-treasurer__body :is(th,td):last-child { width: 36%; text-align: right; }
@@ -2974,3 +2975,16 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 .hero__logo{width:min(100%,620px);}
 .hero__mark{width:100%;height:auto;max-height:none;}
 @media(max-width:560px){.hero{display:flex;min-height:0;padding:6px 10px}.hero__logo{width:100%}.hero__mark{width:min(100%,440px);max-height:none}}
+
+/* Branded brush-stroke masthead, with the original transparent group lettering. */
+.hero{min-height:142px;padding:8px 12px;background-color:var(--cream);background-image:url("assets/home-header-mobile-v1.jpg?v=1");background-position:center;background-size:cover}
+.hero__logo{width:min(100%,560px)}
+.hero__mark{width:min(100%,250px);filter:saturate(1.75) contrast(1.08)}
+@media(min-width:561px){.hero{min-height:178px;background-image:url("assets/home-header-mobile-v1.jpg?v=1")}.hero__mark{width:min(36vw,320px)}}
+@media(max-width:560px){.hero{min-height:126px;padding:7px 10px}.hero__mark{width:min(66vw,230px);max-height:none}}
+.meeting-countdown{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;margin:12px 0;padding:12px 14px;border:1px solid #9ac58e;border-radius:16px;background:linear-gradient(110deg,#cfe9c8 0%,#e4f2dc 58%,#d4ebcd 100%);box-shadow:0 8px 18px rgba(44,105,54,.2);text-align:center}
+.meeting-countdown__label{color:var(--muted);font-family:"Unbounded",Arial,sans-serif;font-size:clamp(14px,3.8vw,17px);font-weight:700}
+.meeting-countdown__value{color:var(--orange-dark);font-family:"Unbounded","Manrope",sans-serif;font-size:clamp(16px,4.6vw,22px);font-weight:800;line-height:1.25}
+@media(max-width:420px){.meeting-countdown{gap:3px 6px;padding:10px 9px}.meeting-countdown__label{width:100%}}
+.meeting-countdown.is-live{border-color:#74b982;background:linear-gradient(110deg,#e7f7e9,#f2fbf1);box-shadow:0 8px 18px rgba(32,112,56,.12)}
+.meeting-countdown.is-live .meeting-countdown__label{color:#21733b;font-size:clamp(16px,4.4vw,21px);font-weight:800}

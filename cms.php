@@ -86,6 +86,16 @@ function cms_date_ru(string $value): string {
     $month = (int)$parts[2];
     return (int)$parts[3] . ' ' . ($months[$month] ?? $parts[2]) . ' ' . $parts[1];
 }
+function cms_rs_audio_display_title(string $title, string $eventDate): string {
+    $title = cms_text($title, 180);
+    if ($title === '') return 'Рабочее собрание';
+    if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $eventDate, $parts) || !checkdate((int)$parts[2], (int)$parts[3], (int)$parts[1])) return $title;
+    $numericDate = sprintf('%02d.%02d.%04d', (int)$parts[3], (int)$parts[2], (int)$parts[1]);
+    $title = preg_replace('/(?<!\d)' . preg_quote($numericDate, '/') . '(?!\d)/u', '', $title, 1) ?? $title;
+    $title = preg_replace('/\s+([,;:])/u', '$1', $title) ?? $title;
+    $title = trim($title, " \t\n\r\0\x0B·,;:–—-");
+    return $title !== '' ? $title : 'Рабочее собрание';
+}
 function cms_speakers_newest_first(array $items): array {
     usort($items, static function ($a, $b): int {
         $date = strcmp((string)($b['event_date'] ?? ''), (string)($a['event_date'] ?? ''));
@@ -775,6 +785,14 @@ function cms_site_text(array $content, string $key): string {
     $default = (string) ($fields[$key][2] ?? '');
     $value = $content['site_texts'][$key] ?? null;
     return is_string($value) && trim($value) !== '' ? $value : $default;
+}
+function cms_home_heading_html(string $heading): string {
+    // Older saves may contain literal "\\n" characters rather than actual line breaks.
+    $heading = str_replace(["\\r\\n", "\\n", "\\r"], "\n", $heading);
+    $heading = preg_replace('/(?<=\\p{Ll})(?=\\p{Lu}|«)/u', ' ', $heading) ?? $heading;
+    $heading = preg_replace('/(?<=»)\\s*(?=\\p{L})/u', ' ', $heading) ?? $heading;
+    $lines = preg_split('/\\R/u', trim($heading)) ?: [];
+    return implode('<br>', array_map(static fn(string $line): string => h(trim($line)), $lines));
 }
 function cms_users(): array { return cms_read('users', []); }
 /** Stable, opaque keys keep usernames and client IPs out of the rate-limit file. */

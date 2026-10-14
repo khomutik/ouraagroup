@@ -40,6 +40,18 @@ test("staff see the control panel without the privileged admin tools", () => {
   assert.doesNotMatch(adminHtml, /id="adminPanel" hidden/u);
 });
 
+test("the live control panel includes a dedicated sobriety medals section", () => {
+  const html = buildControlHtml();
+  assert.match(html, /id="medalsPanel"/u);
+  assert.match(html, /id="medalsPanelFrame" title="Медали трезвости"/u);
+  assert.match(html, /\.\/medals-panel/u);
+});
+
+test("the sender status is placed on the line below the Nafanya heading", () => {
+  const html = buildControlHtml();
+  assert.match(html, /class="title">Нафаня в Zoom<\/div>\s*<div class="status">/u);
+});
+
 test("the embedded Zoom admin and book-base section is hidden for staff and Zoom app users", () => {
   const workerHtml = '<details class="admin"><summary>Админ / книжная база</summary></details>';
   assert.match(hideWorkerAdminPanel(workerHtml, "staff"), /<details class="admin" hidden>/u);

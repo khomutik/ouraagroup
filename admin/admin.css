@@ -244,13 +244,15 @@ body:not(.admin-login){min-height:100vh;background:#111a40;color:#111a40}
 .plain-emoji-picker[hidden],.plain-emoji-picker__panel[hidden]{display:none!important}
 .admin-main,.admin-form,.card-editor,.button-editor,.button-editor__body,.button-editor__settings,.field{min-width:0;max-width:100%}
 input,textarea,select{min-width:0;max-width:100%}
-.admin-portal__icon{width:54px;height:54px;flex-basis:54px;background-color:transparent;background-image:url("/assets/admin-portal-icons.png");background-repeat:no-repeat;background-size:200% 200%;border-radius:10px}
+.admin-portal__icon{width:54px;height:54px;flex-basis:54px;background-color:transparent;background-image:url("/assets/admin-portal-icons.png");background-repeat:no-repeat;background-size:200% 200%;border-radius:10px;overflow:hidden}
+.admin-portal__icon img{display:block;width:100%;height:100%;object-fit:cover}
+.admin-portal__icon--services,.admin-portal__icon--scenarios,.admin-portal__icon--nafanya,.admin-portal__icon--music{background-image:none;background-color:transparent}
 .admin-portal__icon--services{background-position:0 0}
 .admin-portal__icon--scenarios{background-position:100% 0}
 .admin-portal__icon--edit-site{background-position:0 100%}
 .admin-portal__icon--edit-admin{background-position:100% 100%}
 .admin-portal__icon--nafanya{background:#fff1da}
-.admin-portal__icon--nafanya img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.admin-portal__icon--nafanya img{width:100%;height:100%;object-fit:contain;border-radius:10px}
 .admin-portal__icon--music{background-image:none;background:#111a40;color:#fff;font:800 30px/1 "Manrope",sans-serif}
 @media(max-width:600px){.admin-portal__icon{width:48px;height:48px;flex-basis:48px}}
 @media(max-width:650px){.rs-audio-card .speaker-audio__load,.rs-audio-card .speaker-audio__download{width:100%}}

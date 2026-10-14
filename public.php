@@ -31,8 +31,8 @@ function page_head(string $title, string $description, string $canonical, string
   <link rel="icon" href="favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon-v3.png" />
-  <link rel="stylesheet" href="styles.css?v=122" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-v4.png" />
+  <link rel="stylesheet" href="styles.css?v=126" />
   <script defer src="/site-analytics.js?v=1"></script>
 </head>
 <body>
@@ -44,7 +44,7 @@ function page_foot(): void { global $content; ?>
   </main>
   <script type="application/json" id="site-navigation-data"><?=json_encode(cms_navigation_payload($content), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)?></script>
   <script src="site-nav.js?v=24"></script>
-  <script src="pwa-install.js?v=11"></script>
+  <script src="pwa-install.js?v=12"></script>
   <script src="site-chat.js?v=7" data-api="/support-chat-api"></script>
   <script src="site-search.js?v=6"></script>
 </body>
@@ -80,12 +80,16 @@ if ($section === 'archive') { $data=$content['archive']??[]; $items=$data['items
       $archiveId = (string)($item['id'] ?? '');
       $agendaText = archive_plain_text((string)($item['body'] ?? ''), true);
       $protocolText = archive_plain_text((string)($item['protocol_text'] ?? ''));
+      $voteResultsText = archive_plain_text((string)($item['vote_results_text'] ?? ''), true);
+      if ($voteResultsText !== '') [$protocolText] = archive_split_legacy_protocol($protocolText);
+      $treasurerText = archive_plain_text((string)($item['treasurer_report'] ?? ''), true);
+      $treasurerImage = cms_safe_url($item['treasurer_image'] ?? '');
   ?><section class="announcement-card archive-card" id="<?=h(site_search_anchor('archive', $archiveId, (int)$i))?>">
     <?php if (!empty($item['image'])): ?><img src="<?=h(cms_safe_url($item['image']))?>" alt="<?=h($item['title']??'')?>"><?php endif; ?>
     <div class="announcement-copy">
       <div class="announcement-meta"><time><?=h(cms_date_ru($item['event_date']??''))?></time><?php if (!empty($item['event_time'])): ?><time><?=h($item['event_time'])?> по МСК</time><?php endif; ?></div>
       <h2 class="announcement-title"><?=cms_display_text($item['title']??'')?></h2>
-      <div class="announcement-text"><?=archive_document_html($agendaText, 'agenda', $archiveId)?><?=archive_document_html($protocolText, 'protocol', $archiveId)?><?php if (!empty($item['treasurer_report'])): ?><details class="archive-document archive-treasurer" id="<?=h(archive_treasurer_id($archiveId))?>"><summary>Отчёт казначея</summary><div class="archive-treasurer__body"><?=cms_rich((string)$item['treasurer_report'])?></div></details><?php endif; ?></div>
+      <div class="announcement-text"><?=archive_document_html($agendaText, 'agenda', $archiveId)?><?=archive_document_html($protocolText, 'protocol', $archiveId)?><?=archive_document_html($voteResultsText, 'votes', $archiveId)?><?php if ($treasurerText !== '' || $treasurerImage !== ''): ?><details class="archive-document archive-treasurer" id="<?=h(archive_treasurer_id($archiveId))?>"><summary>Отчёт казначея</summary><div class="archive-treasurer__body"><?php if ($treasurerImage !== ''): ?><img class="archive-treasurer__image" src="<?=h($treasurerImage)?>" alt="Иллюстрация к отчёту казначея" loading="lazy"><?php endif; ?><?=archive_paragraphs_html($treasurerText)?></div></details><?php endif; ?></div>
       <?=cms_actions_html(archive_public_links($item), 'announcement-links')?>
     </div>
   </section><?php endforeach; ?>

@@ -103,6 +103,8 @@ function site_search_documents(array $content, ?string $today = null): array {
             }
         }
         $protocolText = archive_plain_text((string)($item['protocol_text'] ?? ''));
+        $voteResultsText = archive_plain_text((string)($item['vote_results_text'] ?? ''), true);
+        if ($voteResultsText !== '') [$protocolText] = archive_split_legacy_protocol($protocolText);
         if ($protocolText !== '') {
             $protocol = archive_protocol_sections($protocolText);
             $voteCategory = $protocol['items'] ? 'Протокол РС' : 'Голосование группы';
@@ -114,6 +116,18 @@ function site_search_documents(array $content, ?string $today = null): array {
             foreach ($protocol['votes'] as $vote) {
                 $body = preg_replace('~https?://[^\s<>]+~u', ' ', $vote['text']) ?? $vote['text'];
                 $add($voteCategory, 'Голосование: ' . cms_text($vote['heading'], 140), '/archive.html#' . archive_vote_id($id, $vote['index']), $body, 'протокол РС результаты голосования решение', $date);
+            }
+        }
+        if ($voteResultsText !== '') {
+            $results = archive_protocol_sections($voteResultsText);
+            $voteItems = $results['votes'];
+            if (!$voteItems && $results['items']) {
+                $voteItems = array_map(static fn(array $point): array => ['index'=>$point['index'],'heading'=>$point['heading'],'text'=>$point['text']], $results['items']);
+            }
+            if ($results['intro'] !== '') $add('Голосование группы', 'Результаты голосований · ' . $displayDate, $cardUrl, $results['intro'], 'результаты голосований решения рабочее собрание', $date);
+            foreach ($voteItems as $vote) {
+                $body = preg_replace('~https?://[^\s<>]+~u', ' ', $vote['text']) ?? $vote['text'];
+                $add('Голосование группы', 'Голосование: ' . cms_text($vote['heading'], 140), '/archive.html#' . archive_vote_id($id, $vote['index']), $body, 'результаты голосования рабочее собрание решение', $date);
             }
         }
         $treasurerText = archive_plain_text((string)($item['treasurer_report'] ?? ''), true);

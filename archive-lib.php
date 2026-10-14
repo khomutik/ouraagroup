@@ -7,6 +7,8 @@ require_once __DIR__ . '/cms.php';
 function archive_plain_text(string $value, bool $html = false): string {
     if ($html) {
         $value = preg_replace('~<br\s*/?>|</(?:p|div|summary|li|h[1-6])\s*>~iu', "\n", $value) ?? $value;
+        $value = preg_replace('~</(?:td|th)\s*>~iu', ' | ', $value) ?? $value;
+        $value = preg_replace('~</tr\s*>~iu', "\n", $value) ?? $value;
         $value = preg_replace('~<(?:p|div|summary|li|h[1-6])\b[^>]*>~iu', "\n", $value) ?? $value;
         $value = html_entity_decode(strip_tags($value), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
@@ -66,6 +68,21 @@ function archive_protocol_sections(string $text): array {
         $parts['votes'][] = ['index' => $number, 'heading' => $heading, 'text' => $block];
     }
     return $parts;
+}
+
+/** Split legacy records on first edit so their appended vote blocks land in the new field without loss. */
+function archive_split_legacy_protocol(string $text): array {
+    $plain = archive_plain_text($text);
+    if (!archive_protocol_sections($plain)['votes']) return [$plain, ''];
+    $lines = explode("\n", $plain);
+    foreach ($lines as $index => $line) {
+        if (!preg_match('/^\d{2}\.\d{2}\.\d{4}$/u', trim($line))) continue;
+        $next = $index + 1;
+        while (isset($lines[$next]) && ($next - $index) <= 3 && (trim($lines[$next]) === '' || trim($lines[$next]) === 'Внеочередное РС')) $next++;
+        if (!isset($lines[$next]) || !preg_match('/^Источник\s*:/iu', trim($lines[$next]))) continue;
+        return [rtrim(implode("\n", array_slice($lines, 0, $index)), "\r\n \t"), trim(implode("\n", array_slice($lines, $index)))];
+    }
+    return [$plain, ''];
 }
 
 function archive_section_id(string $kind, string $id, int $index): string {
@@ -198,9 +215,14 @@ function archive_paragraphs_html(string $text): string {
 }
 
 function archive_document_html(string $text, string $kind, string $itemId): string {
-    $parts = $kind === 'protocol' ? archive_protocol_sections($text) : archive_sections($text);
+    $isVotes = $kind === 'votes';
+    $parts = $kind === 'protocol' || $isVotes ? archive_protocol_sections($text) : archive_sections($text);
+    if ($isVotes && !$parts['votes'] && $parts['items']) {
+        $parts['votes'] = array_map(static fn(array $item): array => ['index'=>$item['index'],'heading'=>$item['heading'],'text'=>$item['text']], $parts['items']);
+        $parts['items'] = [];
+    }
     if ($parts['intro'] === '' && !$parts['items'] && empty($parts['votes'])) return '';
-    $label = $kind === 'protocol' ? ($parts['items'] ? 'Протокол и результаты голосований' : 'Итоги голосования') : 'Повестка РС';
+    $label = $isVotes ? 'Результаты голосований' : ($kind === 'protocol' ? ($parts['items'] ? 'Протокол и результаты голосований' : 'Итоги голосования') : 'Повестка РС');
     $html = '<details class="archive-document archive-document--' . h($kind) . '"><summary>' . h($label) . '</summary>';
     $intro = $parts['intro'];
     if ($parts['items'] && preg_match('/^\s*(?:Повестка|Протокол)\s+(?:к\s+)?РС\b[^\n]*(?:\n|$)/iu', $intro, $match)) {
@@ -218,9 +240,10 @@ function archive_document_html(string $text, string $kind, string $itemId): stri
         $html .= '</section>';
     }
     if (!empty($parts['votes'])) {
-        $html .= '<h3 class="archive-document__votes-heading">Итоги голосований</h3>';
+        if (!$isVotes) $html .= '<h3 class="archive-document__votes-heading">Итоги голосований</h3>';
         foreach ($parts['votes'] as $vote) {
-            $html .= '<section class="archive-document__vote" id="' . h(archive_vote_id($itemId, $vote['index'])) . '">';
+            $voteId = $isVotes ? archive_section_id('vote', $itemId, (int)$vote['index']) : archive_vote_id($itemId, (int)$vote['index']);
+            $html .= '<section class="archive-document__vote" id="' . h($voteId) . '">';
             $html .= '<h4>' . h($vote['heading']) . '</h4>';
             $body = $vote['text'];
             $body = preg_replace('/^Вопрос:\s*.+?(?=^Варианты:|^Итог:|\z)/msu', '', $body) ?? $body;
