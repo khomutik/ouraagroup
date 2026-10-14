@@ -68,11 +68,10 @@ describe("request safety", () => {
   });
 
   it("accepts a visitor address only from the trusted website proxy", () => {
-    expect(rateLimitAddress("89.124.123.138", "203.0.113.7", "89.124.123.138")).toBe("203.0.113.7");
-    expect(rateLimitAddress("198.51.100.4", "203.0.113.7", "89.124.123.138")).toBe("198.51.100.4");
-    expect(rateLimitAddress("89.124.123.138", "not-an-ip", "89.124.123.138")).toBe("89.124.123.138");
-    expect(rateLimitAddress("194.60.132.53", "203.0.113.7", "89.124.123.138,194.60.132.53")).toBe("203.0.113.7");
-    expect(rateLimitAddress("198.51.100.4", "203.0.113.7", "89.124.123.138,194.60.132.53")).toBe("198.51.100.4");
+    expect(rateLimitAddress("194.60.132.53", "203.0.113.7", "194.60.132.53")).toBe("203.0.113.7");
+    expect(rateLimitAddress("198.51.100.4", "203.0.113.7", "194.60.132.53")).toBe("198.51.100.4");
+    expect(rateLimitAddress("194.60.132.53", "not-an-ip", "194.60.132.53")).toBe("194.60.132.53");
+    expect(rateLimitAddress("89.124.123.138", "203.0.113.7", "194.60.132.53")).toBe("89.124.123.138");
   });
 
   it("encrypts a Telegram chat address and rejects tampering", async () => {

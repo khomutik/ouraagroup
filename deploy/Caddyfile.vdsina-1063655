@@ -14,7 +14,7 @@ pochtinormalnye.ru {
     }
 
     handle /nafanya-zoom-control/* {
-        reverse_proxy https://89.124.123.138 {
+        reverse_proxy https://91.84.122.244 {
             header_up Host pochtinormalnye.ru
             transport http {
                 tls_server_name pochtinormalnye.ru
@@ -33,7 +33,7 @@ pochtinormalnye.ru {
     }
 
     handle /support-chat-max-api-* {
-        reverse_proxy https://89.124.123.138 {
+        reverse_proxy https://91.84.122.244 {
             header_up Host pochtinormalnye.ru
             transport http {
                 tls_server_name pochtinormalnye.ru
@@ -80,7 +80,7 @@ site.194-60-132-53.nip.io {
     }
 
     handle /nafanya-zoom-control/* {
-        reverse_proxy https://89.124.123.138 {
+        reverse_proxy https://91.84.122.244 {
             header_up Host pochtinormalnye.ru
             transport http {
                 tls_server_name pochtinormalnye.ru
@@ -99,7 +99,7 @@ site.194-60-132-53.nip.io {
     }
 
     handle /support-chat-max-api-* {
-        reverse_proxy https://89.124.123.138 {
+        reverse_proxy https://91.84.122.244 {
             header_up Host pochtinormalnye.ru
             transport http {
                 tls_server_name pochtinormalnye.ru
