@@ -124,14 +124,15 @@ function site_search_documents(array $content, ?string $today = null): array {
             if (!$voteItems && $results['items']) {
                 $voteItems = array_map(static fn(array $point): array => ['index'=>$point['index'],'heading'=>$point['heading'],'text'=>$point['text']], $results['items']);
             }
-            if ($results['intro'] !== '') $add('Голосование группы', 'Результаты голосований · ' . $displayDate, $cardUrl, $results['intro'], 'результаты голосований решения рабочее собрание', $date);
+            if ($results['intro'] !== '') $add('Результаты голосований', 'Результаты голосований · ' . $displayDate, $cardUrl, $results['intro'], 'результаты голосований решения рабочее собрание', $date);
             foreach ($voteItems as $vote) {
                 $body = preg_replace('~https?://[^\s<>]+~u', ' ', $vote['text']) ?? $vote['text'];
-                $add('Голосование группы', 'Голосование: ' . cms_text($vote['heading'], 140), '/archive.html#' . archive_vote_id($id, $vote['index']), $body, 'результаты голосования рабочее собрание решение', $date);
+                $add('Результаты голосований', 'Голосование: ' . cms_text($vote['heading'], 140), '/archive.html#' . archive_vote_id($id, $vote['index']), $body, 'результаты голосования рабочее собрание решение', $date);
             }
         }
         $treasurerText = archive_plain_text((string)($item['treasurer_report'] ?? ''), true);
-        if ($treasurerText !== '') {
+        $treasurerImage = cms_safe_url($item['treasurer_image'] ?? '');
+        if ($treasurerText !== '' || $treasurerImage !== '') {
             $add('Отчёт казначея', 'Отчёт казначея · ' . $displayDate, '/archive.html#' . archive_treasurer_id($id), $treasurerText, 'отчёт казначей приход расход остаток резерв', $date);
         }
     }

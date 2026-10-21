@@ -222,7 +222,8 @@ function archive_document_html(string $text, string $kind, string $itemId): stri
         $parts['items'] = [];
     }
     if ($parts['intro'] === '' && !$parts['items'] && empty($parts['votes'])) return '';
-    $label = $isVotes ? 'Результаты голосований' : ($kind === 'protocol' ? ($parts['items'] ? 'Протокол и результаты голосований' : 'Итоги голосования') : 'Повестка РС');
+    $isVoteOnlyProtocol = $kind === 'protocol' && !$parts['items'] && !empty($parts['votes']);
+    $label = $isVotes || $isVoteOnlyProtocol ? 'Результаты голосований' : ($kind === 'protocol' ? 'Протокол РС' : 'Повестка РС');
     $html = '<details class="archive-document archive-document--' . h($kind) . '"><summary>' . h($label) . '</summary>';
     $intro = $parts['intro'];
     if ($parts['items'] && preg_match('/^\s*(?:Повестка|Протокол)\s+(?:к\s+)?РС\b[^\n]*(?:\n|$)/iu', $intro, $match)) {

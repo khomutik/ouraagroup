@@ -13,7 +13,10 @@ archive_expect(count($agenda['items']) === 3, 'Все пункты повест�
 archive_expect($agenda['items'][1]['heading'] === 'Оплатить хостинг сайта.', 'Тема повестки потеряна.');
 archive_expect(archive_protocol_date("Протокол РС 05.04.2026\n1. Решение принято.") === '2026-04-05', 'Дата протокола определена неверно.');
 archive_expect(archive_protocol_date("Протокол РС 05.04.2026\n1. Решение принято.") !== '2026-04-10', 'Чужой протокол нельзя привязать к другой дате.');
-archive_expect(str_contains(archive_document_html("Протокол РС 29.08.2026\n\n1. Оплатить хостинг.\nПринято единогласно.", 'protocol', 'record-1'), 'protocol-record-1-point-0'), 'Глубокая ссылка на решение отсутствует.');
+$protocolCardHtml = archive_document_html("Протокол РС 29.08.2026\n\n1. Оплатить хостинг.\nПринято единогласно.", 'protocol', 'record-1');
+archive_expect(str_contains($protocolCardHtml, '<summary>Протокол РС</summary>'), 'Карточка протокола должна иметь отдельное название.');
+archive_expect(!str_contains($protocolCardHtml, 'Протокол и результаты голосований'), 'Старое объединённое название протокола не должно появляться.');
+archive_expect(str_contains($protocolCardHtml, 'protocol-record-1-point-0'), 'Глубокая ссылка на решение отсутствует.');
 archive_expect(!str_contains(archive_document_html("1. <script>alert(1)</script>", 'agenda', 'record-1'), '<script>'), 'Текст документа нужно экранировать.');
 archive_expect(str_contains(archive_document_html("1. Утвердить отчёт.\n\n2. Сохранить переносы.", 'agenda', 'record-1'), 'archive-document__item'), 'Обычный текст повестки должен автоматически разбиваться на оформленные пункты.');
 archive_expect(str_contains(archive_document_html("05.04.2026\nИсточник: Telegram\nВопрос: Выбрать тему\nВарианты:\n— За — 8 голосов\nИтог: принято.", 'votes', 'record-1'), 'Результаты голосований'), 'Результаты из отдельного поля должны оформляться отдельной карточкой.');
@@ -38,6 +41,8 @@ $content['archive']['items'] = [[
     'event_date' => '2026-08-29',
     'body' => $agendaHtml,
     'protocol_text' => "Протокол РС 29.08.2026\n\n1. Оплатить хостинг сайта.\nГолосование: за 7, против 0. Решение принято.",
+    'vote_results_text' => "29.08.2026\nВопрос: Оплатить хостинг на год\nВарианты:\n— За — 10 голосов\n— Против — 0 голосов\nИтог: решение принято.",
+    'treasurer_image' => 'https://pochtinormalnye.ru/uploads/treasurer-report.jpg',
     'links' => [['label' => 'Оригинал', 'url' => 'https://docs.google.com/document/d/ValidDoc123/edit']],
 ]];
 $docs = site_search_documents($content, '2026-10-04');
@@ -46,6 +51,10 @@ $decision = array_values(array_filter($docs, static fn($doc): bool => $doc['url'
 archive_expect(count($point) === 1 && $point[0]['category'] === 'Повестка РС', 'Пункт повестки должен искаться отдельно.');
 archive_expect(count($decision) === 1 && $decision[0]['category'] === 'Протокол РС', 'Пункт протокола должен искаться отдельно.');
 archive_expect(str_contains($decision[0]['text'], 'за 7, против 0'), 'Итог голосования потерян при индексации.');
+$voteResult = array_values(array_filter($docs, static fn($doc): bool => $doc['category'] === 'Результаты голосований' && $doc['date'] === '2026-08-29'));
+archive_expect(count($voteResult) === 1, 'Отдельные результаты голосований должны использовать название видимого блока.');
+$treasurer = array_values(array_filter($docs, static fn($doc): bool => $doc['category'] === 'Отчёт казначея' && $doc['date'] === '2026-08-29'));
+archive_expect(count($treasurer) === 1 && $treasurer[0]['text'] === '', 'Публичный отчёт-изображение должен быть доступен в поиске по разделу и дате без выдумывания текста из изображения.');
 $content['archive']['items'][0]['treasurer_report'] = '<p>За август 2026. Расход PayPal 19,27 €.</p>';
 $content['archive']['items'][0]['vote_results_text'] = "05.04.2026\nИсточник: Telegram\nВопрос: Выбрать тему\nВарианты:\n— За — 8 голосов\nИтог: принято.";
 $separateVoteDocs = site_search_documents($content, '2026-10-04');
@@ -79,6 +88,8 @@ archive_expect(archive_add_standalone_vote($standalone, '2026-03-05', 'Голо�
 archive_expect(archive_add_standalone_vote($standalone, '2026-06-14', 'Внеочередное РС', (string)file_get_contents(dirname(__DIR__) . '/imports/vote-2026-06-14.txt'), $pdfSource), 'Внеочередное голосование о Zoom потеряно.');
 archive_expect(!archive_add_standalone_vote($standalone, '2026-06-14', 'Дубликат', (string)file_get_contents(dirname(__DIR__) . '/imports/vote-2026-06-14.txt'), $pdfSource), 'Нельзя дублировать отдельное голосование.');
 archive_expect(($standalone['archive']['items'][0]['event_date'] ?? '') === '2026-06-14', 'Карточки должны идти от новых к старым.');
-archive_expect(str_contains(archive_document_html($standalone['archive']['items'][0]['protocol_text'], 'protocol', 'vote-test'), 'Итоги голосования'), 'Отдельное голосование нельзя называть протоколом РС.');
+$voteOnlyHtml = archive_document_html($standalone['archive']['items'][0]['protocol_text'], 'protocol', 'vote-test');
+archive_expect(str_contains($voteOnlyHtml, '<summary>Результаты голосований</summary>'), 'Отдельное голосование должно называться результатами голосования.');
+archive_expect(!str_contains($voteOnlyHtml, '<summary>Протокол РС</summary>'), 'Отдельное голосование нельзя называть протоколом РС.');
 
 echo "Archive parsing, vote preservation and deep-link checks passed.\n";
