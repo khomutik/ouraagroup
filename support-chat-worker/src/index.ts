@@ -31,7 +31,7 @@ const MAX_API_PROXY_URL = "https://pochtinormalnye.ru/support-chat-max-api-";
 const MAX_ANNOUNCEMENT_NOON_CRON = "0 9 * * *";
 const MAX_ANNOUNCEMENT_EVENING_CRON = "20 18 * * *";
 const MAX_ANNOUNCEMENT_CHAT_SETTING = "max_announcement_chat_id";
-const MAX_ANNOUNCEMENT_IMAGE_URL = "https://raw.githubusercontent.com/khomutik/ouraagroup/main/assets/max-meeting-schedule.png";
+const MAX_ANNOUNCEMENT_IMAGE_URL = "https://raw.githubusercontent.com/khomutik/ouraagroup/0cc5cf45a55827289df633c56150c3c586446540/assets/max-meeting-schedule.png";
 
 type SessionRow = {
   id: string;
