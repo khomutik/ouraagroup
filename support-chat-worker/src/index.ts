@@ -463,7 +463,7 @@ async function sendMaxGroupAnnouncement(
   }
   try {
     await maxApi(env, "/messages?chat_id=" + encodeURIComponent(chatId), {
-      text: "Приглашаем на открытое онлайн-собрание группы АА.\n\n━━━━━━━━━━━━━━━━\nАНОНИМНО ЗАДАТЬ ВОПРОС ТРЕЗВОМУ АЛКОГОЛИКУ\n\nЧерез ботов можно АНОНИМНО задать вопрос, касающийся проблем с алкоголем, работы нашей группы или Сообщества Анонимных Алкоголиков. Вам ответит трезвый алкоголик - служащий нашей группы.",
+      text: "────────\nАНОНИМНО задать вопрос трезвому алкоголику можно через ботов",
       attachments: [
         { type: "image", payload: { url: MAX_ANNOUNCEMENT_IMAGE_URL } },
         { type: "inline_keyboard", payload: { buttons: [...MAX_ANNOUNCEMENT_LINK_BUTTONS, ...MAX_ANONYMOUS_LINK_BUTTONS] } },
