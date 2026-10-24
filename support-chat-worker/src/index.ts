@@ -422,7 +422,7 @@ async function claimAnnouncementStep(env: RuntimeEnv, day: string, step: string)
 
 async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<void> {
   const chatId = await getSetting(env, MAX_ANNOUNCEMENT_CHAT_SETTING);
-  if (!chatId || !/^\d{1,20}$/.test(chatId)) {
+  if (!chatId || !/^-?\d{1,20}$/.test(chatId)) {
     console.log(JSON.stringify({ event: "max_announcement_skipped", reason: "group_not_bound" }));
     return;
   }
@@ -452,17 +452,27 @@ async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<void> {
 
 async function captureMaxAnnouncementGroup(update: MaxUpdate, env: RuntimeEnv): Promise<void> {
   const message = update.message;
-  if (message?.recipient?.chat_type !== "chat") return;
-  const chatId = String(message.recipient.chat_id || "");
-  if (!/^\d{1,20}$/.test(chatId)) return;
+  if (message?.recipient?.chat_type === "dialog") return;
+  const rawChatId = message?.recipient?.chat_id ?? update.chat_id;
+  const chatId = String(rawChatId ?? "");
+  if (!/^-?\d{1,20}$/.test(chatId)) {
+    console.log(JSON.stringify({
+      event: "max_announcement_group_ignored",
+      reason: "missing_chat_id",
+      recipientType: message?.recipient?.chat_type || "unknown",
+      hasUpdateChatId: update.chat_id !== undefined && update.chat_id !== null,
+    }));
+    return;
+  }
 
-  let chat: { title?: string };
+  let chat: { title?: string; type?: string };
   try {
-    chat = await maxApiGet<{ title?: string }>(env, "/chats/" + encodeURIComponent(chatId));
+    chat = await maxApiGet<{ title?: string; type?: string }>(env, "/chats/" + encodeURIComponent(chatId));
   } catch (error) {
     console.error(JSON.stringify({ event: "max_announcement_chat_check_failed", error: error instanceof Error ? error.name : "unknown" }));
     return;
   }
+  if (chat.type && chat.type !== "chat") return;
   const normalizedTitle = (chat.title || "").toLocaleLowerCase("ru-RU").replace(/ё/g, "е");
   if (!normalizedTitle.includes("почти нормаль")) return;
 
