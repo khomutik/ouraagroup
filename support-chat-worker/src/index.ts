@@ -29,7 +29,8 @@ type RuntimeEnv = Env & {
 
 const MAX_WEBHOOK_URL = "https://pochtinormalnye.ru/support-chat-api/max/webhook";
 const MAX_API_PROXY_URL = "https://pochtinormalnye.ru/support-chat-max-api-";
-const MAX_ANNOUNCEMENT_CRON = "20 18 * * *";
+const MAX_ANNOUNCEMENT_NOON_CRON = "0 9 * * *";
+const MAX_ANNOUNCEMENT_EVENING_CRON = "20 18 * * *";
 const MAX_ANNOUNCEMENT_CHAT_SETTING = "max_announcement_chat_id";
 const MAX_ANNOUNCEMENT_IMAGE_URL = "https://raw.githubusercontent.com/khomutik/ouraagroup/main/assets/max-meeting-schedule.png";
 
@@ -442,7 +443,10 @@ async function claimAnnouncementStep(env: RuntimeEnv, day: string, step: string)
   return retry.meta.changes === 1;
 }
 
-async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<{ ok: boolean; sent: boolean; day: string; reason?: string }> {
+async function sendMaxGroupAnnouncement(
+  env: RuntimeEnv,
+  slot: "noon" | "evening" | "manual",
+): Promise<{ ok: boolean; sent: boolean; day: string; reason?: string }> {
   const day = moscowDateKey();
   const chatId = await getSetting(env, MAX_ANNOUNCEMENT_CHAT_SETTING);
   if (!chatId || !/^-?\d{1,20}$/.test(chatId)) {
@@ -454,8 +458,8 @@ async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<{ ok: boolean;
     return { ok: true, sent: false, day, reason: "write_permission_not_confirmed" };
   }
 
-  if (!(await claimAnnouncementStep(env, day, "post"))) {
-    console.log(JSON.stringify({ event: "max_announcement_skipped", day, reason: "already_sent_or_claimed" }));
+  if (!(await claimAnnouncementStep(env, day, slot))) {
+    console.log(JSON.stringify({ event: "max_announcement_skipped", day, slot, reason: "already_sent_or_claimed" }));
     return { ok: true, sent: false, day, reason: "already_sent_or_claimed" };
   }
   try {
@@ -467,12 +471,12 @@ async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<{ ok: boolean;
       ],
       notify: true,
     });
-    await setSetting(env, `max_announcement:${day}:post`, "sent");
-    console.log(JSON.stringify({ event: "max_announcement_sent", day, messages: 1, buttons: 8 }));
+    await setSetting(env, `max_announcement:${day}:${slot}`, "sent");
+    console.log(JSON.stringify({ event: "max_announcement_sent", day, slot, messages: 1, buttons: 8 }));
     return { ok: true, sent: true, day };
   } catch (error) {
-    await setSetting(env, `max_announcement:${day}:post`, "failed");
-    console.error(JSON.stringify({ event: "max_announcement_failed", day, step: "post", error: error instanceof Error ? error.name : "unknown" }));
+    await setSetting(env, `max_announcement:${day}:${slot}`, "failed");
+    console.error(JSON.stringify({ event: "max_announcement_failed", day, slot, error: error instanceof Error ? error.name : "unknown" }));
     return { ok: false, sent: false, day, reason: "delivery_failed" };
   }
 }
@@ -1760,7 +1764,7 @@ async function route(request: Request, env: RuntimeEnv, ctx: ExecutionContext): 
     if (!env.MAX_ANNOUNCEMENT_TRIGGER_SECRET || !constantTimeEqual(supplied, env.MAX_ANNOUNCEMENT_TRIGGER_SECRET)) {
       throw new ApiError(401, "invalid_announcement_trigger", "Unauthorized");
     }
-    return json(await sendMaxGroupAnnouncement(env));
+    return json(await sendMaxGroupAnnouncement(env, "noon"));
   }
   if (request.method === "POST" && url.pathname === "/max/register") {
     return registerMaxWebhook(request, env);
@@ -1844,8 +1848,7 @@ export default {
 
   async scheduled(controller, env, ctx) {
     ctx.waitUntil(cleanupExpired(env));
-    if (controller.cron === MAX_ANNOUNCEMENT_CRON) {
-      ctx.waitUntil(sendMaxGroupAnnouncement(env));
-    }
+    if (controller.cron === MAX_ANNOUNCEMENT_NOON_CRON) ctx.waitUntil(sendMaxGroupAnnouncement(env, "noon"));
+    if (controller.cron === MAX_ANNOUNCEMENT_EVENING_CRON) ctx.waitUntil(sendMaxGroupAnnouncement(env, "evening"));
   },
 } satisfies ExportedHandler<RuntimeEnv>;
