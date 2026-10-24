@@ -432,43 +432,21 @@ async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<void> {
   }
 
   const day = moscowDateKey();
-  const photoClaimed = await claimAnnouncementStep(env, day, "schedule");
-  if (photoClaimed) {
-    try {
-      await maxApi(env, "/messages?chat_id=" + encodeURIComponent(chatId), {
-        text: "Приглашаем на открытое онлайн-собрание группы АА.",
-        attachments: [
-          { type: "image", payload: { url: MAX_ANNOUNCEMENT_IMAGE_URL } },
-          { type: "inline_keyboard", payload: { buttons: MAX_ANNOUNCEMENT_LINK_BUTTONS } },
-        ],
-        notify: true,
-      });
-      await setSetting(env, `max_announcement:${day}:schedule`, "sent");
-    } catch (error) {
-      await setSetting(env, `max_announcement:${day}:schedule`, "failed");
-      console.error(JSON.stringify({ event: "max_announcement_failed", day, step: "schedule", error: error instanceof Error ? error.name : "unknown" }));
-      return;
-    }
-  }
-
-  const scheduleStatus = await getSetting(env, `max_announcement:${day}:schedule`);
-  if (scheduleStatus !== "sent") return;
-  await new Promise((resolve) => setTimeout(resolve, 650));
-
-  if (!(await claimAnnouncementStep(env, day, "anonymous"))) return;
+  if (!(await claimAnnouncementStep(env, day, "post"))) return;
   try {
     await maxApi(env, "/messages?chat_id=" + encodeURIComponent(chatId), {
-      text: "━━━━━━━━━━━━━━━━\nАНОНИМНО ЗАДАТЬ ВОПРОС ТРЕЗВОМУ АЛКОГОЛИКУ\n\nЧерез ботов можно АНОНИМНО задать вопрос, касающийся проблем с алкоголем, работы нашей группы или Сообщества Анонимных Алкоголиков. Вам ответит трезвый алкоголик - служащий нашей группы.",
+      text: "Приглашаем на открытое онлайн-собрание группы АА.\n\n━━━━━━━━━━━━━━━━\nАНОНИМНО ЗАДАТЬ ВОПРОС ТРЕЗВОМУ АЛКОГОЛИКУ\n\nЧерез ботов можно АНОНИМНО задать вопрос, касающийся проблем с алкоголем, работы нашей группы или Сообщества Анонимных Алкоголиков. Вам ответит трезвый алкоголик - служащий нашей группы.",
       attachments: [
-        { type: "inline_keyboard", payload: { buttons: MAX_ANONYMOUS_LINK_BUTTONS } },
+        { type: "image", payload: { url: MAX_ANNOUNCEMENT_IMAGE_URL } },
+        { type: "inline_keyboard", payload: { buttons: [...MAX_ANNOUNCEMENT_LINK_BUTTONS, ...MAX_ANONYMOUS_LINK_BUTTONS] } },
       ],
       notify: true,
     });
-    await setSetting(env, `max_announcement:${day}:anonymous`, "sent");
-    console.log(JSON.stringify({ event: "max_announcement_sent", day }));
+    await setSetting(env, `max_announcement:${day}:post`, "sent");
+    console.log(JSON.stringify({ event: "max_announcement_sent", day, messages: 1, buttons: 8 }));
   } catch (error) {
-    await setSetting(env, `max_announcement:${day}:anonymous`, "failed");
-    console.error(JSON.stringify({ event: "max_announcement_failed", day, step: "anonymous", error: error instanceof Error ? error.name : "unknown" }));
+    await setSetting(env, `max_announcement:${day}:post`, "failed");
+    console.error(JSON.stringify({ event: "max_announcement_failed", day, step: "post", error: error instanceof Error ? error.name : "unknown" }));
   }
 }
 
