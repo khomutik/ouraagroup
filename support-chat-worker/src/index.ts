@@ -366,10 +366,24 @@ async function maxApi<T>(env: RuntimeEnv, path: string, payload: unknown): Promi
     body: JSON.stringify(payload),
   });
   if (!response.ok) {
+    const detail = await response.text();
+    console.error(JSON.stringify({
+      event: "max_api_request_failed",
+      path: path.split("?")[0],
+      status: response.status,
+      detail: detail.slice(0, 400),
+    }));
     throw new ApiError(502, "max_unavailable", "MAX временно недоступен.", true);
   }
   const result = (await response.json()) as T & { success?: unknown };
   if (result && typeof result === "object" && result.success === false) {
+    const details = result as T & { code?: unknown; message?: unknown };
+    console.error(JSON.stringify({
+      event: "max_api_operation_failed",
+      path: path.split("?")[0],
+      code: typeof details.code === "string" ? details.code : undefined,
+      message: typeof details.message === "string" ? details.message.slice(0, 300) : undefined,
+    }));
     throw new ApiError(502, "max_unavailable", "MAX не подтвердил операцию.", true);
   }
   return result;
@@ -413,12 +427,19 @@ function moscowDateKey(date = new Date()): string {
 }
 
 async function claimAnnouncementStep(env: RuntimeEnv, day: string, step: string): Promise<boolean> {
+  const key = `max_announcement:${day}:${step}`;
   const result = await env.DB.prepare(
     "INSERT OR IGNORE INTO settings(key, value, updated_at) VALUES (?, 'sending', ?)",
   )
-    .bind(`max_announcement:${day}:${step}`, nowSeconds())
+    .bind(key, nowSeconds())
     .run();
-  return result.meta.changes === 1;
+  if (result.meta.changes === 1) return true;
+  const retry = await env.DB.prepare(
+    "UPDATE settings SET value = 'sending', updated_at = ? WHERE key = ? AND value = 'failed'",
+  )
+    .bind(nowSeconds(), key)
+    .run();
+  return retry.meta.changes === 1;
 }
 
 async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<{ ok: boolean; sent: boolean; day: string; reason?: string }> {
