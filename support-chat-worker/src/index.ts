@@ -22,7 +22,6 @@ type RuntimeEnv = Env & {
   MAX_BOT_TOKEN?: string;
   MAX_WEBHOOK_SECRET?: string;
   MAX_PROXY_SECRET?: string;
-  MAX_ANNOUNCEMENT_TRIGGER_SECRET?: string;
   RATE_LIMIT_SECRET?: string;
   TELEGRAM_CHAT_ENCRYPTION_KEY?: string;
 };
@@ -1758,13 +1757,6 @@ async function route(request: Request, env: RuntimeEnv, ctx: ExecutionContext): 
   }
   if (request.method === "POST" && url.pathname === "/max/webhook") {
     return handleMaxWebhook(request, env);
-  }
-  if (request.method === "POST" && url.pathname === "/max/announcement-now") {
-    const supplied = request.headers.get("X-Max-Announcement-Trigger") || "";
-    if (!env.MAX_ANNOUNCEMENT_TRIGGER_SECRET || !constantTimeEqual(supplied, env.MAX_ANNOUNCEMENT_TRIGGER_SECRET)) {
-      throw new ApiError(401, "invalid_announcement_trigger", "Unauthorized");
-    }
-    return json(await sendMaxGroupAnnouncement(env, "noon"));
   }
   if (request.method === "POST" && url.pathname === "/max/register") {
     return registerMaxWebhook(request, env);
