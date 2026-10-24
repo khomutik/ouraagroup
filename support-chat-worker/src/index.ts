@@ -29,7 +29,7 @@ type RuntimeEnv = Env & {
 const MAX_WEBHOOK_URL = "https://pochtinormalnye.ru/support-chat-api/max/webhook";
 const MAX_API_PROXY_URL = "https://pochtinormalnye.ru/support-chat-max-api-";
 const MAX_ANNOUNCEMENT_NOON_CRON = "0 9 * * *";
-const MAX_ANNOUNCEMENT_EVENING_CRON = "20 18 * * WED,SAT";
+const MAX_ANNOUNCEMENT_EVENING_CRON = "20 18 * * *";
 const MAX_ANNOUNCEMENT_CHAT_SETTING = "max_announcement_chat_id";
 const MAX_ANNOUNCEMENT_IMAGE_URL = "https://raw.githubusercontent.com/khomutik/ouraagroup/0cc5cf45a55827289df633c56150c3c586446540/assets/max-meeting-schedule.png";
 
@@ -415,6 +415,43 @@ const MAX_ANONYMOUS_LINK_BUTTONS = [
   [{ type: "link", text: "Анонимный чат-бот в MAX", url: "https://max.ru/se14269604_bot" }],
 ];
 
+const MAX_WEEKDAY_ANNOUNCEMENT_IMAGE_URLS: Record<string, string> = {
+  monday: "https://raw.githubusercontent.com/khomutik/ouraagroup/5e43a270d874233e5c19761144e29d3bbfd32d9e/assets/max-announcement-monday.jpg",
+  tuesday: "https://raw.githubusercontent.com/khomutik/ouraagroup/5e43a270d874233e5c19761144e29d3bbfd32d9e/assets/max-announcement-tuesday.jpg",
+  thursday: "https://raw.githubusercontent.com/khomutik/ouraagroup/5e43a270d874233e5c19761144e29d3bbfd32d9e/assets/max-announcement-thursday.jpg",
+  friday: "https://raw.githubusercontent.com/khomutik/ouraagroup/5e43a270d874233e5c19761144e29d3bbfd32d9e/assets/max-announcement-friday.jpg",
+  sunday: "https://raw.githubusercontent.com/khomutik/ouraagroup/5e43a270d874233e5c19761144e29d3bbfd32d9e/assets/max-announcement-sunday.jpg",
+};
+
+function maxWeekdayAnnouncementImage(date = new Date()): string | undefined {
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Moscow",
+    weekday: "long",
+  }).format(date).toLowerCase();
+  return MAX_WEEKDAY_ANNOUNCEMENT_IMAGE_URLS[weekday];
+}
+
+function buildMaxAnnouncementPayload(
+  slot: "noon" | "evening" | "manual",
+  date = new Date(),
+) {
+  const weekdayImage = slot === "evening" ? maxWeekdayAnnouncementImage(date) : undefined;
+  const buttons = weekdayImage
+    ? MAX_ANNOUNCEMENT_LINK_BUTTONS.slice(0, 3)
+    : [...MAX_ANNOUNCEMENT_LINK_BUTTONS, ...MAX_ANONYMOUS_LINK_BUTTONS];
+  const attachments = [
+    { type: "image", payload: { url: weekdayImage || MAX_ANNOUNCEMENT_IMAGE_URL } },
+    { type: "inline_keyboard", payload: { buttons } },
+  ];
+
+  if (weekdayImage) return { attachments, notify: true };
+  return {
+    text: "АНОНИМНО ЗАДАТЬ ВОПРОС ТРЕЗВОМУ АЛКОГОЛИКУ МОЖНО ЧЕРЕЗ НАШИХ БОТОВ",
+    attachments,
+    notify: true,
+  };
+}
+
 function moscowDateKey(date = new Date()): string {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Moscow",
@@ -462,16 +499,16 @@ async function sendMaxGroupAnnouncement(
     return { ok: true, sent: false, day, reason: "already_sent_or_claimed" };
   }
   try {
-    await maxApi(env, "/messages?chat_id=" + encodeURIComponent(chatId), {
-      text: "АНОНИМНО ЗАДАТЬ ВОПРОС ТРЕЗВОМУ АЛКОГОЛИКУ МОЖНО ЧЕРЕЗ НАШИХ БОТОВ",
-      attachments: [
-        { type: "image", payload: { url: MAX_ANNOUNCEMENT_IMAGE_URL } },
-        { type: "inline_keyboard", payload: { buttons: [...MAX_ANNOUNCEMENT_LINK_BUTTONS, ...MAX_ANONYMOUS_LINK_BUTTONS] } },
-      ],
-      notify: true,
-    });
+    const payload = buildMaxAnnouncementPayload(slot);
+    await maxApi(env, "/messages?chat_id=" + encodeURIComponent(chatId), payload);
     await setSetting(env, `max_announcement:${day}:${slot}`, "sent");
-    console.log(JSON.stringify({ event: "max_announcement_sent", day, slot, messages: 1, buttons: 8 }));
+    console.log(JSON.stringify({
+      event: "max_announcement_sent",
+      day,
+      slot,
+      messages: 1,
+      buttons: payload.text === undefined ? 3 : 8,
+    }));
     return { ok: true, sent: true, day };
   } catch (error) {
     await setSetting(env, `max_announcement:${day}:${slot}`, "failed");
@@ -1804,6 +1841,8 @@ export const maxTestHelpers = {
   isDedicatedTelegramThreadId,
   telegramMessageMatchesThread,
   maxTelegramText,
+  maxWeekdayAnnouncementImage,
+  buildMaxAnnouncementPayload,
 };
 
 export const telegramTestHelpers = {

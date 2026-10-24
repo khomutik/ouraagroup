@@ -36,3 +36,34 @@ describe("MAX webhook guards", () => {
     expect(maxTestHelpers.telegramMessageMatchesThread(85, undefined)).toBe(false);
   });
 });
+
+describe("MAX scheduled announcements", () => {
+  it.each([
+    ["2026-10-26T18:30:00Z", "monday"],
+    ["2026-10-27T18:30:00Z", "tuesday"],
+    ["2026-10-29T18:30:00Z", "thursday"],
+    ["2026-10-30T18:30:00Z", "friday"],
+    ["2026-11-01T18:30:00Z", "sunday"],
+  ])("uses the %s Moscow weekday poster with three links", (time, day) => {
+    const payload = maxTestHelpers.buildMaxAnnouncementPayload("evening", new Date(time));
+    expect(payload).not.toHaveProperty("text");
+    expect(payload.attachments[0].payload.url).toContain(`max-announcement-${day}.jpg`);
+    expect(payload.attachments[1].payload.buttons).toHaveLength(3);
+  });
+
+  it.each([
+    "2026-10-28T18:30:00Z",
+    "2026-10-31T18:30:00Z",
+  ])("uses the general schedule with eight links on %s", (time) => {
+    const payload = maxTestHelpers.buildMaxAnnouncementPayload("evening", new Date(time));
+    expect(payload.text).toBe("АНОНИМНО ЗАДАТЬ ВОПРОС ТРЕЗВОМУ АЛКОГОЛИКУ МОЖНО ЧЕРЕЗ НАШИХ БОТОВ");
+    expect(payload.attachments[0].payload.url).toContain("max-meeting-schedule.png");
+    expect(payload.attachments[1].payload.buttons).toHaveLength(8);
+  });
+
+  it("keeps the noon announcement general every day", () => {
+    const payload = maxTestHelpers.buildMaxAnnouncementPayload("noon", new Date("2026-10-27T18:30:00Z"));
+    expect(payload.text).toBe("АНОНИМНО ЗАДАТЬ ВОПРОС ТРЕЗВОМУ АЛКОГОЛИКУ МОЖНО ЧЕРЕЗ НАШИХ БОТОВ");
+    expect(payload.attachments[1].payload.buttons).toHaveLength(8);
+  });
+});
