@@ -22,6 +22,7 @@ type RuntimeEnv = Env & {
   MAX_BOT_TOKEN?: string;
   MAX_WEBHOOK_SECRET?: string;
   MAX_PROXY_SECRET?: string;
+  MAX_ANNOUNCEMENT_TRIGGER_SECRET?: string;
   RATE_LIMIT_SECRET?: string;
   TELEGRAM_CHAT_ENCRYPTION_KEY?: string;
 };
@@ -420,19 +421,22 @@ async function claimAnnouncementStep(env: RuntimeEnv, day: string, step: string)
   return result.meta.changes === 1;
 }
 
-async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<void> {
+async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<{ ok: boolean; sent: boolean; day: string; reason?: string }> {
+  const day = moscowDateKey();
   const chatId = await getSetting(env, MAX_ANNOUNCEMENT_CHAT_SETTING);
   if (!chatId || !/^-?\d{1,20}$/.test(chatId)) {
     console.log(JSON.stringify({ event: "max_announcement_skipped", reason: "group_not_bound" }));
-    return;
+    return { ok: true, sent: false, day, reason: "group_not_bound" };
   }
   if ((await getSetting(env, "max_announcement_write_permission")) !== "true") {
     console.log(JSON.stringify({ event: "max_announcement_skipped", reason: "write_permission_not_confirmed" }));
-    return;
+    return { ok: true, sent: false, day, reason: "write_permission_not_confirmed" };
   }
 
-  const day = moscowDateKey();
-  if (!(await claimAnnouncementStep(env, day, "post"))) return;
+  if (!(await claimAnnouncementStep(env, day, "post"))) {
+    console.log(JSON.stringify({ event: "max_announcement_skipped", day, reason: "already_sent_or_claimed" }));
+    return { ok: true, sent: false, day, reason: "already_sent_or_claimed" };
+  }
   try {
     await maxApi(env, "/messages?chat_id=" + encodeURIComponent(chatId), {
       text: "Приглашаем на открытое онлайн-собрание группы АА.\n\n━━━━━━━━━━━━━━━━\nАНОНИМНО ЗАДАТЬ ВОПРОС ТРЕЗВОМУ АЛКОГОЛИКУ\n\nЧерез ботов можно АНОНИМНО задать вопрос, касающийся проблем с алкоголем, работы нашей группы или Сообщества Анонимных Алкоголиков. Вам ответит трезвый алкоголик - служащий нашей группы.",
@@ -444,9 +448,11 @@ async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<void> {
     });
     await setSetting(env, `max_announcement:${day}:post`, "sent");
     console.log(JSON.stringify({ event: "max_announcement_sent", day, messages: 1, buttons: 8 }));
+    return { ok: true, sent: true, day };
   } catch (error) {
     await setSetting(env, `max_announcement:${day}:post`, "failed");
     console.error(JSON.stringify({ event: "max_announcement_failed", day, step: "post", error: error instanceof Error ? error.name : "unknown" }));
+    return { ok: false, sent: false, day, reason: "delivery_failed" };
   }
 }
 
@@ -1727,6 +1733,13 @@ async function route(request: Request, env: RuntimeEnv, ctx: ExecutionContext): 
   }
   if (request.method === "POST" && url.pathname === "/max/webhook") {
     return handleMaxWebhook(request, env);
+  }
+  if (request.method === "POST" && url.pathname === "/max/announcement-now") {
+    const supplied = request.headers.get("X-Max-Announcement-Trigger") || "";
+    if (!env.MAX_ANNOUNCEMENT_TRIGGER_SECRET || !constantTimeEqual(supplied, env.MAX_ANNOUNCEMENT_TRIGGER_SECRET)) {
+      throw new ApiError(401, "invalid_announcement_trigger", "Unauthorized");
+    }
+    return json(await sendMaxGroupAnnouncement(env));
   }
   if (request.method === "POST" && url.pathname === "/max/register") {
     return registerMaxWebhook(request, env);
