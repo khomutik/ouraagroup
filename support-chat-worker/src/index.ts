@@ -28,6 +28,9 @@ type RuntimeEnv = Env & {
 
 const MAX_WEBHOOK_URL = "https://pochtinormalnye.ru/support-chat-api/max/webhook";
 const MAX_API_PROXY_URL = "https://pochtinormalnye.ru/support-chat-max-api-";
+const MAX_ANNOUNCEMENT_CRON = "20 18 * * *";
+const MAX_ANNOUNCEMENT_CHAT_SETTING = "max_announcement_chat_id";
+const MAX_ANNOUNCEMENT_IMAGE_URL = "https://raw.githubusercontent.com/khomutik/ouraagroup/main/assets/max-meeting-schedule.png";
 
 type SessionRow = {
   id: string;
@@ -369,6 +372,151 @@ async function maxApi<T>(env: RuntimeEnv, path: string, payload: unknown): Promi
     throw new ApiError(502, "max_unavailable", "MAX не подтвердил операцию.", true);
   }
   return result;
+}
+
+async function maxApiGet<T>(env: RuntimeEnv, path: string): Promise<T> {
+  requireMaxConfiguration(env);
+  const response = await fetch(MAX_API_PROXY_URL + (env.MAX_PROXY_SECRET || "") + path, {
+    method: "GET",
+    headers: { Authorization: env.MAX_BOT_TOKEN || "" },
+  });
+  if (!response.ok) {
+    throw new ApiError(502, "max_unavailable", "MAX временно недоступен.", true);
+  }
+  return (await response.json()) as T;
+}
+
+const MAX_ANNOUNCEMENT_LINK_BUTTONS = [
+  [{ type: "link", text: "Собрание в ZOOM (код 111)", url: "https://us06web.zoom.us/j/5487249245?pwd=UE3buqca6pTDt8kGPJDW9pRoaC7gkt.1" }],
+  [{ type: "link", text: "Сайт группы", url: "https://pochtinormalnye.ru/" }],
+  [{ type: "link", text: "Группа в Telegram", url: "https://telegram.me/+mta_CKQY2c05ODRi" }],
+  [{ type: "link", text: "ИНФО Канал в Telegram", url: "https://telegram.me/+n40PjinXX_pjNTcy" }],
+  [{ type: "link", text: "Группа в MAX", url: "https://max.ru/join/GV-P-08zFtVs6pX-xR5Z8x80MMNPzhjJ1w6JVEYGn9M" }],
+];
+
+const MAX_ANONYMOUS_LINK_BUTTONS = [
+  [{ type: "link", text: "Анонимный чат на сайте", url: "https://pochtinormalnye.ru/" }],
+  [{ type: "link", text: "Анонимный чат-бот в ТГ", url: "https://telegram.me/PochtiNormalnye_help_bot" }],
+  [{ type: "link", text: "Анонимный чат-бот в MAX", url: "https://max.ru/se14269604_bot" }],
+];
+
+function moscowDateKey(date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Moscow",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const part = (type: string) => parts.find((item) => item.type === type)?.value || "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
+async function claimAnnouncementStep(env: RuntimeEnv, day: string, step: string): Promise<boolean> {
+  const result = await env.DB.prepare(
+    "INSERT OR IGNORE INTO settings(key, value, updated_at) VALUES (?, 'sending', ?)",
+  )
+    .bind(`max_announcement:${day}:${step}`, nowSeconds())
+    .run();
+  return result.meta.changes === 1;
+}
+
+async function sendMaxGroupAnnouncement(env: RuntimeEnv): Promise<void> {
+  const chatId = await getSetting(env, MAX_ANNOUNCEMENT_CHAT_SETTING);
+  if (!chatId || !/^\d{1,20}$/.test(chatId)) {
+    console.log(JSON.stringify({ event: "max_announcement_skipped", reason: "group_not_bound" }));
+    return;
+  }
+  if ((await getSetting(env, "max_announcement_write_permission")) !== "true") {
+    console.log(JSON.stringify({ event: "max_announcement_skipped", reason: "write_permission_not_confirmed" }));
+    return;
+  }
+
+  const day = moscowDateKey();
+  const photoClaimed = await claimAnnouncementStep(env, day, "schedule");
+  if (photoClaimed) {
+    try {
+      await maxApi(env, "/messages?chat_id=" + encodeURIComponent(chatId), {
+        text: "Приглашаем на открытое онлайн-собрание группы АА.",
+        attachments: [
+          { type: "image", payload: { url: MAX_ANNOUNCEMENT_IMAGE_URL } },
+          { type: "inline_keyboard", payload: { buttons: MAX_ANNOUNCEMENT_LINK_BUTTONS } },
+        ],
+        notify: true,
+      });
+      await setSetting(env, `max_announcement:${day}:schedule`, "sent");
+    } catch (error) {
+      await setSetting(env, `max_announcement:${day}:schedule`, "failed");
+      console.error(JSON.stringify({ event: "max_announcement_failed", day, step: "schedule", error: error instanceof Error ? error.name : "unknown" }));
+      return;
+    }
+  }
+
+  const scheduleStatus = await getSetting(env, `max_announcement:${day}:schedule`);
+  if (scheduleStatus !== "sent") return;
+  await new Promise((resolve) => setTimeout(resolve, 650));
+
+  if (!(await claimAnnouncementStep(env, day, "anonymous"))) return;
+  try {
+    await maxApi(env, "/messages?chat_id=" + encodeURIComponent(chatId), {
+      text: "━━━━━━━━━━━━━━━━\nАНОНИМНО ЗАДАТЬ ВОПРОС ТРЕЗВОМУ АЛКОГОЛИКУ\n\nЧерез ботов можно АНОНИМНО задать вопрос, касающийся проблем с алкоголем, работы нашей группы или Сообщества Анонимных Алкоголиков. Вам ответит трезвый алкоголик - служащий нашей группы.",
+      attachments: [
+        { type: "inline_keyboard", payload: { buttons: MAX_ANONYMOUS_LINK_BUTTONS } },
+      ],
+      notify: true,
+    });
+    await setSetting(env, `max_announcement:${day}:anonymous`, "sent");
+    console.log(JSON.stringify({ event: "max_announcement_sent", day }));
+  } catch (error) {
+    await setSetting(env, `max_announcement:${day}:anonymous`, "failed");
+    console.error(JSON.stringify({ event: "max_announcement_failed", day, step: "anonymous", error: error instanceof Error ? error.name : "unknown" }));
+  }
+}
+
+async function captureMaxAnnouncementGroup(update: MaxUpdate, env: RuntimeEnv): Promise<void> {
+  const message = update.message;
+  if (message?.recipient?.chat_type !== "chat") return;
+  const chatId = String(message.recipient.chat_id || "");
+  if (!/^\d{1,20}$/.test(chatId)) return;
+
+  let chat: { title?: string };
+  try {
+    chat = await maxApiGet<{ title?: string }>(env, "/chats/" + encodeURIComponent(chatId));
+  } catch (error) {
+    console.error(JSON.stringify({ event: "max_announcement_chat_check_failed", error: error instanceof Error ? error.name : "unknown" }));
+    return;
+  }
+  const normalizedTitle = (chat.title || "").toLocaleLowerCase("ru-RU").replace(/ё/g, "е");
+  if (!normalizedTitle.includes("почти нормаль")) return;
+
+  const boundChatId = await getSetting(env, MAX_ANNOUNCEMENT_CHAT_SETTING);
+  if (boundChatId && boundChatId !== chatId) {
+    console.log(JSON.stringify({ event: "max_announcement_group_ignored", reason: "already_bound" }));
+    return;
+  }
+  const checkedAt = Number.parseInt((await getSetting(env, "max_announcement_permission_checked_at")) || "0", 10);
+  if (boundChatId === chatId && checkedAt > nowSeconds() - 900) return;
+  if (!boundChatId) await setSetting(env, MAX_ANNOUNCEMENT_CHAT_SETTING, chatId);
+
+  try {
+    const member = await maxApiGet<{ is_admin?: boolean; permissions?: string[] }>(
+      env,
+      "/chats/" + encodeURIComponent(chatId) + "/members/me",
+    );
+    const permissions = member.permissions || [];
+    const canWrite = member.is_admin === true &&
+      (permissions.includes("write") || permissions.includes("post_edit_delete_message"));
+    await setSetting(env, "max_announcement_write_permission", canWrite ? "true" : "false");
+    await setSetting(env, "max_announcement_permission_checked_at", String(nowSeconds()));
+    console.log(JSON.stringify({
+      event: "max_announcement_group_bound",
+      isAdmin: member.is_admin === true,
+      writePermission: canWrite,
+    }));
+  } catch (error) {
+    await setSetting(env, "max_announcement_write_permission", "unknown");
+    await setSetting(env, "max_announcement_permission_checked_at", String(nowSeconds()));
+    console.error(JSON.stringify({ event: "max_announcement_permission_check_failed", error: error instanceof Error ? error.name : "unknown" }));
+  }
 }
 
 async function sendMaxMessage(env: RuntimeEnv, userId: string, text: string): Promise<void> {
@@ -1465,7 +1613,11 @@ async function handleMaxWebhook(request: Request, env: RuntimeEnv): Promise<Resp
       await sendMaxMessage(env, userId, "Здравствуйте! Напишите сообщение — я передам его группе. Чтобы завершить диалог, отправьте /close.");
     }
   } else if (update.update_type === "message_created") {
-    await sendMaxVisitorMessage(update, env);
+    if (isDirectMaxMessage(update)) {
+      await sendMaxVisitorMessage(update, env);
+    } else {
+      await captureMaxAnnouncementGroup(update, env);
+    }
   } else if (update.update_type === "bot_stopped" || update.update_type === "dialog_removed") {
     const userId = maxUserId(update.user);
     if (userId) {
@@ -1523,12 +1675,19 @@ async function registerTelegramWebhook(request: Request, env: RuntimeEnv): Promi
 
 async function health(env: RuntimeEnv): Promise<Response> {
   await env.DB.prepare("SELECT 1").first();
+  const announcementWritePermission = await getSetting(env, "max_announcement_write_permission");
   return json({
     ok: true,
     version: "1.3.0",
     telegramConfigured: Boolean(env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_WEBHOOK_SECRET),
     telegramPrivateConfigured: Boolean(env.TELEGRAM_CHAT_ENCRYPTION_KEY && env.TELEGRAM_CHAT_ENCRYPTION_KEY.length >= 32),
     maxConfigured: Boolean(env.MAX_BOT_TOKEN && env.MAX_WEBHOOK_SECRET && env.MAX_PROXY_SECRET),
+    maxAnnouncementGroupBound: Boolean(await getSetting(env, MAX_ANNOUNCEMENT_CHAT_SETTING)),
+    maxAnnouncementWritePermission: announcementWritePermission === "true"
+      ? true
+      : announcementWritePermission === "false"
+        ? false
+        : null,
     operatorGroupBound: Boolean(await getSetting(env, "operator_chat_id")),
     retentionDays: positiveInteger(env.RETENTION_DAYS, RETENTION_FALLBACK_DAYS),
   });
@@ -1661,7 +1820,10 @@ export default {
     }
   },
 
-  async scheduled(_controller, env, ctx) {
+  async scheduled(controller, env, ctx) {
     ctx.waitUntil(cleanupExpired(env));
+    if (controller.cron === MAX_ANNOUNCEMENT_CRON) {
+      ctx.waitUntil(sendMaxGroupAnnouncement(env));
+    }
   },
 } satisfies ExportedHandler<RuntimeEnv>;
