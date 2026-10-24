@@ -30,6 +30,7 @@ const MAX_WEBHOOK_URL = "https://pochtinormalnye.ru/support-chat-api/max/webhook
 const MAX_API_PROXY_URL = "https://pochtinormalnye.ru/support-chat-max-api-";
 const MAX_ANNOUNCEMENT_NOON_CRON = "0 9 * * *";
 const MAX_ANNOUNCEMENT_EVENING_CRON = "20 18 * * *";
+const MAX_ANNOUNCEMENT_PREVIEW_CRON = "48 9 * * *";
 const MAX_ANNOUNCEMENT_CHAT_SETTING = "max_announcement_chat_id";
 const MAX_ANNOUNCEMENT_IMAGE_URL = "https://raw.githubusercontent.com/khomutik/ouraagroup/0cc5cf45a55827289df633c56150c3c586446540/assets/max-meeting-schedule.png";
 
@@ -463,7 +464,7 @@ async function sendMaxGroupAnnouncement(
   }
   try {
     await maxApi(env, "/messages?chat_id=" + encodeURIComponent(chatId), {
-      text: "────────\nАНОНИМНО задать вопрос трезвому алкоголику можно через ботов",
+      text: "АНОНИМНО задать вопрос трезвому алкоголику можно через ботов",
       attachments: [
         { type: "image", payload: { url: MAX_ANNOUNCEMENT_IMAGE_URL } },
         { type: "inline_keyboard", payload: { buttons: [...MAX_ANNOUNCEMENT_LINK_BUTTONS, ...MAX_ANONYMOUS_LINK_BUTTONS] } },
@@ -1842,5 +1843,6 @@ export default {
     ctx.waitUntil(cleanupExpired(env));
     if (controller.cron === MAX_ANNOUNCEMENT_NOON_CRON) ctx.waitUntil(sendMaxGroupAnnouncement(env, "noon"));
     if (controller.cron === MAX_ANNOUNCEMENT_EVENING_CRON) ctx.waitUntil(sendMaxGroupAnnouncement(env, "evening"));
+    if (controller.cron === MAX_ANNOUNCEMENT_PREVIEW_CRON) ctx.waitUntil(sendMaxGroupAnnouncement(env, "manual"));
   },
 } satisfies ExportedHandler<RuntimeEnv>;
