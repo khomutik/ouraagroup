@@ -12,7 +12,7 @@ const frame = {
   replaceChildren() { this.children = []; }
 };
 const button = {
-  dataset: {speakerAudio: 'https://drive.google.com/uc?export=download&id=ABC_123', openLabel: 'Моя кнопка плеера'},
+  dataset: {speakerAudio: '/public.php?speaker_audio=ABC_123', openLabel: 'Моя кнопка плеера'},
   parentElement: {querySelector: () => frame},
   attributes: {'aria-expanded': 'false'},
   getAttribute(name) { return this.attributes[name]; },

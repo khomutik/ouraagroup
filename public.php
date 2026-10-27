@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/cms.php';
+
+if (array_key_exists('speaker_audio', $_GET)) {
+    require __DIR__ . '/speaker-audio-stream.php';
+    cms_stream_speaker_audio($_GET['speaker_audio']);
+    exit;
+}
+
 require __DIR__ . '/site-search-lib.php';
 
 $section = (string) ($_GET['section'] ?? '');
@@ -126,7 +133,7 @@ if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms
   <?php if (!empty($data['privacy'])): ?><section class="speakers-privacy"><?= cms_rich((string)$data['privacy']) ?></section><?php endif; ?>
   <section class="content-card speakers-materials" aria-label="Материалы об анонимности"><h2><?=h(cms_site_text($content, 'speakers_materials_heading'))?></h2><?php foreach (($data['materials'] ?? []) as $item): if ($url = cms_safe_url($item['resource'] ?? '')): ?><a class="speakers-file" href="<?= h($url) ?>" target="_blank" rel="noopener"><span>📄</span><span><?= cms_display_text($item['title'] ?? '') ?></span></a><?php endif; endforeach; ?></section>
   <?php if ($driveUrl): ?><a class="document-link speakers-drive-link" href="<?= h($driveUrl) ?>" target="_blank" rel="noopener"><img src="assets/emoji/aa_microphone.png" alt="" /><span><?=h(cms_site_text($content, 'speakers_drive_button'))?></span></a><?php endif; ?>
-  <?php foreach($speakerItems as $i => $item): $previewUrl=cms_speaker_preview_url($item); $downloadUrl=cms_speaker_download_url($item); $playerButton=cms_speaker_button($item,'player'); $downloadButton=cms_speaker_button($item,'download'); ?>
+  <?php foreach($speakerItems as $i => $item): $streamUrl=cms_speaker_audio_stream_url($item); $downloadUrl=cms_speaker_download_url($item); $playerButton=cms_speaker_button($item,'player'); $downloadButton=cms_speaker_button($item,'download'); ?>
     <article class="announcement-card speaker-card" id="<?=h(site_search_anchor('speaker', $item['id'] ?? '', (int)$i))?>">
       <div class="announcement-copy">
         <div class="announcement-meta"><time datetime="<?=h($item['event_date']??'')?>"><?=h(cms_date_ru((string)($item['event_date']??'')))?></time></div>
@@ -135,12 +142,12 @@ if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms
           <div><dt>Спикер</dt><dd><?=h($item['speaker']??'')?></dd></div>
           <?php foreach(['city'=>'Город','home_group'=>'Домашняя группа','sobriety'=>'Трезвость'] as $key=>$label): if (!empty($item[$key])): ?><div><dt><?=h($label)?></dt><dd><?=h($item[$key])?></dd></div><?php endif; endforeach; ?>
         </dl>
-        <?php if($previewUrl || $downloadUrl): ?><div class="speaker-audio"><?php if($downloadUrl): ?><button class="speaker-audio__load <?=h(cms_action_classes($playerButton))?>" type="button" data-speaker-audio="<?=h($downloadUrl)?>" data-open-label="<?=h($playerButton['label'])?>" aria-expanded="false"><?=h($playerButton['label'])?></button><?php endif; ?><?php if($downloadUrl): ?><a class="speaker-audio__download <?=h(cms_action_classes($downloadButton))?>" href="<?=h($downloadUrl)?>" target="_blank" rel="noopener noreferrer"><?=h($downloadButton['label'])?></a><?php endif; ?><div class="speaker-audio__frame" hidden></div></div><?php endif; ?>
+        <?php if($streamUrl || $downloadUrl): ?><div class="speaker-audio"><?php if($streamUrl): ?><button class="speaker-audio__load <?=h(cms_action_classes($playerButton))?>" type="button" data-speaker-audio="<?=h($streamUrl)?>" data-open-label="<?=h($playerButton['label'])?>" aria-expanded="false"><?=h($playerButton['label'])?></button><?php endif; ?><?php if($downloadUrl): ?><a class="speaker-audio__download <?=h(cms_action_classes($downloadButton))?>" href="<?=h($downloadUrl)?>" target="_blank" rel="noopener noreferrer"><?=h($downloadButton['label'])?></a><?php endif; ?><div class="speaker-audio__frame" hidden></div></div><?php endif; ?>
       </div>
     </article>
   <?php endforeach; ?>
   <?=cms_actions_html(cms_page_actions($content,'speakers'))?>
-  <script defer src="/speakers-audio.js?v=5"></script>
+  <script defer src="/speakers-audio.js?v=6"></script>
 <?php }
 
 if ($section === 'services') { $data = $content['services'] ?? []; ?>

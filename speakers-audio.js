@@ -17,7 +17,7 @@ document.addEventListener('click', (event) => {
     return;
   }
   const source = button.dataset.speakerAudio;
-  if (!/^https:\/\/drive\.google\.com\/uc\?export=download&id=[A-Za-z0-9_-]+(?:&resourcekey=[A-Za-z0-9_-]+)?$/.test(source || '')) return;
+  if (!/^\/public\.php\?speaker_audio=[A-Za-z0-9_-]{1,40}$/.test(source || '')) return;
 
   const player = document.createElement('audio');
   player.controls = true;

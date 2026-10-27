@@ -249,6 +249,13 @@ function cms_speaker_download_url(array $speaker): string {
     }
     return $download;
 }
+function cms_speaker_audio_stream_url(array $speaker): string {
+    $id = $speaker['id'] ?? '';
+    if (!is_string($id)) return '';
+    $id = cms_text($id, 40);
+    if (!preg_match('/^[A-Za-z0-9_-]{1,40}$/', $id) || cms_speaker_download_url($speaker) === '') return '';
+    return '/public.php?speaker_audio=' . rawurlencode($id);
+}
 function cms_html_attribute(string $attributes, string $name): string {
     if (!preg_match('/\b' . preg_quote($name, '/') . '\s*=\s*(["\'])(.*?)\1/iu', $attributes, $match)) return '';
     return html_entity_decode($match[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
