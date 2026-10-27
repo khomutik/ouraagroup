@@ -17,7 +17,7 @@ document.addEventListener('click', (event) => {
     return;
   }
   const source = button.dataset.speakerAudio;
-  if (!/^\/public\.php\?speaker_audio=[A-Za-z0-9_-]{1,40}$/.test(source || '')) return;
+  if (!/^\/speaker-audio\/[A-Za-z0-9_-]{1,40}$/.test(source || '')) return;
 
   const player = document.createElement('audio');
   player.controls = true;

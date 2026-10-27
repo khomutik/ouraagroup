@@ -20,4 +20,8 @@ for (const name of ['deploy/Caddyfile.vdsina-1063655', 'server/Caddyfile']) {
   assert.match(caddyfile, /handle \/nafanya-zoom-control\/logout[\s\S]{0,180}rewrite \* \/nafanya-logout/, `${name}: cookie-scoped logout must reach PHP revocation before the Zoom proxy`);
 }
 
+const deployedCaddyfile = fs.readFileSync(path.join(__dirname, '..', 'deploy/Caddyfile.vdsina-1063655'), 'utf8');
+assert.equal((deployedCaddyfile.match(/@speaker_audio path_regexp/g) || []).length, 2, 'Production and preview hosts must route speaker audio through PHP.');
+assert.equal((deployedCaddyfile.match(/rewrite \* \/public\.php\?speaker_audio=\{re\.speaker_audio\.1\}/g) || []).length, 2, 'Speaker audio proxy must forward only the validated path ID.');
+
 console.log('Caddy source-disclosure and visitor-IP checks passed.');

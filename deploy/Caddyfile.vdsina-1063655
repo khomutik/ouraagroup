@@ -41,6 +41,14 @@ pochtinormalnye.ru {
         }
     }
 
+    @speaker_audio path_regexp speaker_audio ^/speaker-audio/([A-Za-z0-9_-]{1,40})$
+    handle @speaker_audio {
+        rewrite * /public.php?speaker_audio={re.speaker_audio.1}
+        reverse_proxy 127.0.0.1:8091 {
+            header_up X-PN-Client-IP {http.request.remote.host}
+        }
+    }
+
     @private path /.git* /.agents* /.codex* /.gitignore /.htaccess /README.md /admin/.htaccess *.php /cms-data* /cms-backups* /support-chat-worker*
     handle @private {
         respond 404
@@ -104,6 +112,14 @@ site.194-60-132-53.nip.io {
             transport http {
                 tls_server_name pochtinormalnye.ru
             }
+        }
+    }
+
+    @speaker_audio path_regexp speaker_audio ^/speaker-audio/([A-Za-z0-9_-]{1,40})$
+    handle @speaker_audio {
+        rewrite * /public.php?speaker_audio={re.speaker_audio.1}
+        reverse_proxy 127.0.0.1:8091 {
+            header_up X-PN-Client-IP {http.request.remote.host}
         }
     }
 

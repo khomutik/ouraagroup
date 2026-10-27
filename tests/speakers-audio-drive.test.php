@@ -11,7 +11,7 @@ $preview = cms_speaker_preview_url($speaker);
 $download = cms_speaker_download_url($speaker);
 if (!str_contains($preview, '/LIGHT_ID/preview')) throw new RuntimeException('Архивный предпросмотр должен брать облегчённую копию.');
 if ($download !== 'https://drive.google.com/uc?export=download&id=LIGHT_ID') throw new RuntimeException('Скачивание должно вести к облегчённой копии.');
-if (cms_speaker_audio_stream_url($speaker) !== '/public.php?speaker_audio=speaker_123') throw new RuntimeException('Встроенный плеер должен использовать адрес защищённого потока на сайте.');
+if (cms_speaker_audio_stream_url($speaker) !== '/speaker-audio/speaker_123') throw new RuntimeException('Встроенный плеер должен использовать адрес защищённого потока на сайте.');
 if (cms_speaker_audio_stream_url(['id'=>'bad id', 'audio_url'=>$speaker['audio_url']]) !== '') throw new RuntimeException('Для потока нужно безопасное ID записи.');
 if (cms_speaker_audio_stream_url(['id'=>['bad'], 'audio_url'=>$speaker['audio_url']]) !== '') throw new RuntimeException('Для потока ID записи должен быть текстом.');
 echo "Speaker audio player and download use the same lightweight Drive file.\n";

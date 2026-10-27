@@ -254,7 +254,7 @@ function cms_speaker_audio_stream_url(array $speaker): string {
     if (!is_string($id)) return '';
     $id = cms_text($id, 40);
     if (!preg_match('/^[A-Za-z0-9_-]{1,40}$/', $id) || cms_speaker_download_url($speaker) === '') return '';
-    return '/public.php?speaker_audio=' . rawurlencode($id);
+    return '/speaker-audio/' . rawurlencode($id);
 }
 function cms_html_attribute(string $attributes, string $name): string {
     if (!preg_match('/\b' . preg_quote($name, '/') . '\s*=\s*(["\'])(.*?)\1/iu', $attributes, $match)) return '';
