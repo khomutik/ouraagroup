@@ -21,10 +21,11 @@ document.addEventListener('click', (event) => {
 
   const player = document.createElement('audio');
   player.controls = true;
-  player.preload = 'none';
+  player.preload = 'metadata';
   player.src = source;
   player.setAttribute('aria-label', 'Прослушивание спикерской');
   frame.append(player);
+  player.load();
   frame.hidden = false;
   button.setAttribute('aria-expanded', 'true');
   button.textContent = 'Закрыть плеер';

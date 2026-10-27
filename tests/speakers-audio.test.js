@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-assert.match(fs.readFileSync(path.join(__dirname, '..', 'public.php'), 'utf8'), /speakers-audio\.js\?v=7/, 'The changed player URL must bypass stale browser caches.');
+assert.match(fs.readFileSync(path.join(__dirname, '..', 'public.php'), 'utf8'), /speakers-audio\.js\?v=8/, 'The changed player URL must bypass stale browser caches.');
 
 let clickHandler;
 const frame = {
@@ -41,8 +41,9 @@ clickHandler({target: {closest: () => button}});
 assert.equal(frame.children.length, 1);
 assert.equal(frame.children[0].src, button.dataset.speakerAudio);
 assert.equal(frame.children[0].controls, true);
-assert.equal(frame.children[0].preload, 'none');
+assert.equal(frame.children[0].preload, 'metadata');
 assert.equal(frame.children[0].attributes['aria-label'], 'Прослушивание спикерской');
+assert.equal(frame.children[0].loaded, true, 'The browser should prepare the player when it is opened.');
 assert.equal(button.getAttribute('aria-expanded'), 'true');
 const player = frame.children[0];
 clickHandler({target: {closest: () => button}});
