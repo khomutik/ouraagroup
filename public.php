@@ -135,12 +135,12 @@ if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms
           <div><dt>Спикер</dt><dd><?=h($item['speaker']??'')?></dd></div>
           <?php foreach(['city'=>'Город','home_group'=>'Домашняя группа','sobriety'=>'Трезвость'] as $key=>$label): if (!empty($item[$key])): ?><div><dt><?=h($label)?></dt><dd><?=h($item[$key])?></dd></div><?php endif; endforeach; ?>
         </dl>
-        <?php if($previewUrl || $downloadUrl): ?><div class="speaker-audio"><?php if($previewUrl): ?><button class="speaker-audio__load <?=h(cms_action_classes($playerButton))?>" type="button" data-speaker-preview="<?=h($previewUrl)?>" data-open-label="<?=h($playerButton['label'])?>" aria-expanded="false"><?=h($playerButton['label'])?></button><?php endif; ?><?php if($downloadUrl): ?><a class="speaker-audio__download <?=h(cms_action_classes($downloadButton))?>" href="<?=h($downloadUrl)?>" target="_blank" rel="noopener noreferrer"><?=h($downloadButton['label'])?></a><?php endif; ?><div class="speaker-audio__frame" hidden></div></div><?php endif; ?>
+        <?php if($previewUrl || $downloadUrl): ?><div class="speaker-audio"><?php if($downloadUrl): ?><button class="speaker-audio__load <?=h(cms_action_classes($playerButton))?>" type="button" data-speaker-audio="<?=h($downloadUrl)?>" data-open-label="<?=h($playerButton['label'])?>" aria-expanded="false"><?=h($playerButton['label'])?></button><?php endif; ?><?php if($downloadUrl): ?><a class="speaker-audio__download <?=h(cms_action_classes($downloadButton))?>" href="<?=h($downloadUrl)?>" target="_blank" rel="noopener noreferrer"><?=h($downloadButton['label'])?></a><?php endif; ?><div class="speaker-audio__frame" hidden></div></div><?php endif; ?>
       </div>
     </article>
   <?php endforeach; ?>
   <?=cms_actions_html(cms_page_actions($content,'speakers'))?>
-  <script defer src="/speakers-audio.js?v=4"></script>
+  <script defer src="/speakers-audio.js?v=5"></script>
 <?php }
 
 if ($section === 'services') { $data = $content['services'] ?? []; ?>
