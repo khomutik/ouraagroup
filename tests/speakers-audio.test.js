@@ -3,6 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
+assert.match(fs.readFileSync(path.join(__dirname, '..', 'public.php'), 'utf8'), /speakers-audio\.js\?v=7/, 'The changed player URL must bypass stale browser caches.');
+
 let clickHandler;
 const frame = {
   hidden: true,

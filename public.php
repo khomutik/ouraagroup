@@ -147,7 +147,7 @@ if ($section === 'speakers') { $data = $content['speakers'] ?? []; $driveUrl=cms
     </article>
   <?php endforeach; ?>
   <?=cms_actions_html(cms_page_actions($content,'speakers'))?>
-  <script defer src="/speakers-audio.js?v=6"></script>
+  <script defer src="/speakers-audio.js?v=7"></script>
 <?php }
 
 if ($section === 'services') { $data = $content['services'] ?? []; ?>
