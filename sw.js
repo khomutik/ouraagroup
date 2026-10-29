@@ -8,7 +8,7 @@ const APP_SHELL = [
   "./tradition.html",
   "./robots.txt",
   "./sitemap.xml",
-  "./styles.css?v=126",
+  "./styles.css?v=127",
   "./site-nav.js?v=22",
   "./pwa-install.js?v=12",
   "./site-chat.js?v=7",
