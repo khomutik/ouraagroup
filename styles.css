@@ -2675,7 +2675,7 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 }
 .site-chat__panel{
   position:absolute;
-  right:0;
+  right:62px;
   bottom:64px;
   display:grid;
   grid-template-rows:auto minmax(150px,1fr) auto auto;
@@ -2769,7 +2769,7 @@ h1,h2,h3,.page-title,.quick-action strong,.menu-button strong,.site-nav__summary
 }
 @media(max-width:520px){
   .site-chat__launcher{width:48px;height:48px;min-height:48px;padding:0}
-  .site-chat__panel{position:fixed;inset:8px 8px calc(72px + env(safe-area-inset-bottom));width:auto;height:auto;border-radius:15px}
+  .site-chat__panel{position:fixed;inset:8px 68px calc(72px + env(safe-area-inset-bottom)) 8px;width:auto;height:auto;border-radius:15px}
   .site-chat__messages{padding:12px}
 }
 @media(prefers-reduced-motion:no-preference){
