@@ -40,3 +40,24 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run typecheck
+
+  deploy:
+    needs: [site, chat]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Подготовить SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.PRODUCTION_DEPLOY_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/site-deploy
+          chmod 600 ~/.ssh/site-deploy
+          printf '%s\n' '194.60.132.53 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDJ9IYnAVvgMgWqSN5KcmKZFSQDKUv3602QMSH2IbLBy' > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+      - name: Обновить сайт на сервере
+        run: git archive --format=tar "$GITHUB_SHA" | ssh -T -i ~/.ssh/site-deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes site-deploy@194.60.132.53
