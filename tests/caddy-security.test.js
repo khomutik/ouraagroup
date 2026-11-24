@@ -24,4 +24,12 @@ const deployedCaddyfile = fs.readFileSync(path.join(__dirname, '..', 'deploy/Cad
 assert.equal((deployedCaddyfile.match(/@speaker_audio path_regexp/g) || []).length, 2, 'Production and preview hosts must route speaker audio through PHP.');
 assert.equal((deployedCaddyfile.match(/rewrite \* \/public\.php\?speaker_audio=\{re\.speaker_audio\.1\}/g) || []).length, 2, 'Speaker audio proxy must forward only the validated path ID.');
 
+const nafanyaProxyBlocks = deployedCaddyfile.match(/reverse_proxy https:\/\/91\.84\.122\.244 \{[^}]*\}\s*\}/g) || [];
+assert.equal(nafanyaProxyBlocks.length, 4, 'Zoom and MAX must share the verified upstream on both hosts.');
+for (const proxy of nafanyaProxyBlocks) {
+  assert.match(proxy, /header_up Host pochtinormalnye\.ru\b/);
+  assert.match(proxy, /tls_server_name today\.khomutik\.ru\b/);
+  assert.doesNotMatch(proxy, /tls_insecure_skip_verify/);
+}
+
 console.log('Caddy source-disclosure and visitor-IP checks passed.');
