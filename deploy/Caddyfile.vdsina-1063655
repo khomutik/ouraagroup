@@ -1,3 +1,4 @@
+# The Zoom/MAX backend certificate renews on today.khomutik.ru. Keep the public Host for routing.
 194-60-132-53.nip.io {
     root * /srv/vdsina-test
     header Cache-Control "no-store"
@@ -17,7 +18,7 @@ pochtinormalnye.ru {
         reverse_proxy https://91.84.122.244 {
             header_up Host pochtinormalnye.ru
             transport http {
-                tls_server_name pochtinormalnye.ru
+                tls_server_name today.khomutik.ru
             }
         }
     }
@@ -36,7 +37,7 @@ pochtinormalnye.ru {
         reverse_proxy https://91.84.122.244 {
             header_up Host pochtinormalnye.ru
             transport http {
-                tls_server_name pochtinormalnye.ru
+                tls_server_name today.khomutik.ru
             }
         }
     }
@@ -91,7 +92,7 @@ site.194-60-132-53.nip.io {
         reverse_proxy https://91.84.122.244 {
             header_up Host pochtinormalnye.ru
             transport http {
-                tls_server_name pochtinormalnye.ru
+                tls_server_name today.khomutik.ru
             }
         }
     }
@@ -110,7 +111,7 @@ site.194-60-132-53.nip.io {
         reverse_proxy https://91.84.122.244 {
             header_up Host pochtinormalnye.ru
             transport http {
-                tls_server_name pochtinormalnye.ru
+                tls_server_name today.khomutik.ru
             }
         }
     }
